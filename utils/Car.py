@@ -2,6 +2,8 @@ from typing import List
 
 
 class Car:
+    id: int = 0
+
     def __init__(self, dist: List[float], velocity: float, dest: str, car_type: str):
         """
         Represents a car in the simulation.
@@ -14,3 +16,5 @@ class Car:
         self.velocity = velocity
         self.dest = dest
         self.car_type = car_type
+        self.id = Car.id
+        Car.id += 1
