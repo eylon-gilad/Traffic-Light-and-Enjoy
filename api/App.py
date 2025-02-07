@@ -1,8 +1,9 @@
 # app.py
-import FastAPI
+from fastapi import FastAPI
 from typing import List
-from utils.Junction import Junction
 from utils.Road import Road
+from utils.RoadEnum import RoadEnum
+from utils.Junction import Junction
 from utils.TrafficLight import TrafficLight
 from utils.Car import Car
 
@@ -23,7 +24,7 @@ def get_full_simulation_state():
             "total_roads": len(junction.roads),
             "roads": [
                 {
-                    "road_index": idx,
+                    "road_index": RoadEnum(idx).name,
                     "num_lanes": len(road.lanes),
                     "congestion_level": get_road_congestion(road),
                     "lanes": [

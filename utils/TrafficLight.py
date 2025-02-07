@@ -1,6 +1,6 @@
 from typing import List
 
-from Lane import Lane
+from utils.Lane import Lane
 
 
 class TrafficLight:

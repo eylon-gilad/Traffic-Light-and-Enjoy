@@ -1,6 +1,6 @@
 from typing import List
 
-from Road import Road
+from utils.Road import Road
 
 
 class Junction:

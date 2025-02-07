@@ -1,6 +1,6 @@
 from typing import List
 
-import Car
+from utils.Car import Car
 
 
 class Lane:
