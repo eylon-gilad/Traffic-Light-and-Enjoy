@@ -4,16 +4,20 @@ from utils.Road import Road
 
 
 class Junction:
-    id: int = 0
 
-    def __init__(self):
+    def __init__(self, id: int = 0, roads: List[Road] = []):
         """
         Represents a traffic junction where roads meet.
         """
-        self.roads: List[Road] = []
-        self.id = Junction.id
-        Junction.id += 1
+        self.roads: List[Road] = roads
+        self.id = id
 
-    def add_road(self, road: Road):
-        """Adds a road to the junction."""
-        self.roads.append(road)
+    def set_roads(self, roads: List[Road]) -> None:
+        """Sets the roads connected to the junction."""
+        self.roads = roads
+
+    def get_id(self) -> int:
+        return self.id
+
+    def get_roads(self) -> List[Road]:
+        return self.roads

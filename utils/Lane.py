@@ -4,16 +4,20 @@ from utils.Car import Car
 
 
 class Lane:
-    id: int = 0
 
-    def __init__(self):
+    def __init__(self, id: int = 0, cars: List[Car] = []):
         """
         Represents a lane on a road where cars drive.
         """
         self.cars: List[Car] = []
-        self.id = Lane.id
-        Lane.id += 1
+        self.id = id
 
-    def add_car(self, car: Car):
-        """Adds a car to the lane."""
-        self.cars.append(car)
+    def set_cars(self, cars: List[Car]) -> None:
+        """Sets the cars in the lane."""
+        self.cars = cars
+
+    def get_cars(self) -> List[Car]:
+        return self.cars
+
+    def get_id(self) -> int:
+        return self.id

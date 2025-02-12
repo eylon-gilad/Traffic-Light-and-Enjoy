@@ -2,9 +2,9 @@ from typing import List
 
 
 class Car:
-    id: int = 0
-
-    def __init__(self, dist: List[float], velocity: float, dest: str, car_type: str):
+    def __init__(
+        self, id: int, dist: List[float], velocity: float, dest: str, car_type: str
+    ):
         """
         Represents a car in the simulation.
         :param dist: List of distances from the junction.
@@ -12,9 +12,36 @@ class Car:
         :param dest: Destination road ID.
         :param car_type: Type of the car ('CAR', 'AMBULANCE', or 'PEDESTRIAN').
         """
+        self.id = id
+        self.id = Car.id
         self.dist = dist
         self.velocity = velocity
         self.dest = dest
         self.car_type = car_type
-        self.id = Car.id
-        Car.id += 1
+
+    def get_id(self) -> int:
+        return self.id
+
+    def get_dist(self) -> List[float]:
+        return self.dist
+
+    def get_velocity(self) -> float:
+        return self.velocity
+
+    def get_dest(self) -> str:
+        return self.dest
+
+    def get_car_type(self) -> str:
+        return self.car_type
+
+    def set_dist(self, dist: List[float]) -> None:
+        self.dist = dist
+
+    def set_velocity(self, velocity: float) -> None:
+        self.velocity = velocity
+
+    def set_dest(self, dest: str) -> None:
+        self.dest = dest
+
+    def set_car_type(self, car_type: str) -> None:
+        self.car_type = car_type
