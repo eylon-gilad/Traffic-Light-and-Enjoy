@@ -1,16 +1,20 @@
 from typing import List
 
 from utils.Road import Road
+from utils.TrafficLight import TrafficLight
 
 
 class Junction:
 
-    def __init__(self, id: int = 0, roads: List[Road] = []):
+    def __init__(self, id: int = 0, traffic_lights: List[TrafficLight] = [], roads: List[Road] = []):
         """
         Represents a traffic junction where roads meet.
         """
         self.roads: List[Road] = roads
         self.id = id
+
+    def set_traffic_lights(self, traffic_lights: List[TrafficLight]) -> None:
+        self.traffic_lights = traffic_lights
 
     def set_roads(self, roads: List[Road]) -> None:
         """Sets the roads connected to the junction."""
@@ -21,3 +25,7 @@ class Junction:
 
     def get_roads(self) -> List[Road]:
         return self.roads
+
+    def get_traffic_lights(self) -> List[TrafficLight]:
+        return self.traffic_lights
+
