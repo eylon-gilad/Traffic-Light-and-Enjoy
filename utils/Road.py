@@ -32,3 +32,8 @@ class Road:
 
     def set_congection_level(self, congection_level: int) -> None:
         self.congection_level = congection_level
+
+    def __str__(self):
+        lanes_str = ", ".join(str(lane) for lane in self.lanes)
+        return (f"Road(id={self.id}, "
+                f"congection_level=[{self.congection_level}], lanes=[{lanes_str}])")

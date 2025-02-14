@@ -5,10 +5,10 @@ from utils.TrafficLight import TrafficLight
 
 class Junction:
     def __init__(
-        self,
-        id: int = 0,
-        traffic_lights: List[TrafficLight] = [],
-        roads: List[Road] = [],
+            self,
+            id: int = 0,
+            traffic_lights: List[TrafficLight] = [],
+            roads: List[Road] = [],
     ) -> None:
         """
         Represents a traffic junction where roads meet.

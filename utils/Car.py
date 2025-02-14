@@ -1,3 +1,5 @@
+
+
 from typing import List
 
 
@@ -46,3 +48,7 @@ class Car:
 
     def set_car_type(self, car_type: str) -> None:
         self.car_type = car_type
+
+    def __str__(self) -> str:
+        return (f"Car(id={self.id}, dist={self.dist}, "
+                f"velocity={self.velocity}, dest='{self.dest}', car_type='{self.car_type}')")
