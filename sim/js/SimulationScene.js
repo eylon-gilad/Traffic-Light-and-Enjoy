@@ -33,7 +33,8 @@ export default class SimulationScene extends Phaser.Scene {
     // Create the four roads.
     this.roads = createRoads(this.centerX, this.centerY, this.canvasWidth, this.canvasHeight, this.roadWidth);
 
-    // Setup simple traffic lights (toggle every few seconds).
+    // Setup simple traffic lights.
+    // For NS roads, nsTrafficLight is defined; for EW roads, ewTrafficLight is defined.
     this.roads.forEach((road) => {
       if (road.id === "north" || road.id === "south") {
         road.nsTrafficLight = {
@@ -62,16 +63,54 @@ export default class SimulationScene extends Phaser.Scene {
       loop: true,
     });
 
-    // Toggle traffic lights every 4 seconds.
-    this.time.addEvent({
-      delay: 4000,
-      callback: () => {
+    // Define the traffic–light cycle function using an arrow function to bind 'this'
+    this.scheduleTrafficLightsCycle = () => {
+      // At t = 0s: NS green, EW red.
+      this.roads.forEach((road) => {
+        if (road.id === "north" || road.id === "south") {
+          if (road.nsTrafficLight) road.nsTrafficLight.state = true;
+        } else {
+          if (road.ewTrafficLight) road.ewTrafficLight.state = false;
+        }
+      });
+
+      // At t = 3s: both red.
+      this.time.delayedCall(3000, () => {
         this.roads.forEach((road) => {
-          if (road.nsTrafficLight) road.nsTrafficLight.toggle();
-          if (road.ewTrafficLight) road.ewTrafficLight.toggle();
+          if (road.nsTrafficLight) road.nsTrafficLight.state = false;
+          if (road.ewTrafficLight) road.ewTrafficLight.state = false;
         });
-      },
-      loop: true,
+      }, [], this);
+
+      // At t = 4s: NS red, EW green.
+      this.time.delayedCall(4000, () => {
+        this.roads.forEach((road) => {
+          if (road.id === "north" || road.id === "south") {
+            if (road.nsTrafficLight) road.nsTrafficLight.state = false;
+          } else {
+            if (road.ewTrafficLight) road.ewTrafficLight.state = true;
+          }
+        });
+      }, [], this);
+
+      // At t = 7s: both red.
+      this.time.delayedCall(7000, () => {
+        this.roads.forEach((road) => {
+          if (road.nsTrafficLight) road.nsTrafficLight.state = false;
+          if (road.ewTrafficLight) road.ewTrafficLight.state = false;
+        });
+      }, [], this);
+    };
+
+    // Run the cycle immediately.
+    this.scheduleTrafficLightsCycle();
+
+    // Then schedule it to repeat every 8 seconds.
+    this.time.addEvent({
+      delay: 8000,
+      callback: this.scheduleTrafficLightsCycle,
+      callbackScope: this,
+      loop: true
     });
 
     // Setup control panel buttons (pause and reset).
