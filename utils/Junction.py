@@ -36,3 +36,9 @@ class Junction:
     def set_roads(self, roads: List[Road]) -> None:
         """Sets the roads connected to the junction."""
         self.roads = roads
+
+    def __str__(self) -> str:
+        roads_str = ", ".join(str(road) for road in self.roads)
+        tls_str = ", ".join(str(tl) for tl in self.traffic_lights)
+        return (f"Junction(id={self.id}, "
+                f"traffic_lights=[{tls_str}], roads=[{roads_str}])")
