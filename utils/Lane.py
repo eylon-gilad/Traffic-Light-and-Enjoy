@@ -26,5 +26,4 @@ class Lane:
 
     def __str__(self):
         cars_str = ", ".join(str(car) for car in self.cars)
-        return (f"Lane(id={self.id}, "
-                f"cars=[{cars_str}])")
+        return f"Lane(id={self.id}, " f"cars=[{cars_str}])"

@@ -5,10 +5,10 @@ from utils.TrafficLight import TrafficLight
 
 class Junction:
     def __init__(
-            self,
-            id: int = 0,
-            traffic_lights: List[TrafficLight] = [],
-            roads: List[Road] = [],
+        self,
+        id: int = 0,
+        traffic_lights: List[TrafficLight] = [],
+        roads: List[Road] = [],
     ) -> None:
         """
         Represents a traffic junction where roads meet.
@@ -40,5 +40,7 @@ class Junction:
     def __str__(self) -> str:
         roads_str = ", ".join(str(road) for road in self.roads)
         tls_str = ", ".join(str(tl) for tl in self.traffic_lights)
-        return (f"Junction(id={self.id}, "
-                f"traffic_lights=[{tls_str}], roads=[{roads_str}])")
+        return (
+            f"Junction(id={self.id}, "
+            f"traffic_lights=[{tls_str}], roads=[{roads_str}])"
+        )

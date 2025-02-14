@@ -36,14 +36,17 @@ def get_full_simulation_state():
                                     "dist": car.dist,
                                     "velocity": car.velocity,
                                     "dest": car.dest,
-                                    "car_type": car.car_type
-                                } for car in lane.cars
-                            ]
-                        } for lane_idx, lane in enumerate(road.lanes)
-                    ]
-                } for idx, road in enumerate(junction.roads)
-            ]
-        }
+                                    "car_type": car.car_type,
+                                }
+                                for car in lane.cars
+                            ],
+                        }
+                        for lane_idx, lane in enumerate(road.lanes)
+                    ],
+                }
+                for idx, road in enumerate(junction.roads)
+            ],
+        },
     }
     return state
 
@@ -60,11 +63,21 @@ def add_road(num_lanes: int):
 def toggle_traffic_light():
     """Toggles the traffic light state."""
     traffic_light.toggle()
-    return {"message": "Traffic light toggled", "new_state": "Green" if traffic_light.state else "Red"}
+    return {
+        "message": "Traffic light toggled",
+        "new_state": "Green" if traffic_light.state else "Red",
+    }
 
 
 @app.post("/lanes/cars")
-def add_car(road_index: int, lane_index: int, dist: List[float], velocity: float, dest: str, car_type: str):
+def add_car(
+    road_index: int,
+    lane_index: int,
+    dist: List[float],
+    velocity: float,
+    dest: str,
+    car_type: str,
+):
     """Adds a car to a specified lane."""
     if road_index >= len(junction.roads):
         return {"error": "Invalid road index."}

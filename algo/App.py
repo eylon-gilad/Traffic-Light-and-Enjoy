@@ -99,7 +99,6 @@ def get_traffic_light_state() -> Response:
     Returns the current state of all traffic lights in the junction.
     If the junction is not yet set, returns an error.
     """
-    print([traffic_light.__str__() for traffic_light in alg.get_current_state()])
 
     global junction
 
@@ -107,7 +106,7 @@ def get_traffic_light_state() -> Response:
         return jsonify({"error": "Junction not set yet."}, 400)
 
     traffic_light_states: List[Dict[str, Any]] = []
-    for tl in junction.get_traffic_lights():
+    for tl in alg.get_current_state():
         traffic_light_states.append(
             {
                 "traffic_light_index": tl.get_id(),

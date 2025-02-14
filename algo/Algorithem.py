@@ -34,7 +34,7 @@ class TrafficLightController:
 
 
 class AlgoRunner:
-    def __init__(self, junction:Junction):
+    def __init__(self, junction: Junction):
         self.controller = TrafficLightController(junction)
 
     def run(self):
