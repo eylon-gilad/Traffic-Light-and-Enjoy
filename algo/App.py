@@ -1,7 +1,7 @@
 from flask import Flask, request
 from utils.Junction import Junction
 from utils.Road import Road
-# from utils.RoadEnum import RoadEnum
+from utils.RoadEnum import RoadEnum
 from utils.Lane import Lane
 from utils.Car import Car
 from utils.TrafficLight import TrafficLight
