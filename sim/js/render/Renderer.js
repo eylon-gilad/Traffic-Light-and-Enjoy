@@ -110,7 +110,8 @@ export default class Renderer {
   }
 
   updateCarSprites() {
-    const usedSprites = new Set();
+    // Instead of iterating over container children and hiding unused sprites,
+    // we update or create a sprite for every car.
     this.roads.forEach((road) => {
       road.lanes.forEach((lane) => {
         lane.cars.forEach((car) => {
@@ -132,8 +133,6 @@ export default class Renderer {
           }
           sprite.setPosition(cx, cy);
           // Instead of rotating 180°, we determine whether to flip horizontally.
-          // For roads with an angle whose absolute value is greater than 90° (i.e. > π/2),
-          // we flip horizontally and set rotation to 0.
           if (Math.abs(road.angle) > Math.PI / 2) {
             sprite.setFlipX(true);
             sprite.setRotation(0);
@@ -141,21 +140,13 @@ export default class Renderer {
             sprite.setFlipX(false);
             sprite.setRotation(road.angle);
           }
-          usedSprites.add(sprite);
+          // Always mark the sprite as active and visible.
+          sprite.setActive(true);
+          sprite.setVisible(true);
         });
       });
     });
-    // Hide sprites that are not used.
-    this.carSpriteContainer.iterate((child) => {
-      if (!usedSprites.has(child)) {
-        child.setActive(false);
-        child.setVisible(false);
-        this.spritePool.push(child);
-      } else {
-        child.setActive(true);
-        child.setVisible(true);
-      }
-    });
+    // Do not hide any sprite in the container—this ensures all car sprites remain visible.
   }
 
   /**
