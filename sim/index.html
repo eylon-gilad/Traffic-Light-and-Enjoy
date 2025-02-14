@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Road Simulation</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <!-- The simulation canvas -->
-  <canvas id="simulation"></canvas>
-
-  <!-- Include all JS files in order -->
-  <script src="classes.js"></script>
-  <script src="simulation.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Advanced Traffic Simulation</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- Load Phaser from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.86.0/dist/phaser.js"></script>
+  </head>
+  <body>
+    <div id="controls">
+      <button id="toggleBtn">Toggle Simulation</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+    <!-- Main module -->
+    <script type="module" src="js/main.js"></script>
+  </body>
 </html>
