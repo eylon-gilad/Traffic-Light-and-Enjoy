@@ -17,6 +17,7 @@ junction: Optional[Junction] = None
 alg: AlgoRunner = None
 
 
+# TODO move this file to the api folder
 @app.route("/junction-info", methods=["POST"])
 def post_junction_info() -> Response:
     """

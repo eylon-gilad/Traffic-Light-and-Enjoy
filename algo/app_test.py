@@ -1,7 +1,7 @@
 import requests
 import time
 from typing import Dict, Any
-
+# TODO move this file to the api folder
 # Large dummy data with 4 roads, multiple lanes, traffic lights, etc.
 dummy_data: Dict[str, Any] = {
     "junction": {
