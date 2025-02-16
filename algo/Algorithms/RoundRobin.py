@@ -1,9 +1,10 @@
 import time
 from utils import Junction, TrafficLight
 from typing import List
+from algo.Algorithms.BaseAlgorithm import BaseAlgorithm
 
 
-class RoundRobinController:
+class RoundRobinController(BaseAlgorithm):
     """
     Controls traffic lights in a junction
     """
@@ -14,18 +15,20 @@ class RoundRobinController:
         :param junction: object that represents a junction
         """
 
+        super().__init__()
         self.junction = junction
-        self.current_traffic_light_id = self.junction.get_traffic_lights()[0].id
+        self.current_traffic_light_id = 0
         self.time_interval = 5
 
     def start(self):
         """
         Starts the algorithm
         """
+        self.current_traffic_light_id = self.junction.get_traffic_lights()[0].id
 
         while True:
             lights: List[TrafficLight] = self.junction.get_traffic_lights()
-
+            print(self.junction)
             for light in lights:
                 if light.id == self.current_traffic_light_id:
                     light.state = True
@@ -47,9 +50,9 @@ class RoundRobinController:
             if light.id == self.current_traffic_light_id:
                 return lights[(i + 1) % len(lights)].id
 
-    def get_current_state(self):
-        """
-        Get the current state of the traffic lights - red or green
-        """
-
-        return self.junction.get_traffic_lights()
+    # def get_current_state(self):
+    #     """
+    #     Get the current state of the traffic lights - red or green
+    #     """
+    #
+    #     return self.junction.get_traffic_lights()

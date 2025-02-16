@@ -1,3 +1,4 @@
+import time
 from typing import Any, Dict, List, Optional
 
 from flask import Flask, request, jsonify, Response
@@ -8,7 +9,8 @@ from utils.Lane import Lane
 from utils.Road import Road
 from utils.TrafficLight import TrafficLight
 
-from Algorithem import AlgoRunner
+from algo.AlgoRunner import AlgoRunner
+from algo.Algorithms import BaseAlgorithm
 
 app = Flask(__name__)
 
@@ -89,6 +91,10 @@ def post_junction_info() -> Response:
     junction_id: int = junction_data.get("id", 0)
     junction = Junction(id=junction_id, traffic_lights=traffic_lights, roads=roads)
 
+    # alg = AlgoRunner(junction)
+    # alg.run()
+
+    alg.set_junction_info(junction)
     return jsonify({"message": "Junction information updated successfully."}, 200)
 
 
@@ -96,13 +102,10 @@ def post_junction_info() -> Response:
 def start_algorithm() -> Response:
     global junction, alg
 
-    if junction is None:
-        return jsonify({"error": "Junction not set yet."}, 400)
-
     alg = AlgoRunner(junction)
     alg.run()
 
-    return jsonify({"message": "Algorithm started successfully."}, 200)
+    return jsonify({"message": "Algorithm runner started successfully."}, 200)
 
 
 @app.route("/traffic-light-state", methods=["GET"])
