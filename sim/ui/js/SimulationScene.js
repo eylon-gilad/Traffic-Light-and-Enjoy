@@ -19,6 +19,7 @@ export default class SimulationScene extends Phaser.Scene {
     this.load.image("carSprite5", "assets/car5.png");
     this.load.image("carSprite6", "assets/car6.png");
     this.load.image("carSprite7", "assets/car7.png");
+    this.load.image("carSprite8", "assets/car8.png")
   }
 
   create() {

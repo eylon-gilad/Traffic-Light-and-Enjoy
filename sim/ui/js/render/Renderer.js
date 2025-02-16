@@ -124,7 +124,7 @@ export default class Renderer {
           if (!sprite) {
             sprite = this.getSpriteFromPool();
             // Choose one of the car sprites randomly.
-            const spriteIndex = Math.floor(Math.random() * 7) + 1;
+            const spriteIndex = Math.floor(Math.random() * 8) + 1;
             sprite.setTexture(`carSprite${spriteIndex}`);
             // Enlarge the car sprite.
             sprite.setDisplaySize(96, 72);
