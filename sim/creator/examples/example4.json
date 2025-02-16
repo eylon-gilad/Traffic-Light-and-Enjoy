@@ -1,0 +1,287 @@
+{
+    "junction": {
+        "junction_index": 1,
+        "total_roads": 4,
+        "roads": [
+            {
+                "road_index": 1,
+                "num_lanes": 3,
+                "lanes": [
+                    {
+                        "lane_index": 1,
+                        "cars_creation": 87
+                    },
+                    {
+                        "lane_index": 2,
+                        "cars_creation": 89
+                    },
+                    {
+                        "lane_index": 3,
+                        "cars_creation": 73
+                    }
+                ]
+            },
+            {
+                "road_index": 2,
+                "num_lanes": 3,
+                "lanes": [
+                    {
+                        "lane_index": 1,
+                        "cars_creation": 88
+                    },
+                    {
+                        "lane_index": 2,
+                        "cars_creation": 83
+                    },
+                    {
+                        "lane_index": 3,
+                        "cars_creation": 67
+                    }
+                ]
+            },
+            {
+                "road_index": 3,
+                "num_lanes": 3,
+                "lanes": [
+                    {
+                        "lane_index": 1,
+                        "cars_creation": 58
+                    },
+                    {
+                        "lane_index": 2,
+                        "cars_creation": 68
+                    },
+                    {
+                        "lane_index": 3,
+                        "cars_creation": 5
+                    }
+                ]
+            },
+            {
+                "road_index": 4,
+                "num_lanes": 3,
+                "lanes": [
+                    {
+                        "lane_index": 1,
+                        "cars_creation": 4
+                    },
+                    {
+                        "lane_index": 2,
+                        "cars_creation": 80
+                    },
+                    {
+                        "lane_index": 3,
+                        "cars_creation": 59
+                    }
+                ]
+            }
+        ],
+        "traffic_lights": [
+            {
+                "traffic_light_index": 0,
+                "input_index": [
+                    2
+                ],
+                "output_index": [
+                    2,
+                    3,
+                    0
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 1,
+                "input_index": [
+                    0
+                ],
+                "output_index": [
+                    0,
+                    1,
+                    2
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 2,
+                "input_index": [
+                    2,
+                    1,
+                    0
+                ],
+                "output_index": [
+                    2
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 3,
+                "input_index": [
+                    1,
+                    0,
+                    2
+                ],
+                "output_index": [
+                    1,
+                    2,
+                    0
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 4,
+                "input_index": [
+                    3,
+                    1,
+                    0
+                ],
+                "output_index": [
+                    3,
+                    2,
+                    1
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 5,
+                "input_index": [
+                    3,
+                    2,
+                    1
+                ],
+                "output_index": [
+                    3
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 6,
+                "input_index": [
+                    0,
+                    2
+                ],
+                "output_index": [
+                    1
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 7,
+                "input_index": [
+                    1,
+                    3
+                ],
+                "output_index": [
+                    3,
+                    2,
+                    1
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 8,
+                "input_index": [
+                    3
+                ],
+                "output_index": [
+                    2,
+                    3,
+                    1
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 9,
+                "input_index": [
+                    0
+                ],
+                "output_index": [
+                    2,
+                    3
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 10,
+                "input_index": [
+                    3,
+                    1
+                ],
+                "output_index": [
+                    3,
+                    0
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 11,
+                "input_index": [
+                    1
+                ],
+                "output_index": [
+                    4
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 12,
+                "input_index": [
+                    2
+                ],
+                "output_index": [
+                    4
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 13,
+                "input_index": [
+                    3
+                ],
+                "output_index": [
+                    4
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 14,
+                "input_index": [
+                    4
+                ],
+                "output_index": [
+                    1
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 15,
+                "input_index": [
+                    4
+                ],
+                "output_index": [
+                    2
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 16,
+                "input_index": [
+                    4
+                ],
+                "output_index": [
+                    3
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 17,
+                "input_index": [
+                    4
+                ],
+                "output_index": [
+                    4
+                ],
+                "state": 0
+            }
+        ]
+    }
+}

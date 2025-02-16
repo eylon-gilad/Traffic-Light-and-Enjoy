@@ -408,7 +408,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.venv
+venv
 env/
 venv/
 ENV/
@@ -474,5 +474,5 @@ pyrightconfig.json
 # Ignore all local history of files
 .history
 .ionide
-
+.vscode/
 # End of https://www.toptal.com/developers/gitignore/api/pycharm,python,visualstudiocode,node,c++
