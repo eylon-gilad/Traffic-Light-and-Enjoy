@@ -11,12 +11,13 @@ class AlgoRunner:
         """
 
         self.controller = RoundRobinController(junction)
+        self.lock = threading.Lock()
 
     def run(self):
         """
         Runs the algorithm
         """
-
+        # with self.lock:
         thread = threading.Thread(target=self.controller.start)
         thread.start()
 
@@ -25,4 +26,9 @@ class AlgoRunner:
         Get current state of traffic lights
         """
 
-        return self.controller.get_current_state()
+        return self.controller.get_current_traffic_lights_state()
+
+    def set_junction_info(self, junction):
+        # Which algo to call.
+        with self.lock:
+            self.controller.set_junction_info(junction)

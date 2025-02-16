@@ -298,6 +298,17 @@ dummy_data: Dict[str, Any] = {
 
 POST_URL = "http://127.0.0.1:8080/junction-info"
 GET_URL = "http://127.0.0.1:8080/traffic-light-state"
+GET_START_URL = "http://127.0.0.1:8080/start-algorithm"
+
+
+def test_start_algorithm() -> None:
+    print(f"Sending GET to: {GET_START_URL}")
+    response = requests.get(GET_START_URL)
+    print("Status Code:", response.status_code)
+    try:
+        print("Response JSON:", response.json())
+    except ValueError:
+        print("Response Text:", response.text)
 
 
 def test_post_junction_info() -> None:
@@ -358,6 +369,7 @@ def repeated_get_traffic_light_state(
 
 
 if __name__ == "__main__":
+    test_start_algorithm()
     # 1. POST the large dummy data to set up the junction
     test_post_junction_info()
 
