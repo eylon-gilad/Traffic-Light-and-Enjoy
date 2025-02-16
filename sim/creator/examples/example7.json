@@ -9,15 +9,15 @@
                 "lanes": [
                     {
                         "lane_index": 1,
-                        "cars_creation": 49
+                        "cars_creation": 28
                     },
                     {
                         "lane_index": 2,
-                        "cars_creation": 86
+                        "cars_creation": 43
                     },
                     {
                         "lane_index": 3,
-                        "cars_creation": 96
+                        "cars_creation": 2
                     }
                 ]
             },
@@ -27,15 +27,15 @@
                 "lanes": [
                     {
                         "lane_index": 1,
-                        "cars_creation": 32
+                        "cars_creation": 73
                     },
                     {
                         "lane_index": 2,
-                        "cars_creation": 39
+                        "cars_creation": 10
                     },
                     {
                         "lane_index": 3,
-                        "cars_creation": 3
+                        "cars_creation": 60
                     }
                 ]
             },
@@ -45,15 +45,15 @@
                 "lanes": [
                     {
                         "lane_index": 1,
-                        "cars_creation": 63
+                        "cars_creation": 2
                     },
                     {
                         "lane_index": 2,
-                        "cars_creation": 3
+                        "cars_creation": 51
                     },
                     {
                         "lane_index": 3,
-                        "cars_creation": 80
+                        "cars_creation": 73
                     }
                 ]
             },
@@ -63,15 +63,15 @@
                 "lanes": [
                     {
                         "lane_index": 1,
-                        "cars_creation": 79
-                    },
-                    {
-                        "lane_index": 2,
                         "cars_creation": 40
                     },
                     {
+                        "lane_index": 2,
+                        "cars_creation": 34
+                    },
+                    {
                         "lane_index": 3,
-                        "cars_creation": 95
+                        "cars_creation": 2
                     }
                 ]
             }
@@ -80,37 +80,38 @@
             {
                 "traffic_light_index": 0,
                 "input_index": [
-                    1,
-                    0
+                    2,
+                    3,
+                    1
                 ],
                 "output_index": [
-                    2,
-                    1,
-                    3
+                    3,
+                    2
                 ],
                 "state": 0
             },
             {
                 "traffic_light_index": 1,
                 "input_index": [
-                    0,
-                    2
+                    3,
+                    2,
+                    0
                 ],
                 "output_index": [
-                    1,
                     3,
-                    0
+                    1,
+                    2
                 ],
                 "state": 0
             },
             {
                 "traffic_light_index": 2,
                 "input_index": [
-                    2,
-                    3
+                    3,
+                    0
                 ],
                 "output_index": [
-                    0,
+                    3,
                     1
                 ],
                 "state": 0
@@ -119,76 +120,87 @@
                 "traffic_light_index": 3,
                 "input_index": [
                     3,
-                    1,
-                    0
+                    0,
+                    2
                 ],
                 "output_index": [
-                    1
+                    0,
+                    2
                 ],
                 "state": 0
             },
             {
                 "traffic_light_index": 4,
                 "input_index": [
-                    0
+                    2,
+                    0,
+                    1
                 ],
                 "output_index": [
-                    1,
-                    2
+                    0,
+                    3,
+                    1
                 ],
                 "state": 0
             },
             {
                 "traffic_light_index": 5,
                 "input_index": [
+                    2,
                     0,
-                    1
+                    3
                 ],
                 "output_index": [
-                    1,
-                    2
+                    0
                 ],
                 "state": 0
             },
             {
                 "traffic_light_index": 6,
                 "input_index": [
-                    0
+                    1,
+                    3,
+                    2
                 ],
                 "output_index": [
-                    3
+                    3,
+                    0
                 ],
                 "state": 0
             },
             {
                 "traffic_light_index": 7,
                 "input_index": [
-                    2,
-                    1,
-                    3
+                    0
                 ],
                 "output_index": [
-                    0,
-                    3
+                    1,
+                    2
                 ],
                 "state": 0
             },
             {
                 "traffic_light_index": 8,
                 "input_index": [
-                    1
+                    1,
+                    2,
+                    0
                 ],
                 "output_index": [
-                    4
+                    2,
+                    3,
+                    0
                 ],
                 "state": 0
             },
             {
                 "traffic_light_index": 9,
                 "input_index": [
-                    2
+                    1,
+                    3
                 ],
                 "output_index": [
+                    1,
                     2
                 ],
                 "state": 0
@@ -196,6 +208,51 @@
             {
                 "traffic_light_index": 10,
                 "input_index": [
+                    1,
+                    0
+                ],
+                "output_index": [
+                    1
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 11,
+                "input_index": [
+                    1
+                ],
+                "output_index": [
+                    2,
+                    1
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 12,
+                "input_index": [
+                    1,
+                    0
+                ],
+                "output_index": [
+                    3,
+                    2,
+                    0
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 13,
+                "input_index": [
+                    1
+                ],
+                "output_index": [
+                    4
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 14,
+                "input_index": [
                     2
                 ],
                 "output_index": [
@@ -204,7 +261,7 @@
                 "state": 0
             },
             {
-                "traffic_light_index": 11,
+                "traffic_light_index": 15,
                 "input_index": [
                     3
                 ],
@@ -214,7 +271,7 @@
                 "state": 0
             },
             {
-                "traffic_light_index": 12,
+                "traffic_light_index": 16,
                 "input_index": [
                     4
                 ],
@@ -224,7 +281,17 @@
                 "state": 0
             },
             {
-                "traffic_light_index": 13,
+                "traffic_light_index": 17,
+                "input_index": [
+                    4
+                ],
+                "output_index": [
+                    2
+                ],
+                "state": 0
+            },
+            {
+                "traffic_light_index": 18,
                 "input_index": [
                     4
                 ],
@@ -234,7 +301,7 @@
                 "state": 0
             },
             {
-                "traffic_light_index": 14,
+                "traffic_light_index": 19,
                 "input_index": [
                     4
                 ],
