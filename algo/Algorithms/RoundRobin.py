@@ -15,18 +15,23 @@ class RoundRobinController(BaseAlgorithm):
         :param junction: object that represents a junction
         """
 
-        super().__init__()
-        self.junction = junction
-        self.current_traffic_light_id = 0
+        super().__init__(junction)
+        self.current_traffic_light_id = 100
         self.time_interval = 5
 
     def start(self):
         """
         Starts the algorithm
         """
-        self.current_traffic_light_id = self.junction.get_traffic_lights()[0].id
-
+        is_first_time = True
         while True:
+            if self.junction is None:
+                continue
+
+            if is_first_time:
+                self.current_traffic_light_id = self.junction.get_traffic_lights()[0].id
+                is_first_time = False
+
             lights: List[TrafficLight] = self.junction.get_traffic_lights()
             print(self.junction)
             for light in lights:

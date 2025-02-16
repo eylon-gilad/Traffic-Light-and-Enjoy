@@ -5,8 +5,8 @@ from abc import ABC, abstractmethod
 
 
 class BaseAlgorithm(ABC):
-    def __init__(self):
-        self.junction: Junction = None
+    def __init__(self, junction):
+        self.junction: Junction = junction
 
     def get_current_traffic_lights_state(self) -> List[TrafficLight]:
         return self.junction.get_traffic_lights()
