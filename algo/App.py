@@ -91,8 +91,9 @@ def post_junction_info() -> Response:
     junction_id: int = junction_data.get("id", 0)
     junction = Junction(id=junction_id, traffic_lights=traffic_lights, roads=roads)
 
-    # alg = AlgoRunner(junction)
-    # alg.run()
+    alg.set_junction_info(junction)
+
+    time.sleep(10)
 
     alg.set_junction_info(junction)
     return jsonify({"message": "Junction information updated successfully."}, 200)

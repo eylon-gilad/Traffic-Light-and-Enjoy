@@ -54,10 +54,3 @@ class RoundRobinController(BaseAlgorithm):
         for i, light in enumerate(lights):
             if light.id == self.current_traffic_light_id:
                 return lights[(i + 1) % len(lights)].id
-
-    # def get_current_state(self):
-    #     """
-    #     Get the current state of the traffic lights - red or green
-    #     """
-    #
-    #     return self.junction.get_traffic_lights()
