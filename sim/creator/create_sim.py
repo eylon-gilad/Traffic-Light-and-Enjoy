@@ -1,5 +1,50 @@
 import json
 import random
+def random_remove_trraficLights(amount_road:int |None=4):
+    """
+    randomlly selects singular lights to remove from the junction
+    input:amount_road(all the roads the lights could leed, which is how we represents lights)
+    outputs: array of pairs which represent each trafficlight
+    """
+    CREATE_ALL=0
+    remove_lights=[]
+    remove_amount=random.randint(CREATE_ALL,amount_road**2-1)
+    
+    for i in range(remove_amount):
+        road_pair=(random.randint(CREATE_ALL,amount_road),random.randint(CREATE_ALL,amount_road))
+        remove_lights.append(road_pair)
+    return remove_lights
+
+def get_random_array_numbers(largest_size):
+    """
+    gives array of random numbers
+    input: largest_size(the highest num)
+    output: array of random numbers between 0-largest_size
+    """
+    MARGE_ONE=1
+    a_size=random.randint(MARGE_ONE,largest_size-1)
+    a=list(range(largest_size))
+    random.shuffle(a)
+    a=a[:a_size]
+    return a
+
+def random_marge_lights(amount_road:int |None=4):
+    """
+    randonly create the non sigular lights in the junction
+    input:amount_road(all possible directions, the traffic could leed to)
+    output: array of trafic lights which is represented by the roads he controll(input) and leeds to(output)
+    """
+    DONT_MARGE=0
+    
+    marged_lights=[]
+    marged_amount=random.randint(DONT_MARGE,amount_road**2-1)
+    for i in range(marged_amount):
+        inputs=get_random_array_numbers(amount_road)
+        outputs=get_random_array_numbers(amount_road)
+        marged_lights.append((inputs,outputs))
+    return marged_lights
+
+        
 
 def create_light(traffic_light_index:int,input_index:list[int],output_index:list[int],state:bool |None=0):
     """
@@ -14,8 +59,12 @@ def create_light(traffic_light_index:int,input_index:list[int],output_index:list
     """
     traffic_light={}
     traffic_light["traffic_light_index"]=traffic_light_index
-    traffic_light["input_index"]=input_index
-    traffic_light["output_index"]=output_index
+    if type(input_index) == int:
+        traffic_light["input_index"]=[input_index]
+        traffic_light["output_index"]=[output_index]
+    else:
+        traffic_light["input_index"]=input_index
+        traffic_light["output_index"]=output_index
     traffic_light["state"]=state
     return traffic_light
 
@@ -58,12 +107,14 @@ def create_lanes(amount_lanes:int |None=3):
     input:amount_lanes(how much to create)
     output: array of the lane obj in a certain road
     """
-    
+    HIGHEST_PRECENTAGE=100
+    LOWEST_PRECENTAGE=1
     lanes=[]
     for i in range(1,amount_lanes+1):
         lane={}
         lane["lane_index"]=i
-        lane["cars_creation"]=random.randint(0,100)
+        #precentage of car creation, every sub-second
+        lane["cars_creation"]=random.randint(LOWEST_PRECENTAGE,HIGHEST_PRECENTAGE)
         lanes.append(lane)
     return lanes
         
@@ -83,7 +134,7 @@ def create_roads(amount_road:int |None=4):
     return roads
 
 
-def create_junction(junction_index:int |None =1):
+def create_junction(junction_index:int |None = 1):
     """
     create the junction obj
     input:junction_index
@@ -93,9 +144,10 @@ def create_junction(junction_index:int |None =1):
     juanction["junction_index"]=junction_index
     juanction["total_roads"]=4#random.randint(1,4)
     juanction["roads"]=create_roads(juanction["total_roads"])
-    juanction["traffic_lights"]=create_all_lights(juanction["total_roads"],[(1,2),(2,2)],[([1,2,3],[1,2])])
+    marged_lights=random_marge_lights(juanction["total_roads"])
+    remove_light=random_remove_trraficLights(juanction["total_roads"])
+    juanction["traffic_lights"]=create_all_lights(juanction["total_roads"],remove_light,marged_lights)
     return juanction
-
 
 def create_all_json():
     """
@@ -111,10 +163,11 @@ def create_all_json():
 
    
 def main():
-    test=create_all_json()
-    with open("sim\creator\example.json","w") as f:
-        f.write(test)
-    print(test)
+    for i in range(10):
+        test=create_all_json()
+        with open(f"sim\creator\examples\example{i}.json","w") as f:
+            f.write(test)
+        print(test)
 
 
 if __name__== "__main__":
