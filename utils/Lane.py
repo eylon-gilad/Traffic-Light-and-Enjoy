@@ -23,3 +23,7 @@ class Lane:
     def set_cars(self, cars: List[Car]) -> None:
         """Sets the cars in the lane."""
         self.cars = cars
+
+    def __str__(self):
+        cars_str = ", ".join(str(car) for car in self.cars)
+        return f"Lane(id={self.id}, " f"cars=[{cars_str}])"

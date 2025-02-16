@@ -8,12 +8,16 @@ from utils.Lane import Lane
 from utils.Road import Road
 from utils.TrafficLight import TrafficLight
 
+from Algorithem import AlgoRunner
+
 app = Flask(__name__)
 
 # Store the Junction object here after parsing the JSON
 junction: Optional[Junction] = None
+alg: AlgoRunner = None
 
 
+# TODO move this file to the api folder
 @app.route("/junction-info", methods=["POST"])
 def post_junction_info() -> Response:
     """
@@ -21,7 +25,7 @@ def post_junction_info() -> Response:
     roads, lanes, cars, and traffic lights, then constructs the
     corresponding objects.
     """
-    global junction
+    global junction, alg
 
     data: Optional[Dict[str, Any]] = request.get_json()
     if not data or "junction" not in data:
@@ -88,19 +92,33 @@ def post_junction_info() -> Response:
     return jsonify({"message": "Junction information updated successfully."}, 200)
 
 
+@app.route("/start-algorithm", methods=["GET"])
+def start_algorithm() -> Response:
+    global junction, alg
+
+    if junction is None:
+        return jsonify({"error": "Junction not set yet."}, 400)
+
+    alg = AlgoRunner(junction)
+    alg.run()
+
+    return jsonify({"message": "Algorithm started successfully."}, 200)
+
+
 @app.route("/traffic-light-state", methods=["GET"])
 def get_traffic_light_state() -> Response:
     """
     Returns the current state of all traffic lights in the junction.
     If the junction is not yet set, returns an error.
     """
+
     global junction
 
     if junction is None:
         return jsonify({"error": "Junction not set yet."}, 400)
 
     traffic_light_states: List[Dict[str, Any]] = []
-    for tl in junction.get_traffic_lights():
+    for tl in alg.get_current_state():
         traffic_light_states.append(
             {
                 "traffic_light_index": tl.get_id(),

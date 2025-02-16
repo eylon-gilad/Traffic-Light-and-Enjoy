@@ -45,3 +45,9 @@ class TrafficLight:
 
     def red(self) -> None:
         self.state = False
+
+    def __str__(self) -> str:
+        return (
+            f"TrafficLight(id={self.id}, origins={self.origins}, "
+            f"destinations={self.destinations}, state={self.state})"
+        )
