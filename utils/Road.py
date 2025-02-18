@@ -4,7 +4,8 @@ from utils.Lane import Lane
 
 class Road:
     def __init__(
-        self, id: int = 0, lanes: List[Lane] = [], congection_level: int = 0
+        self, id: int = 0, lanes: List[Lane] = [], congection_level: int = 0,
+            from_side: str = "", to_side: str = ""
     ) -> None:
         """
         Represents a road in the simulation.
@@ -16,6 +17,8 @@ class Road:
         self.id = id
         self.lanes: List[Lane] = lanes
         self.congection_level = congection_level
+        self.from_side = from_side
+        self.to_side = to_side
 
     def get_id(self) -> int:
         return self.id
