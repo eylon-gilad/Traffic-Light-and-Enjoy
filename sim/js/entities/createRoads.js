@@ -19,13 +19,13 @@ export function createRoads(centerX, centerY, canvasWidth, canvasHeight, roadWid
   const top = centerY - roadWidth;
   const bottom = centerY + roadWidth;
 
-  // Create four roads with start and end points outside the visible area.
-  roads.push(new Road("north", { x: centerX - 100, y: -100 }, { x: centerX - 100, y: canvasHeight + 100 }, 3, roadWidth));
-  roads.push(new Road("south", { x: centerX + 100, y: canvasHeight + 100 }, { x: centerX + 100, y: -100 }, 3, roadWidth));
-  roads.push(new Road("east",  { x: -100, y: centerY + 100 }, { x: canvasWidth + 100, y: centerY + 100 }, 3, roadWidth));
-  roads.push(new Road("west",  { x: canvasWidth + 100, y: centerY - 100 }, { x: -100, y: centerY - 100 }, 3, roadWidth));
+  // Create four roads using the new Road constructor.
+  roads.push(new Road({ x: centerX - 100, y: -100 }, { x: centerX - 100, y: canvasHeight + 100 }, 3, roadWidth));
+  roads.push(new Road({ x: centerX + 100, y: canvasHeight + 100 }, { x: centerX + 100, y: -100 }, 3, roadWidth));
+  roads.push(new Road({ x: -100, y: centerY + 100 }, { x: canvasWidth + 100, y: centerY + 100 }, 3, roadWidth));
+  roads.push(new Road({ x: canvasWidth + 100, y: centerY - 100 }, { x: -100, y: centerY - 100 }, 3, roadWidth));
 
-  // Compute the stop progress for each road (where cars should stop at a red light).
+  // Compute the stop progress for each road.
   roads.forEach((road) => {
     road.centerX = centerX;
     road.centerY = centerY;

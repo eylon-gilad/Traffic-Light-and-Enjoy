@@ -15,6 +15,7 @@ export default class Car {
     // Desired (normalized) speed.
     this.desiredSpeed = baseSpeed;
     this.lane = lane;
+    this.hasTurned = false;
     // For drawing purposes:
     this.currentLaneOffset = lane.offset;
     this.changingLane = false;
@@ -23,5 +24,8 @@ export default class Car {
     this.color = "#ffcc00";
     // Reference to the sprite (for pooling in the Renderer).
     this.__sprite = null;
+
+    // Use the lane's nextCarId counter to assign a unique car ID.
+    this.id = `${lane.id}-C${lane.nextCarId++}`;
   }
 }

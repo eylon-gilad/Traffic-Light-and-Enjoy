@@ -4,6 +4,7 @@ import { SAFE_DISTANCE_PIXELS } from "../utils/config.js";
 
 /**
  * The Renderer handles all drawing via Phaser (and sprite pooling).
+ * It now also draws labels for each lane.
  */
 export default class Renderer {
   /**
@@ -14,6 +15,8 @@ export default class Renderer {
     this.scene = scene;
     this.roads = roads;
     this.carSpriteContainer = scene.add.container(0, 0);
+    // Set the car sprite container depth high so cars are always above text.
+    this.carSpriteContainer.setDepth(100);
     this.spritePool = [];
   }
 
@@ -25,6 +28,7 @@ export default class Renderer {
     this.drawRoads(graphics);
     this.drawTrafficLights(graphics);
     this.updateCarSprites();
+    this.drawLabels();
   }
 
   drawBackground(graphics) {
@@ -91,48 +95,43 @@ export default class Renderer {
   }
 
   drawTrafficLights(graphics) {
+    // For each road, draw a traffic light for each lane.
     this.roads.forEach((road) => {
-      const light = (road.id === "north" || road.id === "south")
-        ? road.nsTrafficLight
-        : road.ewTrafficLight;
-      if (!light) return;
-      const progress = road.stopProgress;
-      let x = road.start.x + (road.end.x - road.start.x) * progress;
-      let y = road.start.y + (road.end.y - road.start.y) * progress;
-      x -= road.dir.x * SAFE_DISTANCE_PIXELS;
-      y -= road.dir.y * SAFE_DISTANCE_PIXELS;
-      graphics.save();
-      const color = light.isGreen() ? 0x2ecc71 : 0xe74c3c;
-      graphics.fillStyle(color, 1);
-      graphics.fillCircle(x, y, 20);
-      graphics.restore();
+      const trafficState = road.nsTrafficLight ? road.nsTrafficLight : road.ewTrafficLight;
+      road.lanes.forEach((lane) => {
+        const baseX = road.start.x + (road.end.x - road.start.x) * road.stopProgress;
+        const baseY = road.start.y + (road.end.y - road.start.y) * road.stopProgress;
+        const laneX = baseX + road.perp.x * lane.offset;
+        const laneY = baseY + road.perp.y * lane.offset;
+        const lightX = laneX - road.dir.x * 50;
+        const lightY = laneY - road.dir.y * 50;
+        graphics.save();
+        const color = trafficState.isGreen() ? 0x2ecc71 : 0xe74c3c;
+        graphics.fillStyle(color, 1);
+        graphics.fillCircle(lightX, lightY, 20);
+        graphics.restore();
+      });
     });
   }
 
   updateCarSprites() {
-    // Instead of iterating over container children and hiding unused sprites,
-    // we update or create a sprite for every car.
     this.roads.forEach((road) => {
       road.lanes.forEach((lane) => {
         lane.cars.forEach((car) => {
           const pX = road.start.x + (road.end.x - road.start.x) * car.positionProgress;
           const pY = road.start.y + (road.end.y - road.start.y) * car.positionProgress;
-          // Offset for lane placement.
           const cx = pX + road.perp.x * car.currentLaneOffset;
           const cy = pY + road.perp.y * car.currentLaneOffset;
           let sprite = car.__sprite;
           if (!sprite) {
             sprite = this.getSpriteFromPool();
-            // Choose one of the car sprites randomly.
             const spriteIndex = Math.floor(Math.random() * 7) + 1;
             sprite.setTexture(`carSprite${spriteIndex}`);
-            // Enlarge the car sprite.
             sprite.setDisplaySize(96, 72);
             car.__sprite = sprite;
             this.carSpriteContainer.add(sprite);
           }
           sprite.setPosition(cx, cy);
-          // Instead of rotating 180°, we determine whether to flip horizontally.
           if (Math.abs(road.angle) > Math.PI / 2) {
             sprite.setFlipX(true);
             sprite.setRotation(0);
@@ -140,13 +139,54 @@ export default class Renderer {
             sprite.setFlipX(false);
             sprite.setRotation(road.angle);
           }
-          // Always mark the sprite as active and visible.
           sprite.setActive(true);
           sprite.setVisible(true);
         });
       });
     });
-    // Do not hide any sprite in the container—this ensures all car sprites remain visible.
+  }
+
+  drawLabels() {
+    // For each lane, draw its label below the cars.
+    // We ensure that lane labels have a lower depth so that cars are drawn above them.
+    this.roads.forEach((road) => {
+      road.lanes.forEach((lane) => {
+        // Base position: near the stop line, then offset downward.
+        const t = road.stopProgress - 0.2;  // Slightly before the stop line.
+        const baseX = road.start.x + (road.end.x - road.start.x) * t;
+        const baseY = road.start.y + (road.end.y - road.start.y) * t;
+        let labelX = baseX + road.perp.x * lane.offset;
+        let labelY = baseY + road.perp.y * lane.offset;
+        // Offset the label so that it appears behind (i.e. lower depth than) the cars.
+        if (road.isVertical()) {
+          if (!lane.label) {
+            lane.label = this.scene.add.text(labelX, labelY, lane.id, {
+              font: "20px Arial",
+              fill: "#fff",
+              align: "center"
+            });
+            lane.label.setOrigin(0.5);
+            // Rotate text so that it appears vertical.
+            lane.label.setAngle(90);
+            lane.label.setDepth(0); // lower than car sprites
+          } else {
+            lane.label.setPosition(labelX, labelY);
+          }
+        } else {
+          if (!lane.label) {
+            lane.label = this.scene.add.text(labelX, labelY, lane.id, {
+              font: "20px Arial",
+              fill: "#fff",
+              align: "center"
+            });
+            lane.label.setOrigin(0.5);
+            lane.label.setDepth(0); // lower than car sprites
+          } else {
+            lane.label.setPosition(labelX, labelY);
+          }
+        }
+      });
+    });
   }
 
   /**

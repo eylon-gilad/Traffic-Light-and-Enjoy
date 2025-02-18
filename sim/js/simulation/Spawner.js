@@ -21,14 +21,10 @@ export default class Spawner {
   spawnCarOnRoad(road) {
     // Choose one of the road’s lanes at random.
     const lane = road.lanes[Math.floor(Math.random() * road.lanes.length)];
-    const positionProgress = -1; // start off–screen
+    const positionProgress = -1; // Start off–screen.
     const baseSpeed = DESIRED_SPEED;
     const car = new Car(positionProgress, baseSpeed, lane);
     car.desiredSpeed = baseSpeed;
-    // If the car is in the right–most lane, mark it to turn right.
-    if (lane.index === road.lanes.length - 1) {
-      car.turning = true;
-    }
     lane.cars.push(car);
   }
 }
