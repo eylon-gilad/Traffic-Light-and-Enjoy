@@ -1,10 +1,16 @@
 # sim/simulation.py
-
 import random
 from utils.Car import Car
 from utils.Lane import Lane
 from utils.Road import Road
 from utils.TrafficLight import TrafficLight
+from utils.Junction import Junction
+
+
+def create_traffic_light(id, direction, state):
+    tl = TrafficLight(id=id, origins=[], destinations=[], state=state)
+    tl.direction = direction
+    return tl
 
 
 class StaticIntersectionSimulation:
@@ -53,15 +59,10 @@ class StaticIntersectionSimulation:
         # Create one traffic light per approach.
         # For realism, let’s assume north and south have green while east and west have red.
         self.traffic_lights = []
-        self.traffic_lights.append(self.create_traffic_light(1, 'north', True))
-        self.traffic_lights.append(self.create_traffic_light(2, 'south', True))
-        self.traffic_lights.append(self.create_traffic_light(3, 'east', False))
-        self.traffic_lights.append(self.create_traffic_light(4, 'west', False))
-
-    def create_traffic_light(self, id, direction, state):
-        tl = TrafficLight(id=id, origins=[], destinations=[], state=state)
-        tl.direction = direction
-        return tl
+        self.traffic_lights.append(create_traffic_light(1, 'north', True))
+        self.traffic_lights.append(create_traffic_light(2, 'south', True))
+        self.traffic_lights.append(create_traffic_light(3, 'east', False))
+        self.traffic_lights.append(create_traffic_light(4, 'west', False))
 
     def get_roads(self):
         return self.roads
