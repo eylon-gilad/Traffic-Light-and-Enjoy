@@ -5,7 +5,8 @@ from utils.Junction import Junction
 from utils.Road import Road
 from utils.TrafficLight import TrafficLight
 
-RED_LIGHT  = 0
+VELOCOTY_OPTIONS=[30,50,80,100,110,120]
+RED_LIGHT = 0
 
 
 def random_remove_trraficlights(amount_road: int | None = 4):
@@ -59,7 +60,8 @@ def random_marge_lights(amount_road: int | None = 4):
     return merged_lights
 
 
-def create_light(traffic_light_index: int = None, input_index: list[int] = None, output_index: list[int] = None,
+def create_light(jun_index: int = 1, traffic_light_index: int = None, input_index: list[int] = None,
+                 output_index: list[int] = None,
                  state: bool = 0):
     """
     create the traffic light object
@@ -74,6 +76,10 @@ def create_light(traffic_light_index: int = None, input_index: list[int] = None,
     if traffic_light_index is None or input_index is None or input_index is None:
         raise Exception("wrong use of func")
 
+
+    input_index = [jun_index * 10 + x for x in input_index]
+    output_index = [jun_index * 10 + x for x in output_index]
+
     traffic_light = TrafficLight(
         traffic_light_index,
         input_index,
@@ -83,7 +89,7 @@ def create_light(traffic_light_index: int = None, input_index: list[int] = None,
     return traffic_light
 
 
-def create_all_lights(amount_road: int | None = 4, black_list: list[tuple[int]] | None = [],
+def create_all_lights(jun_index: int = 1, amount_road: int | None = 4, black_list: list[tuple[int]] | None = [],
                       merged_lights: list[tuple[list, list]] | None = [([], [])]):
     """
     create array of all the traffic lights
@@ -99,7 +105,7 @@ def create_all_lights(amount_road: int | None = 4, black_list: list[tuple[int]] 
     removed_lights = black_list
 
     for (inputs, outputs) in merged_lights:
-        traffic_light = create_light(counter, inputs, outputs, RED_LIGHT)
+        traffic_light = create_light(jun_index,counter, inputs, outputs, RED_LIGHT)
         all_traffic_lights.append(traffic_light)
         counter += 1
         for i in inputs:
@@ -109,7 +115,7 @@ def create_all_lights(amount_road: int | None = 4, black_list: list[tuple[int]] 
     for i in range(amount_road):
         for j in range(amount_road):
             if (i, j) not in removed_lights:
-                all_traffic_lights.append(create_light(counter, i, j, RED_LIGHT))
+                all_traffic_lights.append(create_light(jun_index, counter, [i], [j], RED_LIGHT))
                 counter += 1
 
     return all_traffic_lights
@@ -124,12 +130,14 @@ def create_lanes(road_index: int = 1, amount_lanes: int = 3):
     highest_car_reation = 100
     lowest_car_reation = 1
     lanes = []
-    for i in range(1, amount_lanes + 1):
+    for i in range(amount_lanes):
         lane_index = road_index * 10 + i
         cars_creation = random.randint(lowest_car_reation, highest_car_reation)
+        max_vel=VELOCOTY_OPTIONS[random.randint(0, len(VELOCOTY_OPTIONS)-1)]
         lane = Lane(
             lane_index,
-            car_creation=cars_creation
+            car_creation=cars_creation,
+            lane_max_vel=max_vel
         )
         lanes.append(lane)
     return lanes
@@ -164,7 +172,7 @@ def create_junction(junction_index: int = 1):
     remove_light = random_remove_trraficlights(total_roads)
     jun = Junction(
         junction_index,
-        create_all_lights(total_roads, remove_light, merged_lights),
+        create_all_lights(junction_index, total_roads, remove_light, merged_lights),
         create_roads(junction_index, total_roads)
     )
     return jun
