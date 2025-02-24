@@ -3,7 +3,14 @@ from utils.Car import Car
 
 
 class Lane:
-    def __init__(self, id: int = 0, cars: List[Car] = [],car_creation:int=0,lane_len :int =50,lane_max_vel : int  = -1) -> None:
+    def __init__(
+        self,
+        id: int = 0,
+        cars: List[Car] = [],
+        car_creation: int = 0,
+        lane_len: int = 50,
+        lane_max_vel: int = -1,
+    ) -> None:
         """
         Represents a lane on a road where cars drive.
 
@@ -11,12 +18,11 @@ class Lane:
         :param cars: List of Car objects currently in this lane
         """
         self.id = id
-        self.LENGTH=lane_len
-        self.car_creation=car_creation
+        self.LENGTH = lane_len
+        self.car_creation = car_creation
         # Directly use the passed-in cars list (be mindful of mutable defaults in production)
         self.cars = cars
-        self.max_vel=lane_max_vel
-
+        self.max_vel = lane_max_vel
 
     def get_id(self) -> int:
         return self.id
@@ -27,3 +33,12 @@ class Lane:
     def set_cars(self, cars: List[Car]) -> None:
         """Sets the cars in the lane."""
         self.cars = cars
+
+    def get_car_creation(self):
+        self.car_creation
+
+    def add_car(self, new_car):
+        self.cars.append(new_car)
+
+    def remove_car(self, car):
+        self.cars.remove(car)
