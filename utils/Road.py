@@ -15,7 +15,6 @@ class Road:
         """
         self.id = id
         self.lanes: List[Lane] = lanes
-        self.congection_level = congection_level
 
     def get_id(self) -> int:
         return self.id
