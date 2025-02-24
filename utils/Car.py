@@ -3,7 +3,7 @@ from typing import List
 
 class Car:
     def __init__(
-        self, id: int, dist: List[float], velocity: float, dest: str, car_type: str
+        self, id: int, dist: float, velocity: float, dest: str, car_type: str
     ) -> None:
         """
         Represents a car in the simulation.
@@ -23,7 +23,7 @@ class Car:
     def get_id(self) -> int:
         return self.id
 
-    def get_dist(self) -> List[float]:
+    def get_dist(self) -> float:
         return self.dist
 
     def get_velocity(self) -> float:
@@ -35,7 +35,7 @@ class Car:
     def get_car_type(self) -> str:
         return self.car_type
 
-    def set_dist(self, dist: List[float]) -> None:
+    def set_dist(self, dist: float) -> None:
         self.dist = dist
 
     def set_velocity(self, velocity: float) -> None:

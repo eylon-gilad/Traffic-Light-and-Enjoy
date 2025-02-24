@@ -32,7 +32,9 @@ def main():
 
     # Load and scale the background image
     background_img = pygame.image.load("../../sim/assets/background.png").convert()
-    background_img = pygame.transform.scale(background_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
+    background_img = pygame.transform.scale(
+        background_img, (SCREEN_WIDTH, SCREEN_HEIGHT)
+    )
 
     screen.blit(background_img, (0, 0))
 
@@ -58,36 +60,42 @@ def draw_intersection(screen, simulation, car_images):
 
     # Draw a sidewalk around the intersection for realism
     sidewalk_margin = 20
-    sidewalk_rect = pygame.Rect(center_x - intersection_size // 2 - sidewalk_margin,
-                                center_y - intersection_size // 2 - sidewalk_margin,
-                                intersection_size + 2 * sidewalk_margin,
-                                intersection_size + 2 * sidewalk_margin)
+    sidewalk_rect = pygame.Rect(
+        center_x - intersection_size // 2 - sidewalk_margin,
+        center_y - intersection_size // 2 - sidewalk_margin,
+        intersection_size + 2 * sidewalk_margin,
+        intersection_size + 2 * sidewalk_margin,
+    )
     pygame.draw.rect(screen, SIDEWALK_COLOR, sidewalk_rect)
 
     # Draw the intersection (junction) area
-    intersection_rect = pygame.Rect(center_x - intersection_size // 2,
-                                    center_y - intersection_size // 2,
-                                    intersection_size,
-                                    intersection_size)
+    intersection_rect = pygame.Rect(
+        center_x - intersection_size // 2,
+        center_y - intersection_size // 2,
+        intersection_size,
+        intersection_size,
+    )
     pygame.draw.rect(screen, INTERSECTION_COLOR, intersection_rect)
 
     # Define incoming road arms (only the approaches, not exiting)
-    north_rect = pygame.Rect(center_x - road_width // 2,
-                             0,
-                             road_width,
-                             center_y - intersection_size // 2)
-    south_rect = pygame.Rect(center_x - road_width // 2,
-                             center_y + intersection_size // 2,
-                             road_width,
-                             SCREEN_HEIGHT - (center_y + intersection_size // 2))
-    east_rect = pygame.Rect(center_x + intersection_size // 2,
-                            center_y - road_width // 2,
-                            SCREEN_WIDTH - (center_x + intersection_size // 2),
-                            road_width)
-    west_rect = pygame.Rect(0,
-                            center_y - road_width // 2,
-                            center_x - intersection_size // 2,
-                            road_width)
+    north_rect = pygame.Rect(
+        center_x - road_width // 2, 0, road_width, center_y - intersection_size // 2
+    )
+    south_rect = pygame.Rect(
+        center_x - road_width // 2,
+        center_y + intersection_size // 2,
+        road_width,
+        SCREEN_HEIGHT - (center_y + intersection_size // 2),
+    )
+    east_rect = pygame.Rect(
+        center_x + intersection_size // 2,
+        center_y - road_width // 2,
+        SCREEN_WIDTH - (center_x + intersection_size // 2),
+        road_width,
+    )
+    west_rect = pygame.Rect(
+        0, center_y - road_width // 2, center_x - intersection_size // 2, road_width
+    )
 
     pygame.draw.rect(screen, ASPHALT_COLOR, north_rect)
     pygame.draw.rect(screen, ASPHALT_COLOR, south_rect)
@@ -98,23 +106,55 @@ def draw_intersection(screen, simulation, car_images):
     # For horizontal roads (north and south), draw vertical dashed lines at lane boundaries.
     for i in range(1, 4):
         x = north_rect.x + i * simulation.lane_width
-        draw_dashed_line(screen, LANE_MARKING_COLOR, (x, north_rect.top), (x, north_rect.bottom), dash_length=10,
-                         gap_length=5)
+        draw_dashed_line(
+            screen,
+            LANE_MARKING_COLOR,
+            (x, north_rect.top),
+            (x, north_rect.bottom),
+            dash_length=10,
+            gap_length=5,
+        )
         x = south_rect.x + i * simulation.lane_width
-        draw_dashed_line(screen, LANE_MARKING_COLOR, (x, south_rect.top), (x, south_rect.bottom), dash_length=10,
-                         gap_length=5)
+        draw_dashed_line(
+            screen,
+            LANE_MARKING_COLOR,
+            (x, south_rect.top),
+            (x, south_rect.bottom),
+            dash_length=10,
+            gap_length=5,
+        )
     # For vertical roads (east and west), draw horizontal dashed lines at lane boundaries.
     for i in range(1, 4):
         y = east_rect.y + i * simulation.lane_width
-        draw_dashed_line(screen, LANE_MARKING_COLOR, (east_rect.left, y), (east_rect.right, y), dash_length=10,
-                         gap_length=5)
+        draw_dashed_line(
+            screen,
+            LANE_MARKING_COLOR,
+            (east_rect.left, y),
+            (east_rect.right, y),
+            dash_length=10,
+            gap_length=5,
+        )
         y = west_rect.y + i * simulation.lane_width
-        draw_dashed_line(screen, LANE_MARKING_COLOR, (west_rect.left, y), (west_rect.right, y), dash_length=10,
-                         gap_length=5)
+        draw_dashed_line(
+            screen,
+            LANE_MARKING_COLOR,
+            (west_rect.left, y),
+            (west_rect.right, y),
+            dash_length=10,
+            gap_length=5,
+        )
 
     # Draw traffic lights near the junction for each approach
     for tl in simulation.get_traffic_lights():
-        draw_traffic_light(screen, center_x, center_y, intersection_size, road_width, simulation.lane_width, tl)
+        draw_traffic_light(
+            screen,
+            center_x,
+            center_y,
+            intersection_size,
+            road_width,
+            simulation.lane_width,
+            tl,
+        )
 
     # Draw cars for each road (using the car's distance from the junction)
     for road in simulation.get_roads():
@@ -124,22 +164,40 @@ def draw_intersection(screen, simulation, car_images):
             for car in lane.get_cars():
                 img = car_images[car.img_index]
 
-                if direction == 'north':
+                if direction == "north":
                     rotation_angle = -90  # Cars entering from north point downward
-                    x = north_rect.x + simulation.lane_width / 2 + lane_index * simulation.lane_width
+                    x = (
+                        north_rect.x
+                        + simulation.lane_width / 2
+                        + lane_index * simulation.lane_width
+                    )
                     y = north_rect.bottom - car.get_dist()[0]
-                elif direction == 'south':
+                elif direction == "south":
                     rotation_angle = 90  # Cars entering from south point upward
-                    x = south_rect.x + simulation.lane_width / 2 + lane_index * simulation.lane_width
+                    x = (
+                        south_rect.x
+                        + simulation.lane_width / 2
+                        + lane_index * simulation.lane_width
+                    )
                     y = south_rect.y + car.get_dist()[0]
-                elif direction == 'east':
-                    rotation_angle = 0  # Cars entering from east point westward (rotate 0°)
+                elif direction == "east":
+                    rotation_angle = (
+                        0  # Cars entering from east point westward (rotate 0°)
+                    )
                     x = east_rect.x + car.get_dist()[0]
-                    y = east_rect.y + simulation.lane_width / 2 + lane_index * simulation.lane_width
-                elif direction == 'west':
+                    y = (
+                        east_rect.y
+                        + simulation.lane_width / 2
+                        + lane_index * simulation.lane_width
+                    )
+                elif direction == "west":
                     rotation_angle = 180  # Cars entering from west point eastward
                     x = west_rect.right - car.get_dist()[0]
-                    y = west_rect.y + simulation.lane_width / 2 + lane_index * simulation.lane_width
+                    y = (
+                        west_rect.y
+                        + simulation.lane_width / 2
+                        + lane_index * simulation.lane_width
+                    )
                 rotated_img = pygame.transform.rotate(img, rotation_angle)
                 rect = rotated_img.get_rect(center=(int(x), int(y)))
                 screen.blit(rotated_img, rect)
@@ -149,17 +207,24 @@ def draw_dashed_line(surface, color, start_pos, end_pos, dash_length=10, gap_len
     x1, y1 = start_pos
     x2, y2 = end_pos
     from math import hypot
+
     distance = hypot(x2 - x1, y2 - y1)
     dash_count = int(distance // (dash_length + gap_length))
     for i in range(dash_count + 1):
         start_x = x1 + (x2 - x1) * (i * (dash_length + gap_length)) / distance
         start_y = y1 + (y2 - y1) * (i * (dash_length + gap_length)) / distance
-        end_x = x1 + (x2 - x1) * (i * (dash_length + gap_length) + dash_length) / distance
-        end_y = y1 + (y2 - y1) * (i * (dash_length + gap_length) + dash_length) / distance
+        end_x = (
+            x1 + (x2 - x1) * (i * (dash_length + gap_length) + dash_length) / distance
+        )
+        end_y = (
+            y1 + (y2 - y1) * (i * (dash_length + gap_length) + dash_length) / distance
+        )
         pygame.draw.line(surface, color, (start_x, start_y), (end_x, end_y), 2)
 
 
-def draw_traffic_light(screen, center_x, center_y, intersection_size, road_width, lane_width, tl):
+def draw_traffic_light(
+    screen, center_x, center_y, intersection_size, road_width, lane_width, tl
+):
     """
     Draw a traffic light near the junction for a given approach.
     For realism, we place:
@@ -172,20 +237,20 @@ def draw_traffic_light(screen, center_x, center_y, intersection_size, road_width
     light_circle_radius = 5
     offset = 5  # offset from the junction edge
 
-    if tl.direction == 'north':
+    if tl.direction == "north":
         x = center_x - road_width / 2 + lane_width
         y = center_y - intersection_size / 2 - light_height - offset
-    elif tl.direction == 'south':
+    elif tl.direction == "south":
         x = center_x + road_width / 2 - lane_width - light_width
         y = center_y + intersection_size / 2 + offset
-    elif tl.direction == 'east':
+    elif tl.direction == "east":
         x = center_x + intersection_size / 2 + offset
         y = center_y - road_width / 2 + lane_width
-    elif tl.direction == 'west':
+    elif tl.direction == "west":
         x = center_x - intersection_size / 2 - light_height - offset
         y = center_y + road_width / 2 - lane_width - light_width
     # For north and south, the housing is vertical; for east and west, horizontal.
-    if tl.direction in ['north', 'south']:
+    if tl.direction in ["north", "south"]:
         housing = pygame.Rect(x, y, light_width, light_height)
     else:
         housing = pygame.Rect(x, y, light_height, light_width)
