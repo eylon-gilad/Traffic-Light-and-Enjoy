@@ -1,11 +1,12 @@
 from typing import List
 from utils.Lane import Lane
+from utils.RoadEnum import RoadEnum
 
 
 class Road:
     def __init__(
         self, id: int = 0, lanes: List[Lane] = [], congection_level: int = 0,
-            from_side: str = "", to_side: str = ""
+            from_side: RoadEnum = None, to_side: RoadEnum = None
     ) -> None:
         """
         Represents a road in the simulation.
@@ -35,6 +36,12 @@ class Road:
 
     def set_congection_level(self, congection_level: int) -> None:
         self.congection_level = congection_level
+
+    def get_from_side(self) -> RoadEnum:
+        return self.from_side
+
+    def get_to_side(self) -> RoadEnum:
+        return self.to_side
 
     def __str__(self):
         lanes_str = ", ".join(str(lane) for lane in self.lanes)

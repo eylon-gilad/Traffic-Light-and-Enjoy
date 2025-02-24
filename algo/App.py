@@ -7,6 +7,7 @@ from utils.Car import Car
 from utils.Junction import Junction
 from utils.Lane import Lane
 from utils.Road import Road
+from utils.RoadEnum import RoadEnum
 from utils.TrafficLight import TrafficLight
 
 from TrafficLightsCombinator import TrafficLightsCombinator
@@ -137,8 +138,8 @@ def build_junction():
     roads: List[Road] = []
     for rd in roads_data:
         road_id: int = rd.get("road_index", 0)
-        from_side: str = rd.get("from", 0)
-        to_side: str = rd.get("to", 0)
+        from_side: RoadEnum = RoadEnum.from_string(rd.get("from", 0))
+        to_side: RoadEnum = RoadEnum.from_string(rd.get("to", 0))
         congection_level: int = rd.get("congection_level", 0)
 
         # Parse lanes data for this road

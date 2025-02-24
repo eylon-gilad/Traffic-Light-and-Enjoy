@@ -33,6 +33,11 @@ class Junction:
     def get_roads(self) -> List[Road]:
         return self.roads
 
+    def get_road_by_id(self, road_id: int) -> Road:
+        for road in self.roads:
+            if road.id == road_id:
+                return road
+
     def set_roads(self, roads: List[Road]) -> None:
         """Sets the roads connected to the junction."""
         self.roads = roads
