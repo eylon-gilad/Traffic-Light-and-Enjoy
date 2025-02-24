@@ -5,191 +5,189 @@ from utils.Junction import Junction
 from utils.Road import Road
 from utils.TrafficLight import TrafficLight
 
-VELOCOTY_OPTIONS=[30,50,80,100,110,120]
-RED_LIGHT = 0
+VELOCITY_OPTIONS: list[int] = [30, 50, 80, 100, 110, 120]
+RED_LIGHT: bool = False
 
 
-def random_remove_trraficlights(amount_road: int | None = 4):
+def random_remove_traffic_lights(amount_road: int = 4) -> list[tuple[int, int]]:
     """
-    randomly selects singular lights to remove from the junction
-    input:amount_road(all the roads the lights could lead, which is how we represents lights)
-    outputs: array of pairs which represent each trafficlight
-    """
-    create_all = 0
-    remove_lights = []
-    remove_amount = random.randint(create_all, amount_road ** 2 - 1)
+    Randomly selects singular lights to remove from the junction.
 
-    for i in range(remove_amount):
-        road_pair = (
-            random.randint(create_all, amount_road),
-            random.randint(create_all, amount_road)
+    :param amount_road: The number of roads that lights could lead to (default is 4).
+    :return: A list of pairs representing traffic lights to be removed.
+    """
+    remove_lights: list[tuple[int, int]] = []
+    remove_amount: int = random.randint(0, amount_road**2 - 1)
+
+    for _ in range(remove_amount):
+        road_pair: tuple[int, int] = (
+            random.randint(0, amount_road),
+            random.randint(0, amount_road),
         )
         if road_pair[0] != road_pair[1]:
             remove_lights.append(road_pair)
     return remove_lights
 
 
-def get_random_array_numbers(largest_size):
+def get_random_array_numbers(largest_size: int) -> list[int]:
     """
-    gives array of random numbers
-    input: largest_size(the highest num)
-    output: array of random numbers between 0-largest_size
+    Generates an array of random numbers.
+
+    :param largest_size: The highest possible number in the array.
+    :return: An array of random numbers between 0 and largest_size.
     """
-    merge_one = 1
-    a_size = random.randint(merge_one, largest_size - 1)
-    a = list(range(largest_size))
+    a_size: int = random.randint(1, largest_size - 1)
+    a: list[int] = list(range(largest_size))
     random.shuffle(a)
-    a = a[:a_size]
-    return a
+    return a[:a_size]
 
 
-def random_marge_lights(amount_road: int | None = 4):
+def random_merge_lights(amount_road: int = 4) -> list[tuple[list[int], list[int]]]:
     """
-    randomly create the non-singular lights in the junction
-    input:amount_road(all possible directions, the traffic could lead to)
-    output: array of traffic lights which is represented by the roads he controls(input) and leeds to(output)
-    """
-    dont_merge = 0
+    Randomly creates non-singular lights in the junction.
 
-    merged_lights = []
-    merged_amount = random.randint(dont_merge, amount_road ** 2 - 1)
-    for i in range(merged_amount):
-        inputs = get_random_array_numbers(amount_road)
-        outputs = get_random_array_numbers(amount_road)
+    :param amount_road: The number of possible directions traffic can lead to.
+    :return: A list of traffic lights represented by the roads they control.
+    """
+    merged_lights: list[tuple[list[int], list[int]]] = []
+    merged_amount: int = random.randint(0, amount_road**2 - 1)
+    for _ in range(merged_amount):
+        inputs: list[int] = get_random_array_numbers(amount_road)
+        outputs: list[int] = get_random_array_numbers(amount_road)
         merged_lights.append((inputs, outputs))
     return merged_lights
 
 
-def create_light(jun_index: int = 1, traffic_light_index: int = None, input_index: list[int] = None,
-                 output_index: list[int] = None,
-                 state: bool = 0):
+def create_light(
+    jun_index: int = 1,
+    traffic_light_index: int = None,
+    input_index: list[int] = None,
+    output_index: list[int] = None,
+    state: bool = RED_LIGHT,
+) -> TrafficLight:
     """
-    create the traffic light object
-    input: 
-    traffic_light_index,
-    inputs_index(the roads the cars are in),
-    output_index(roads the car will drive to),
-    state(red-0 or green-1)
+    Creates a traffic light object.
 
-    output: traffic light object
+    :param jun_index: The junction index.
+    :param traffic_light_index: The traffic light index.
+    :param input_index: The roads where cars are entering.
+    :param output_index: The roads where cars will exit.
+    :param state: The state of the light (red=0, green=1).
+    :return: A TrafficLight object.
     """
-    if traffic_light_index is None or input_index is None or input_index is None:
-        raise Exception("wrong use of func")
-
+    if traffic_light_index is None or input_index is None or output_index is None:
+        raise ValueError("Missing parameters for 'create_light' function.")
 
     input_index = [jun_index * 10 + x for x in input_index]
     output_index = [jun_index * 10 + x for x in output_index]
 
-    traffic_light = TrafficLight(
-        traffic_light_index,
-        input_index,
-        output_index,
-        state
-    )
-    return traffic_light
+    return TrafficLight(traffic_light_index, input_index, output_index, state)
 
 
-def create_all_lights(jun_index: int = 1, amount_road: int | None = 4, black_list: list[tuple[int]] | None = [],
-                      merged_lights: list[tuple[list, list]] | None = [([], [])]):
+def create_all_lights(
+    jun_index: int = 1,
+    amount_road: int = 4,
+    black_list: list[tuple[int, int]] = None,
+    merged_lights: list[tuple[list[int], list[int]]] = None,
+) -> list[TrafficLight]:
     """
-    create array of all the traffic lights
-    input:
-    amount_road(the amount of possible roads the lights effects)
-    black_list(specific traffic lights that we dont need- only singular input\output)
-    merged_lights(lights with more than one input\output)
-    output: array of all the traffic light in this situation
+    Creates an array of all the traffic lights.
+
+    :param jun_index: The junction index.
+    :param amount_road: The number of possible roads the lights affect.
+    :param black_list: Specific traffic lights that are not needed.
+    :param merged_lights: Lights with more than one input/output.
+    :return: A list of all traffic lights in this situation.
     """
+    if black_list is None:
+        black_list = []
+    if merged_lights is None:
+        merged_lights = []
 
     counter = 0
-    all_traffic_lights = []
-    removed_lights = black_list
+    all_traffic_lights: list[TrafficLight] = []
 
-    for (inputs, outputs) in merged_lights:
-        traffic_light = create_light(jun_index,counter, inputs, outputs, RED_LIGHT)
+    for inputs, outputs in merged_lights:
+        traffic_light = create_light(jun_index, counter, inputs, outputs, RED_LIGHT)
         all_traffic_lights.append(traffic_light)
         counter += 1
         for i in inputs:
             for j in outputs:
-                removed_lights.append((i, j))
+                black_list.append((i, j))
 
     for i in range(amount_road):
         for j in range(amount_road):
-            if (i, j) not in removed_lights:
-                all_traffic_lights.append(create_light(jun_index, counter, [i], [j], RED_LIGHT))
+            if (i, j) not in black_list:
+                all_traffic_lights.append(
+                    create_light(jun_index, counter, [i], [j], RED_LIGHT)
+                )
                 counter += 1
 
     return all_traffic_lights
 
 
-def create_lanes(road_index: int = 1, amount_lanes: int = 3):
+def create_lanes(road_index: int = 1, amount_lanes: int = 3) -> list[Lane]:
     """
-    create all the needed lanes in a certain road
-    input:amount_lanes(how much to create)
-    output: array of the lane obj in a certain road
+    Creates all the needed lanes in a certain road.
+
+    :param road_index: The index of the road.
+    :param amount_lanes: The number of lanes to create.
+    :return: A list of Lane objects in a certain road.
     """
-    highest_car_reation = 100
-    lowest_car_reation = 1
-    lanes = []
+    lanes: list[Lane] = []
     for i in range(amount_lanes):
         lane_index = road_index * 10 + i
-        cars_creation = random.randint(lowest_car_reation, highest_car_reation)
-        max_vel=VELOCOTY_OPTIONS[random.randint(0, len(VELOCOTY_OPTIONS)-1)]
-        lane = Lane(
-            lane_index,
-            car_creation=cars_creation,
-            lane_max_vel=max_vel
-        )
+        cars_creation = random.randint(1, 100)
+        max_vel = random.choice(VELOCITY_OPTIONS)
+        lane = Lane(lane_index, car_creation=cars_creation, lane_max_vel=max_vel)
         lanes.append(lane)
     return lanes
 
 
-def create_roads(junction_index: int = 1, amount_road: int = 4):
+def create_roads(junction_index: int = 1, amount_road: int = 4) -> list[Road]:
     """
-    create all the roads in a certain junction
-    input:amount_road(how much to create)
-    output: array of the road obj in a certain road
+    Creates all the roads in a certain junction.
+
+    :param junction_index: The index of the junction.
+    :param amount_road: The number of roads to create.
+    :return: A list of Road objects.
     """
-    roads = []
+    roads: list[Road] = []
     for i in range(amount_road):
-        num_lanes = 3  # random.randint(1,4)
         index = junction_index * 10 + i
-        road = Road(
-            index,
-            create_lanes(index, num_lanes)
-        )
+        road = Road(index, create_lanes(index, 3))
         roads.append(road)
     return roads
 
 
-def create_junction(junction_index: int = 1):
+def create_junction(junction_index: int = 1) -> Junction:
     """
-    create the junction obj
-    input:junction_index
-    output:junction obj
+    Creates a junction object.
+
+    :param junction_index: The index of the junction.
+    :return: A Junction object.
     """
-    total_roads = 4  # random.randint(1,4)
-    merged_lights = random_marge_lights(total_roads)
-    remove_light = random_remove_trraficlights(total_roads)
-    jun = Junction(
+    total_roads = 4
+    merged_lights = random_merge_lights(total_roads)
+    remove_light = random_remove_traffic_lights(total_roads)
+    return Junction(
         junction_index,
         create_all_lights(junction_index, total_roads, remove_light, merged_lights),
-        create_roads(junction_index, total_roads)
+        create_roads(junction_index, total_roads),
     )
-    return jun
 
 
-def create_all_json():
+def create_all_json() -> str:
     """
-    create all the needed objects and turn them into json
-    input: none
-    output: all the data for a certain sim in json
+    Creates all the needed objects and converts them into JSON.
+
+    :return: JSON data for a certain simulation.
     """
-    json_indetation = 4
     all_data = {"junction": create_junction()}
-    return json.dumps(all_data, indent=json_indetation)
+    return json.dumps(all_data, indent=4)
 
 
-def main():
+def main() -> None:
     test = create_junction(1)
     print(test)
 
