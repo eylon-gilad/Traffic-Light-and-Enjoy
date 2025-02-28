@@ -27,6 +27,13 @@ class Road:
     def get_lanes(self) -> List[Lane]:
         return self.lanes
 
+    def get_lanes_by_ids(self, ids: List[int]) -> List[Lane]:
+        lanes = []
+        for lane in self.lanes:
+            if lane.id in ids:
+                lanes.append(lane)
+        return lanes
+
     def set_lanes(self, lanes: List[Lane]) -> None:
         """Sets the lanes on the road."""
         self.lanes = lanes

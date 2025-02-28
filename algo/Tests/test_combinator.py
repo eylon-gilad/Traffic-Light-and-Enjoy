@@ -9,21 +9,21 @@ from algo.TrafficLightsCombinator import TrafficLightsCombinator
 
 def main():
     test1()
-    test2()
+    # test2()
 
 
 def test1():
     junction: Junction = build_junction1()
 
-    tlc: TrafficLightsCombinator = TrafficLightsCombinator(junction)
-    print(TrafficLightsCombinator.combination)
+    TrafficLightsCombinator.calc_possible_active_lights(junction)
+    print(TrafficLightsCombinator.combinations)
 
 
 def test2():
     junction: Junction = build_junction2()
 
-    tlc: TrafficLightsCombinator = TrafficLightsCombinator(junction)
-    print(TrafficLightsCombinator.combination)
+    TrafficLightsCombinator.calc_possible_active_lights(junction)
+    print(TrafficLightsCombinator.combinations)
 
 
 def build_junction1() -> Junction:

@@ -1,7 +1,7 @@
 from utils import Junction
 from Algorithms.RoundRobin import RoundRobinController
 import threading
-
+from TrafficLightsCombinator import TrafficLightsCombinator
 
 class AlgoRunner:
     def __init__(self, junction: Junction):
@@ -9,7 +9,7 @@ class AlgoRunner:
         Constructor
         :param junction: object that represents a junction
         """
-
+        TrafficLightsCombinator.calc_possible_active_lights(junction)
         self.controller = RoundRobinController(junction)
         self.lock = threading.Lock()
 
