@@ -1,15 +1,17 @@
+# Junction.py
 from typing import List
-from utils.Road import Road
+
 from utils.Lane import Lane
+from utils.Road import Road
 from utils.TrafficLight import TrafficLight
 
 
 class Junction:
     def __init__(
-        self,
-        id: int = 0,
-        traffic_lights: List[TrafficLight] = [],
-        roads: List[Road] = [],
+            self,
+            id: int = 0,
+            traffic_lights: List[TrafficLight] = None,
+            roads: List[Road] = None,
     ) -> None:
         """
         Represents a traffic junction where roads meet.
@@ -19,8 +21,8 @@ class Junction:
         :param roads: Roads connected to the junction
         """
         self.id = id
-        self.traffic_lights = traffic_lights
-        self.roads = roads
+        self.traffic_lights = traffic_lights if traffic_lights is not None else []
+        self.roads = roads if roads is not None else []
 
     def get_id(self) -> int:
         return self.id
@@ -35,17 +37,29 @@ class Junction:
         return self.roads
 
     def set_roads(self, roads: List[Road]) -> None:
-        """Sets the roads connected to the junction."""
         self.roads = roads
 
     def get_road_by_id(self, road_id: int) -> Road:
         for road in self.roads:
-            if road.id == road_id:
+            if road.get_id() == road_id:
                 return road
+        return None
 
-    def get_lanes_by_ids(self, ids: List[int]) -> List[Lane]:
-        lanes = []
-        for lane in self.lanes:
-            if lane.id in ids:
-                lanes.append(lane)
-        return lanes
+    def get_lanes(self) -> List[Lane]:
+        """
+        Returns all lanes from all roads in this junction.
+        """
+        all_lanes = []
+        for road in self.roads:
+            all_lanes.extend(road.get_lanes())
+        return all_lanes
+
+    def get_lanes_by_ids(self, lane_ids: List[int]) -> List[Lane]:
+        """
+        Returns the lanes that match any of the IDs in lane_ids.
+        """
+        result = []
+        for lane in self.get_lanes():
+            if lane.get_id() in lane_ids:
+                result.append(lane)
+        return result

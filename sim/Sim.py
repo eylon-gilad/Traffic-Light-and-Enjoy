@@ -1,3 +1,4 @@
+# Sim.py
 import math
 import threading
 import time
@@ -10,20 +11,19 @@ from utils.Lane import Lane
 
 
 class Sim:
-    __DEFAULT_TIME_STEP: float = 1 / 30  # Default UI mode time step
+    """
+    Manages the main simulation logic in a background thread.
+    """
+    __DEFAULT_TIME_STEP: float = 1 / 30  # default ~30 FPS for UI mode
 
     def __init__(self, junctions: List[Junction] = None, if_ui: bool = True):
-        """
-        Initialize the simulation.
-        :param junctions: List of Junctions in the simulation.
-        :param if_ui: If True, run simulation at ~30 FPS; otherwise ~1000 FPS.
-        """
         self.__junctions: List[Junction] = junctions if junctions else []
-        self.__thread: Optional[threading.Thread] = None
         self.__stop_event = threading.Event()
         self.__lock = threading.Lock()
-        self.if_ui: bool = if_ui
-        self.__time_step: float = 1 / 30 if self.if_ui else 1 / 1000
+        self.if_ui = if_ui
+        # Faster step if there's no UI
+        self.__time_step: float = (1 / 30) if self.if_ui else (1 / 1000)
+        self.__thread: Optional[threading.Thread] = None
 
     def start(self) -> None:
         """Starts the simulation in a new thread."""
@@ -35,7 +35,7 @@ class Sim:
         self.__thread.start()
 
     def __run(self) -> None:
-        """Main simulation loop."""
+        """Main loop that continues until stop_event is triggered."""
         while not self.__stop_event.is_set():
             start_time = time.perf_counter()
 
@@ -48,150 +48,150 @@ class Sim:
             time.sleep(sleep_time)
 
     def __next(self) -> None:
-        """Progresses the simulation state for each car."""
+        """Progresses the simulation (all cars in all lanes)."""
         with self.__lock:
             for junction in self.__junctions:
                 for road in junction.get_roads():
                     for lane in road.get_lanes():
-                        # Make a copy of cars so that removal doesn't break the iteration
+                        # Copy list so removal doesn't break iteration
                         for car in list(lane.get_cars()):
                             self.__move_car(car, lane, junction)
 
     def __move_car(self, car: Car, lane: Lane, junction: Junction) -> None:
         """
-        Moves the car using (simple) physics-based acceleration/deceleration
-        and checks if the car should switch lanes or be removed.
+        Moves the car using a simplified physics-based model:
+          - Acceleration/deceleration
+          - Checking traffic light
+          - Checking distance to car ahead
         """
         velocity = car.get_velocity()
         dist = car.get_dist()
 
-        # Fallback deceleration if lane doesn't have max_decel
-        deceleration = getattr(lane, "max_decel", 3.0)
-        safe_distance = (velocity ** 2) / (2 * deceleration) if deceleration > 0 else 10
-
-        # Check traffic light
-        light_green = self.__check_if_green(lane, junction)
-
-        # Get gap to car in front
-        distance_to_car_ahead = self.__check_car_ahead(lane, car)
-
-        # Desired velocity is the lane speed limit unless we need to slow down
+        # Lane-level config
+        deceleration = getattr(lane, "max_decel", 3.0)  # fallback
+        acceleration_limit = getattr(lane, "max_accel", 2.0)
         desired_velocity = lane.max_vel
 
-        # If light is red, and we are within 30 units of the light, target velocity is 0
+        # Minimum distance needed to stop safely
+        safe_distance = (velocity ** 2) / (2 * deceleration) if deceleration > 0 else 10
+
+        # Check if the light is green for this lane
+        light_green = self.__check_if_green(lane, junction)
+
+        # Check distance to car in front
+        distance_to_car_ahead = self.__distance_to_car_ahead(lane, car)
+
+        # If light is red and car is close to junction, set desired_velocity=0
         if not light_green and dist < 30:
             desired_velocity = 0
-        # If we're too close to the car ahead, slow down
+        # If there's a car ahead too close, slow down
         elif distance_to_car_ahead < safe_distance:
-            # A simple slow-down factor based on the ratio
-            desired_velocity = min(desired_velocity, velocity * (distance_to_car_ahead / safe_distance))
+            fraction = distance_to_car_ahead / safe_distance
+            desired_velocity = min(desired_velocity, velocity * fraction)
 
-        # Calculate acceleration needed to get from velocity to desired_velocity within this timestep
-        max_accel = getattr(lane, "max_accel", 2.0)
+        # Compute needed acceleration to go from velocity -> desired_velocity in this timestep
         raw_acc = (desired_velocity - velocity) / self.__time_step
-        # Clamp acceleration between -deceleration and +max_accel
-        acceleration = max(-deceleration, min(raw_acc, max_accel))
+        # Clamp
+        acc = max(-deceleration, min(raw_acc, acceleration_limit))
 
-        # Update velocity
-        new_velocity = velocity + acceleration * self.__time_step
-
-        # Distance traveled in this time step (simple kinematics)
-        displacement = velocity * self.__time_step + 0.5 * acceleration * (self.__time_step ** 2)
+        # s = v*t + 0.5*a*t^2
+        new_velocity = velocity + acc * self.__time_step
+        displacement = (velocity * self.__time_step) + (0.5 * acc * (self.__time_step ** 2))
         new_dist = dist - displacement
 
-        # Update car state
+        # Update the car
         car.set_velocity(new_velocity)
         car.set_dist(new_dist)
 
-        # Check if we reached the next lane or left this lane
-        dest_lane = next(iter(junction.get_lanes_by_ids([car.get_dest()])), None)
-        if new_dist <= 0 and dest_lane:
-            # Move car to the next lane if it’s a different one
-            if dest_lane.get_id() != lane.get_id():
+        # If the car has reached the junction (dist <= 0), see if it needs to move to another lane
+        if new_dist <= 0:
+            # Attempt to move the car to its "dest" lane if that lane is different
+            dest_lane = next(iter(junction.get_lanes_by_ids([car.get_dest()])), None)
+            if dest_lane and dest_lane.get_id() != lane.get_id():
                 lane.remove_car(car)
                 dest_lane.add_car(car)
+                # Reset the distance in the new lane
                 car.set_dist(dest_lane.LENGTH)
 
-        # If we are too far past the lane's endpoint, remove the car
-        after_length = getattr(lane, "after_length", -(lane.LENGTH // 2))  # fallback
-        if new_dist <= after_length:
+        # If the car has gone beyond some threshold, remove it (it left the system)
+        # You might choose a different approach for "exiting" the simulation
+        exit_threshold = -20  # for example
+        if new_dist < exit_threshold:
             lane.remove_car(car)
-            # Could do something more complex here, e.g., move to a next junction, etc.
+
+    @staticmethod
+    def __distance_to_car_ahead(lane: Lane, this_car: Car) -> float:
+        """
+        Returns how far ahead the nearest car is in the same lane (distances measured from lane end).
+        Larger 'dist' means the car is further from the junction, so "ahead" means 'dist' is smaller.
+        """
+        this_dist = this_car.get_dist()
+        # Any car with a 'dist' less than this_dist is physically ahead.
+        cars_ahead = [c for c in lane.get_cars() if c.get_dist() < this_dist and c != this_car]
+        if not cars_ahead:
+            return math.inf
+        # The gap is (this_dist - that_dist)
+        return min(this_dist - c.get_dist() for c in cars_ahead)
 
     @staticmethod
     def __check_if_green(lane: Lane, junction: Junction) -> bool:
         """
-        Check if the traffic light for this lane is green.
-        This function assumes that if ANY traffic light that has this lane's ID as an origin is green,
-        then the lane's signal is effectively green.
+        Returns True if any traffic light that covers lane.id is green.
         """
         for tl in junction.get_traffic_lights():
             if lane.get_id() in tl.get_origins() and tl.get_state() is True:
                 return True
         return False
 
-    @staticmethod
-    def __check_car_ahead(lane: Lane, car: Car) -> float:
-        """Returns the gap to the car ahead in the same lane, or math.inf if no car ahead."""
-        dist_of_this = car.get_dist()
-        # Cars with distance < dist_of_this are "ahead" (since we measure dist from lane end)
-        cars_ahead = [other for other in lane.get_cars() if other.get_dist() < dist_of_this and other is not car]
-        if not cars_ahead:
-            return math.inf
-        # Minimum gap
-        return min(dist_of_this - other.get_dist() for other in cars_ahead)
-
     def __update_traffic_lights(self) -> None:
         """
-        Update traffic light cycles.
-        (Currently just toggles some lights after a certain count for demonstration.)
-        TODO: In a real scenario, fetch states from a backend or a more complex scheduling logic.
+        Very naive 'time-based' toggler for demonstration.
+        Flip traffic lights every ~5 seconds (assuming 30 FPS => ~150 loops).
         """
         with self.__lock:
-            # A silly time-based toggling demonstration
             for junction in self.__junctions:
-                count = 0
                 for tl in junction.get_traffic_lights():
-                    # Flip state after 5 seconds (assuming 30 fps => ~150 updates)
-                    if count > 30 * 5:
-                        if tl.get_state():
-                            tl.red()
-                        else:
-                            tl.green()
-                    count += 1
+                    # Toggle at random or after a certain count?
+                    # Here we just flip it with small probability each step for demo
+                    # or you could do a time-based approach.
+                    pass
+                    # Example (commented):
+                    # if random.random() < 0.001:
+                    #     if tl.get_state():
+                    #         tl.red()
+                    #     else:
+                    #         tl.green()
 
     def __gen_cars(self) -> None:
         """
-        Generates new cars based on an exponential distribution with parameter 'lane.get_car_creation()'.
-        If lane.get_car_creation() is 0, it means no cars for that lane.
+        Generate new cars for each lane based on an exponential distribution with
+        parameter lane.get_car_creation(). If that is 0, no cars for that lane.
         """
         with self.__lock:
             for junction in self.__junctions:
                 for road in junction.get_roads():
                     for lane in road.get_lanes():
-                        car_creation_rate = lane.get_car_creation()
-                        # Sometimes lane might have 0 creation rate => no new cars
-                        if car_creation_rate > 0:
-                            # On average, expovariate() will produce 1 event per 1/lambda
-                            # We do int() to handle the possibility that we might get > 1 sometimes
-                            num_cars = int(expovariate(car_creation_rate))
+                        rate = lane.get_car_creation()
+                        if rate > 0:
+                            # On average, expovariate(rate) yields 1 event per 1/rate
+                            # We convert that to an integer number of new cars
+                            num_cars = int(expovariate(rate))
                             for i in range(num_cars):
-                                speed = max(0.0, uniform(lane.max_vel - 10, lane.max_vel + 10))
-                                new_car = Car(id=i,
-                                              dist=lane.LENGTH,
-                                              velocity=speed,
-                                              dest=self.__create_random_dest(lane),
-                                              car_type="CAR")
+                                # Create a random velocity near the lane's max_vel
+                                speed = uniform(lane.max_vel * 0.5, lane.max_vel * 1.2)
+                                # Destination is the same lane ID for demonstration
+                                car_id = int(time.time() * 1000)  # generate a pseudo-unique ID
+                                new_car = Car(
+                                    id=car_id,
+                                    dist=lane.LENGTH,
+                                    velocity=speed,
+                                    dest=lane.get_id(),
+                                    car_type="CAR",
+                                )
                                 lane.add_car(new_car)
 
-    @staticmethod
-    def __create_random_dest(lane: Lane) -> Lane:
-        # For now, we just return the same lane as the "destination".
-        # In a bigger simulation, this would be replaced by an actual next-lane or route selection.
-        return lane
-
     def stop(self) -> None:
-        """Stops the simulation."""
+        """Stop the simulation thread."""
         self.__stop_event.set()
         if self.__thread:
             self.__thread.join()
@@ -202,9 +202,8 @@ class Sim:
         self.stop()
 
     def resume(self) -> None:
-        """Resumes the simulation."""
+        """Resumes the simulation if it’s not already running."""
         self.start()
 
     def get_junctions(self) -> List[Junction]:
-        """Returns the list of junctions in the simulation."""
         return self.__junctions
