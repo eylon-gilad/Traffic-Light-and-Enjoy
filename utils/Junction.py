@@ -1,5 +1,6 @@
 from typing import List
 from utils.Road import Road
+from utils.Lane import Lane
 from utils.TrafficLight import TrafficLight
 
 
@@ -36,3 +37,15 @@ class Junction:
     def set_roads(self, roads: List[Road]) -> None:
         """Sets the roads connected to the junction."""
         self.roads = roads
+
+    def get_road_by_id(self, road_id: int) -> Road:
+        for road in self.roads:
+            if road.id == road_id:
+                return road
+
+    def get_lanes_by_ids(self, ids: List[int]) -> List[Lane]:
+        lanes = []
+        for lane in self.lanes:
+            if lane.id in ids:
+                lanes.append(lane)
+        return lanes

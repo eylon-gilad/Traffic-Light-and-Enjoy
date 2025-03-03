@@ -1,4 +1,3 @@
-# sim/simulation.py
 import random
 from utils.Car import Car
 from utils.Lane import Lane
@@ -7,9 +6,9 @@ from utils.TrafficLight import TrafficLight
 from utils.Junction import Junction
 
 
-def create_traffic_light(id, direction, state):
+def create_traffic_light(id, entry_angle, state):
     tl = TrafficLight(id=id, origins=[], destinations=[], state=state)
-    tl.direction = direction
+    tl.entry_angle = entry_angle  # store the numeric entry angle
     return tl
 
 
@@ -17,23 +16,27 @@ class StaticIntersectionSimulation:
     def __init__(self):
         """
         Creates a static simulation state representing a realistic four‐arm intersection.
-        Each of the four roads (north, south, east, west) has 4 lanes with many cars
-        approaching the junction (incoming only). Also creates a traffic light for each approach.
+        Each of the four roads has 4 lanes with many cars approaching the junction (incoming only).
+        Road IDs will be numeric and of the form 11RR (e.g., 1101 for road 1).
+        Lane IDs will be numeric and of the form 11RRLL (e.g., 110101 for lane 1 on road 1).
+
+        Instead of storing a cardinal direction (e.g., "north"), each road gets an
+        entry_angle property. In our example:
+          - Road 1101 gets entry_angle = -90° (formerly north)
+          - Road 1102 gets entry_angle = 90° (formerly south)
+          - Road 1103 gets entry_angle = 0° (formerly east)
+          - Road 1104 gets entry_angle = 180° (formerly west)
         """
         self.roads = []
         self.lane_width = 40  # lane width in pixels
         num_cars_per_lane = 2
 
-        # Define four roads with directions and unique IDs
-        self.road_data = {
-            'north': 1,
-            'south': 2,
-            'east': 3,
-            'west': 4
-        }
-
-        # Create 4 lanes per road
-        for road_direction, road_id in self.road_data.items():
+        # Define entry angles in the order we want our four roads to appear.
+        entry_angles = [-90, 90, 0, 180]
+        for road_index in range(4):
+            road_number = road_index + 1
+            road_id = 1100 + road_number
+            entry_angle = entry_angles[road_index]
             lanes = []
             for lane_index in range(4):
                 cars = []
@@ -41,28 +44,33 @@ class StaticIntersectionSimulation:
                     # Random distance from the junction edge (between 20 and 300 pixels)
                     dist_val = random.uniform(20, 300)
                     img_index = random.randint(1, 7)
+                    # Compute a car ID that incorporates the road and lane info.
+                    car_id = road_id * 1000 + (lane_index + 1) * 100 + i
                     car = Car(
-                        id=road_id * 100 + lane_index * 10 + i,
-                        dist=[dist_val],
+                        id=car_id,
+                        dist=dist_val,
                         velocity=0.0,
-                        dest=road_direction,
-                        car_type="CAR"
+                        dest=road_id,  # using road_id as a placeholder for destination
+                        car_type="CAR",
                     )
                     car.img_index = img_index  # assign a random car image index
                     cars.append(car)
-                lane = Lane(id=road_id * 10 + lane_index, cars=cars)
+                # Create lane ID as 11RRLL (with lanes numbered 1–4)
+                lane_id = road_id * 100 + (lane_index + 1)
+                lane = Lane(id=lane_id, cars=cars)
                 lanes.append(lane)
+
             road = Road(id=road_id, lanes=lanes, congection_level=0)
-            road.direction = road_direction  # store direction for drawing purposes
+            road.entry_angle = entry_angle  # store the numeric entry angle
             self.roads.append(road)
 
-        # Create one traffic light per approach.
-        # For realism, let’s assume north and south have green while east and west have red.
+        # Create one traffic light per road.
+        # For realism, let’s assume roads with entry_angle -90 and 90 (formerly north & south) are green.
         self.traffic_lights = []
-        self.traffic_lights.append(create_traffic_light(1, 'north', True))
-        self.traffic_lights.append(create_traffic_light(2, 'south', True))
-        self.traffic_lights.append(create_traffic_light(3, 'east', False))
-        self.traffic_lights.append(create_traffic_light(4, 'west', False))
+        for road in self.roads:
+            state = True if road.entry_angle in (-90, 90) else False
+            tl = create_traffic_light(road.id, road.entry_angle, state)
+            self.traffic_lights.append(tl)
 
     def get_roads(self):
         return self.roads
