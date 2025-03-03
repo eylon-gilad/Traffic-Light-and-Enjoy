@@ -1,3 +1,9 @@
+"""
+RoadEnum.py
+
+This module defines the RoadEnum enumeration for cardinal road directions.
+"""
+
 from enum import Enum
 
 
