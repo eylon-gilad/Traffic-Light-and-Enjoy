@@ -31,3 +31,5 @@ class Road:
 
     def set_congection_level(self, congection_level: int) -> None:
         self.congection_level = congection_level
+
+
