@@ -4,15 +4,21 @@ from utils.Road import Road
 from utils.RoadEnum import RoadEnum
 from typing import List, Dict
 from collections import defaultdict
-
 import itertools
 
 
 class TrafficLightsCombinator:
     combinations: List[tuple] = []
 
+    def __init__(self, junction: Junction):
+        self.junction = junction
+        self.combinations = self.calc_possible_active_lights(self.junction)
+
+    def get_combinations(self):
+        return self.combinations
+
     @staticmethod
-    def calc_possible_active_lights(junction):
+    def calc_possible_active_lights(junction) -> List[tuple]:
         traffic_lights: List[TrafficLight] = junction.get_traffic_lights()
         possible_combinations: Dict[int, List[int]] = defaultdict(list)
 
@@ -28,7 +34,7 @@ class TrafficLightsCombinator:
             if key in value:
                 value.remove(key)
 
-        TrafficLightsCombinator.combinations = TrafficLightsCombinator.find_max_combinations(possible_combinations)
+        return TrafficLightsCombinator.find_max_combinations(possible_combinations)
 
     @staticmethod
     def power_set(s):
