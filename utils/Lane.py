@@ -10,15 +10,17 @@ from utils.Car import Car
 
 
 class Lane:
+    def get_id(self) -> int:
+        """Returns the lane's unique identifier."""
+        return self.id
+
     def __init__(
         self,
         id: int = 0,
         cars: Optional[List[Car]] = None,
         car_creation: float = 0.0,
         lane_len: int = 400,
-        lane_max_vel: float = 150.0,
-        max_decel: float = 100,
-        max_accel: float = 100,
+        lane_max_vel: float = 100.0,
     ) -> None:
         """
         Initializes a Lane object.
@@ -37,12 +39,8 @@ class Lane:
         self.car_creation: float = car_creation
         self.LENGTH: int = lane_len
         self.max_vel: float = lane_max_vel
-        self.max_decel: float = max_decel
-        self.max_accel: float = max_accel
-
-    def get_id(self) -> int:
-        """Returns the lane's unique identifier."""
-        return self.id
+        self.max_decel: float = lane_max_vel * 3
+        self.max_accel: float = lane_max_vel * 2
 
     def get_cars(self) -> List[Car]:
         """Returns the list of cars currently in the lane."""

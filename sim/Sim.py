@@ -114,7 +114,7 @@ class Sim:
 
         # Calculate the minimum safe stopping distance.
         safe_distance: float = max(
-            40, (velocity**2) / (2 * deceleration) if deceleration > 0 else 40
+            50, (velocity**2) / (2 * deceleration) if deceleration > 0 else 50
         )
 
         # Check if the traffic light for this lane is green.
