@@ -1,4 +1,6 @@
+# Road.py
 from typing import List
+
 from utils.Lane import Lane
 
 
@@ -28,9 +30,3 @@ class Road:
     def set_lanes(self, lanes: List[Lane]) -> None:
         """Sets the lanes on the road."""
         self.lanes = lanes
-
-    def get_congection_level(self) -> int:
-        return self.congection_level
-
-    def set_congection_level(self, congection_level: int) -> None:
-        self.congection_level = congection_level
