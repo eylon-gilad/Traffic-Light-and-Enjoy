@@ -1,13 +1,13 @@
+# TrafficLight.py
 from typing import List
-
 
 class TrafficLight:
     def __init__(
-        self,
-        id: int = 0,
-        origins: List[int] = [],
-        destinations: List[int] = [],
-        state: bool = False,
+            self,
+            id: int = 0,
+            origins: List[int] = None,
+            destinations: List[int] = None,
+            state: bool = False,
     ) -> None:
         """
         Represents a traffic light controlling lanes at an intersection.
@@ -15,11 +15,11 @@ class TrafficLight:
         :param id: Unique identifier for the traffic light
         :param origins: List of lane IDs where traffic originates
         :param destinations: List of lane IDs where traffic is directed
-        :param state: Boolean indicating if the light is green (True) or red (False)
+        :param state: True if light is green, False if red
         """
         self.id = id
-        self.origins = origins  # Lane IDs
-        self.destinations = destinations  # Lane IDs
+        self.origins = origins if origins is not None else []
+        self.destinations = destinations if destinations is not None else []
         self.state = state
 
     def get_id(self) -> int:
