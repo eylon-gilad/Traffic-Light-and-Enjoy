@@ -12,8 +12,10 @@ from utils.TrafficLight import TrafficLight
 
 from TrafficLightsCombinator import TrafficLightsCombinator
 
+from algo.Algorithms.ExpCarsOnTime import ExpCarsOnTimeController
+
 from algo.AlgoRunner import AlgoRunner
-from algo.Algorithms import BaseAlgorithm
+from algo.Algorithms.BaseAlgorithm import BaseAlgorithm
 
 app = Flask(__name__)
 
