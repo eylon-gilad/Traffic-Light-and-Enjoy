@@ -28,7 +28,7 @@ class Sim:
         __lock (threading.Lock): Lock to synchronize simulation updates.
         ui_enabled (bool): Flag indicating whether UI mode is enabled.
         __time_step (float): Time step per simulation loop (faster if UI is disabled).
-        __thread (Optional[threading.Thread]): Thread running the simulation loop.
+        __thread (Optional[threa`ding.Thread]): Thread running the simulation loop.
     """
 
     __DEFAULT_TIME_STEP: float = 1 / 30  # Default ~30 FPS for UI mode
