@@ -17,7 +17,8 @@ from utils.Road import Road
 from utils.Lane import Lane
 from utils.Car import Car
 from utils.TrafficLight import TrafficLight
-from sim.creator.create_sim import create_junction
+from sim.creator.create_sim import create_junction, index_to_directions
+from utils.RoadEnum import RoadEnum
 
 #########################
 # SCREEN / RENDER CONFIG
@@ -149,29 +150,25 @@ def build_simple_plus_junction_sim() -> Sim:
         return [lane1, lane2]
 
     road_north = Road(id=1, lanes=make_lanes(100))
-    setattr(road_north, "direction", "north")
+    setattr(road_north, "from_side", 0)
 
-    road_south = Road(id=2, lanes=make_lanes(200))
-    setattr(road_south, "direction", "south")
+    road_south = Road(id=2, lanes=make_lanes(300))
+    setattr(road_south, "from_side", 2)
 
-    road_east = Road(id=3, lanes=make_lanes(300))
-    setattr(road_east, "direction", "east")
+    road_east = Road(id=3, lanes=make_lanes(200))
+    setattr(road_east, "from_side", 1)
 
     road_west = Road(id=4, lanes=make_lanes(400))
-    setattr(road_west, "direction", "west")
+    setattr(road_west, "from_side", 3)
 
     # Define traffic lights for each road approach.
     tl_north = TrafficLight(id=10, origins=[100, 101], state=True)
-    setattr(tl_north, "direction", "north")
 
-    tl_south = TrafficLight(id=11, origins=[200, 201], state=True)
-    setattr(tl_south, "direction", "south")
+    tl_south = TrafficLight(id=11, origins=[300, 301], state=True)
 
-    tl_east = TrafficLight(id=12, origins=[300, 301], state=False)
-    setattr(tl_east, "direction", "east")
+    tl_east = TrafficLight(id=12, origins=[200, 201], state=False)
 
     tl_west = TrafficLight(id=13, origins=[400, 401], state=False)
-    setattr(tl_west, "direction", "west")
 
     # Create the junction with the roads and traffic lights.
     junction = Junction(
@@ -182,7 +179,9 @@ def build_simple_plus_junction_sim() -> Sim:
 
     # Create and return the simulation instance.
     sim: Sim = Sim(junctions=[junction], if_ui=True)
-    return sim
+    junction = create_junction()
+    sim2 = Sim(junctions=[junction], if_ui=True)
+    return sim2
 
 
 #########################
@@ -304,7 +303,7 @@ def draw_junction_ui(
 
     # 3) Draw the cars.
     for road in junction.get_roads():
-        direction: str = getattr(road, "direction", None)
+        direction: str = getattr(road, "from_side", None)
         for lane_idx, lane in enumerate(road.get_lanes()):
             for car in lane.get_cars():
                 if not hasattr(car, "img_index"):
@@ -339,7 +338,7 @@ def draw_full_road(screen: pygame.Surface, cx: int, cy: int, road: Road) -> None
         cy (int): Y-coordinate of the center.
         road (Road): The road object to draw.
     """
-    direction: str = getattr(road, "direction", None)
+    direction: str = RoadEnum(getattr(road, "from_side", None)).name
     lane_len: int = road.get_lanes()[0].LENGTH  # Example lane length.
     half_int: int = INTERSECTION_SIZE // 2
     half_road: int = ROAD_TOTAL_WIDTH // 2
@@ -347,7 +346,7 @@ def draw_full_road(screen: pygame.Surface, cx: int, cy: int, road: Road) -> None
     # Total length includes the portion before, the intersection, and after.
     total_length: int = INTERSECTION_SIZE + 2 * lane_len
 
-    if direction == "north":
+    if direction == "NORTH":
         shift_x: int = SHIFT_X_NORTH
         top: int = cy - half_int - lane_len
         left: int = (cx - half_road) + shift_x
@@ -358,7 +357,7 @@ def draw_full_road(screen: pygame.Surface, cx: int, cy: int, road: Road) -> None
         pygame.draw.rect(screen, ASPHALT_COLOR, road_rect)
         draw_lane_boundaries_vertical(screen, left, top, width, height)
 
-    elif direction == "south":
+    elif direction == "SOUTH":
         shift_x = SHIFT_X_SOUTH  # FIXME: duplicate code
         top = cy - half_int - lane_len
         left = (cx - half_road) + shift_x
@@ -369,7 +368,7 @@ def draw_full_road(screen: pygame.Surface, cx: int, cy: int, road: Road) -> None
         pygame.draw.rect(screen, ASPHALT_COLOR, road_rect)
         draw_lane_boundaries_vertical(screen, left, top, width, height)
 
-    elif direction == "east":  # FIXME: duplicate code
+    elif direction == "EAST":  # FIXME: duplicate code
         shift_y: int = SHIFT_Y_EAST
         left = cx - half_int - lane_len
         top = (cy - half_road) + shift_y
@@ -380,7 +379,7 @@ def draw_full_road(screen: pygame.Surface, cx: int, cy: int, road: Road) -> None
         pygame.draw.rect(screen, ASPHALT_COLOR, road_rect)
         draw_lane_boundaries_horizontal(screen, left, top, width, height)
 
-    elif direction == "west":
+    elif direction == "WEST":
         shift_y = SHIFT_Y_WEST  # FIXME: duplicate code
         left = cx - half_int - lane_len
         top = (cy - half_road) + shift_y
@@ -476,7 +475,8 @@ def draw_traffic_light(
     """
     is_green: bool = tl.get_state()
     color: Tuple[int, int, int] = (0, 255, 0) if is_green else (255, 0, 0)
-    direction: str = getattr(tl, "direction", "north")
+    # direction: str = getattr(tl, "from_side", "NORTH")
+    direction: int = index_to_directions(tl.get_origins()[0]//100-1)[0]
 
     lw: int = 12
     lh: int = 30
@@ -484,16 +484,16 @@ def draw_traffic_light(
     half_int: int = INTERSECTION_SIZE // 2
     half_road: int = ROAD_TOTAL_WIDTH // 2
 
-    if direction == "north":
+    if direction == 0:  # north
         x: int = cx - half_road + 10
         y: int = cy - half_int - lh - offset
-    elif direction == "south":
+    elif direction == 1:  # east
         x = cx + half_road - lw - 10
         y = cy + half_int + offset
-    elif direction == "east":
+    elif direction == 2:  # south
         x = cx + half_int + offset
         y = cy + half_road + 10
-    else:  # west
+    elif direction == 3:  # west
         x = cx - half_int - lh - offset
         y = cy - half_road - lh - 10
 
@@ -514,7 +514,7 @@ def compute_car_position(
     Args:
         cx (int): Center X-coordinate of the screen.
         cy (int): Center Y-coordinate of the screen.
-        direction (str): The road direction (e.g., "north", "south").
+        direction (str): The road direction (e.g., "NORTH", "SOUTH").
         lane_idx (int): The index of the lane in the road.
         lane (Lane): The lane object.
         car (Car): The car object.
@@ -524,6 +524,7 @@ def compute_car_position(
     """
     dist: float = car.get_dist()
     full_dist: int = lane.LENGTH
+    direction = RoadEnum(direction).name
 
     # Calculate lane center positions.
     lane_centers = [
@@ -535,8 +536,10 @@ def compute_car_position(
     half_road: int = ROAD_TOTAL_WIDTH // 2
     half_int: int = INTERSECTION_SIZE // 2
 
+    x, y, angle = 0, 0, 0
+
     # Calculate the car's position based on the direction.
-    if direction == "north":
+    if direction == "NORTH":
         angle: float = -90
         shift_x: int = SHIFT_X_NORTH
         left_boundary: int = (cx - half_road) + shift_x
@@ -549,7 +552,7 @@ def compute_car_position(
             # For distances beyond the intersection edge.
             y = (cy - half_int) + abs(dist)
 
-    elif direction == "south":
+    elif direction == "SOUTH":
         angle = 90
         shift_x = SHIFT_X_SOUTH
         left_boundary = (cx - half_road) + shift_x
@@ -561,7 +564,7 @@ def compute_car_position(
         else:
             y = (cy + half_int) - abs(dist)
 
-    elif direction == "east":
+    elif direction == "EAST":
         angle = 180
         shift_y: int = SHIFT_Y_EAST
         top_boundary: int = (cy - half_road) + shift_y
@@ -573,7 +576,7 @@ def compute_car_position(
         else:
             x = (cx + half_int) - abs(dist)
 
-    else:  # west
+    elif direction == "WEST":  # west
         angle = 0
         shift_y = SHIFT_Y_WEST
         top_boundary = (cy - half_road) + shift_y
@@ -584,6 +587,9 @@ def compute_car_position(
             x = left_of_road + frac * ((cx - half_int) - left_of_road)
         else:
             x = (cx - half_int) + abs(dist)
+    else:
+        print((direction))
+        print(x,y,angle)
 
     return x, y, angle
 

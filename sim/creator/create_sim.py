@@ -137,7 +137,7 @@ def create_lanes(road_index: int = 1, amount_lanes: int = 3) -> list[Lane]:
     lanes: list[Lane] = []
     for i in range(amount_lanes):
         lane_index = road_index * 10 + i
-        cars_creation = random.randint(1, 100)
+        cars_creation = random.randint(1, 100)/100
         max_vel = random.choice(VELOCITY_OPTIONS)
         lane = Lane(lane_index, car_creation=cars_creation, lane_max_vel=max_vel)
         lanes.append(lane)
