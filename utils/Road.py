@@ -1,39 +1,32 @@
-"""
-Road.py
-
-This module defines the Road class, representing a road in the traffic simulation.
-A road consists of multiple lanes.
-"""
-
+# Road.py
 from typing import List
+
 from utils.Lane import Lane
 
 
 class Road:
-    def __init__(self, id: int = 0, lanes: List[Lane] = None) -> None:
+    def __init__(
+            self, id: int = 0, lanes: List[Lane] = [], congection_level: int = 0,
+            from_side: int = None, to_side: int = None
+    ) -> None:
         """
-        Initializes a Road object.
+        Represents a road in the simulation.
 
-        Args:
-            id (int): Unique identifier for the road.
-            lanes (List[Lane], optional): List of Lane objects on the road.
+        :param id: Unique identifier for the road
+        :param lanes: List of Lane objects on this road
+        :param congection_level: An integer indicating congestion (0 = low, higher = more congestion)
         """
-        self.id: int = id
-        self.lanes: List[Lane] = lanes if lanes is not None else []
+        self.id = id
+        self.lanes: List[Lane] = lanes
+        self.from_side = from_side
+        self.to_side = to_side
 
     def get_id(self) -> int:
-        """Returns the road's unique identifier."""
         return self.id
 
     def get_lanes(self) -> List[Lane]:
-        """Returns the list of lanes on the road."""
         return self.lanes
 
     def set_lanes(self, lanes: List[Lane]) -> None:
-        """
-        Sets the lanes for the road.
-
-        Args:
-            lanes (List[Lane]): New list of lanes.
-        """
+        """Sets the lanes on the road."""
         self.lanes = lanes

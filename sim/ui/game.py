@@ -17,6 +17,7 @@ from utils.Road import Road
 from utils.Lane import Lane
 from utils.Car import Car
 from utils.TrafficLight import TrafficLight
+from sim.creator.create_sim import create_junction
 
 #########################
 # SCREEN / RENDER CONFIG
@@ -140,11 +141,10 @@ def build_simple_plus_junction_sim() -> Sim:
         lane1 = Lane(
             id=lane_id_start,
             lane_len=400,  # Adjustable lane length.
-            lane_max_vel=50.0,
             car_creation=0.01,
         )
         lane2 = Lane(
-            id=lane_id_start + 1, lane_len=400, lane_max_vel=50.0, car_creation=0.01
+            id=lane_id_start + 1, lane_len=400, car_creation=0.01
         )
         return [lane1, lane2]
 
