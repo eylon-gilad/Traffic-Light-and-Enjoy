@@ -150,6 +150,7 @@ def build_simple_plus_junction_sim() -> Sim:
 
     road_north = Road(id=1, lanes=make_lanes(100))
     setattr(road_north, "direction", "north")
+    
 
     road_south = Road(id=2, lanes=make_lanes(200))
     setattr(road_south, "direction", "south")
