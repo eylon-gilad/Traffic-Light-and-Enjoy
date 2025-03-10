@@ -4,8 +4,7 @@ TrafficLight.py
 This module defines the TrafficLight class, representing a traffic light that controls lanes at an intersection.
 
 Changes:
-- Added docstring for the class and methods.
-- Added type hints.
+- Clarified docstrings and type hints.
 - Preserved existing functionality.
 """
 
@@ -107,6 +106,9 @@ class TrafficLight:
         self.state = False
 
     def __str__(self) -> str:
+        """
+        Provide a human-readable string representation of this TrafficLight.
+        """
         return (
             f"TrafficLight(id={self.id}, origins={self.origins}, "
             f"destinations={self.destinations}, state={self.state})"

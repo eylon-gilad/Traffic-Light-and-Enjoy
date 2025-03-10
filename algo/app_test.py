@@ -1,8 +1,11 @@
-import requests
 import time
 from typing import Dict, Any
-# TODO move this file to the api folder
-# Large dummy data with 4 roads, multiple lanes, traffic lights, etc.
+
+import requests
+
+# TODO: Move this file into an appropriate 'api' or 'tests' folder if desired.
+
+# Example large dummy data with roads, lanes, traffic lights, etc.
 dummy_data: Dict[str, Any] = {
     "junction": {
         "traffic_lights": [
@@ -302,6 +305,9 @@ GET_START_URL = "http://127.0.0.1:8080/start-algorithm"
 
 
 def test_start_algorithm() -> None:
+    """
+    Sends a GET request to start the algorithm runner.
+    """
     print(f"Sending GET to: {GET_START_URL}")
     response = requests.get(GET_START_URL)
     print("Status Code:", response.status_code)
@@ -313,8 +319,8 @@ def test_start_algorithm() -> None:
 
 def test_post_junction_info() -> None:
     """
-    Sends dummy_data to the '/junction-info' endpoint to create/modify
-    the Junction object on the server.
+    Sends dummy_data to the '/junction-info' endpoint to update
+    or create the global Junction object on the server.
     """
     print(f"Sending POST to: {POST_URL}")
     response = requests.post(POST_URL, json=dummy_data)
@@ -328,7 +334,8 @@ def test_post_junction_info() -> None:
 
 def test_get_traffic_light_state() -> None:
     """
-    Fetches the current traffic light states from the server at '/traffic-light-state'.
+    Fetches the current traffic light states from the server at
+    '/traffic-light-state'.
     """
     print(f"Sending GET to: {GET_URL}")
     response = requests.get(GET_URL)
@@ -340,16 +347,14 @@ def test_get_traffic_light_state() -> None:
     print()
 
 
-def repeated_get_traffic_light_state(
-    url: str, iterations: int = 100, delay: float = 5.0
-) -> None:
+def repeated_get_traffic_light_state(url: str, iterations: int = 100, delay: float = 5.0) -> None:
     """
-    Repeatedly GET the /traffic-light-state endpoint `iterations` times,
-    waiting `delay` seconds between each call.
+    Repeatedly call the '/traffic-light-state' endpoint `iterations` times,
+    pausing for `delay` seconds between each call.
 
-    :param url: The URL of the traffic-light-state endpoint.
-    :param iterations: Number of times to call the endpoint.
-    :param delay: Delay (in seconds) between successive calls.
+    :param url: The traffic-light-state endpoint URL.
+    :param iterations: How many times to call the endpoint.
+    :param delay: Delay in seconds between requests.
     """
     print(f"Will GET {iterations} times from {url}, every {delay} seconds.")
     for i in range(iterations):
@@ -370,10 +375,11 @@ def repeated_get_traffic_light_state(
 
 if __name__ == "__main__":
     test_start_algorithm()
+
     # 1. POST the large dummy data to set up the junction
     test_post_junction_info()
 
-    # 2. Perform an immediate single GET request to see if data is there
+    # 2. Perform an immediate single GET request
     test_get_traffic_light_state()
 
     # 3. Repeatedly call GET /traffic-light-state 100 times every 5 seconds

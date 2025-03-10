@@ -6,11 +6,10 @@ Each Car instance holds its unique identifier, distance along the lane, velocity
 destination lane/road, and type.
 
 Changes:
-- Added/updated docstring for the class.
-- Added type hints to all methods.
+- Added/clarified docstring for the class and methods.
+- Added type hints to all methods (PEP 484).
 - Preserved existing functionality.
 """
-
 
 class Car:
     """
@@ -118,6 +117,9 @@ class Car:
         self.car_type = car_type
 
     def __str__(self) -> str:
+        """
+        Provide a human-readable string representation of this Car.
+        """
         return (
             f"Car(id={self.id}, dist={self.dist}, "
             f"velocity={self.velocity}, dest='{self.dest}', car_type='{self.car_type}')"

@@ -5,8 +5,9 @@ This module defines the Junction class, representing a traffic junction where ro
 A junction contains roads and associated traffic lights.
 
 Changes:
-- Added/updated docstring for the class.
-- Added type hints to constructor and all methods.
+- Refined docstrings for the class.
+- Added missing docstring for get_traffic_light_by_id.
+- Added type hints.
 - Preserved existing functionality.
 """
 
@@ -77,12 +78,20 @@ class Junction:
         """
         return self.roads
 
+    def get_traffic_light_by_id(self, traffic_light_id: int) -> Optional[TrafficLight]:
+        """
+        Retrieve a traffic light from the junction by its unique identifier.
 
+        Args:
+            traffic_light_id (int): The unique identifier of the traffic light.
 
-    def get_traffic_light_by_id(self, traffic_light_id: int) -> TrafficLight:
+        Returns:
+            Optional[TrafficLight]: The traffic light if found; otherwise None.
+        """
         for traffic_light in self.traffic_lights:
             if traffic_light.id == traffic_light_id:
                 return traffic_light
+        return None  # TODO: Confirm if returning None is acceptable or if an exception should be raised.
 
     def set_roads(self, roads: List[Road]) -> None:
         """
@@ -137,6 +146,9 @@ class Junction:
         return result
 
     def __str__(self) -> str:
+        """
+        Provide a human-readable string representation of this Junction.
+        """
         roads_str = ", ".join(str(road) for road in self.roads)
         tls_str = ", ".join(str(tl) for tl in self.traffic_lights)
         return (

@@ -5,9 +5,8 @@ This module defines the Lane class, representing a lane on a road where cars tra
 It holds a list of cars and various parameters for car generation and movement.
 
 Changes:
-- Added docstring for the class.
-- Added type hints in the constructor and methods.
-- Added a small TODO note when removing a car that doesn’t exist in the lane.
+- Expanded docstrings and type hints for methods.
+- Added TODO note in remove_car if the car does not exist in the lane.
 - Preserved existing functionality.
 """
 
@@ -41,7 +40,7 @@ class Lane:
             lane_id (int): Unique identifier for the lane.
             cars (Optional[List[Car]]): List of Car objects currently in the lane.
             car_creation (float): Rate parameter for car creation (lambda for Poisson process).
-            lane_len (int): Physical length of the lane.
+            lane_len (int): Physical length of the lane in simulation units.
             lane_max_vel (float): Maximum allowed velocity in the lane.
         """
         self.id: int = lane_id
@@ -49,7 +48,7 @@ class Lane:
         self.car_creation: float = car_creation
         self.LENGTH: int = lane_len
         self.max_vel: float = lane_max_vel
-        # Derive maximum deceleration and acceleration from lane_max_vel (unchanged logic)
+        # Keep original logic for max_decel and max_accel:
         self.max_decel: float = self.max_vel * 3
         self.max_accel: float = self.max_vel * 2
 
@@ -85,7 +84,7 @@ class Lane:
         Get the car creation rate for the lane.
 
         Returns:
-            float: The car creation rate parameter.
+            float: The car creation rate parameter (cars/second).
         """
         return self.car_creation
 
@@ -104,14 +103,19 @@ class Lane:
 
         Args:
             car (Car): The car to remove.
+
+        TODO:
+            Confirm whether it's an error or normal scenario when removing a car
+            that isn't currently in this lane.
         """
         if car in self.cars:
             self.cars.remove(car)
         else:
-            # TODO: Confirm whether it's an error or normal scenario when removing a car not in the lane.
             logger.debug(f"Attempted to remove a car not in lane (Lane ID: {self.id}).")
 
-
-    def __str__(self):
+    def __str__(self) -> str:
+        """
+        Provide a human-readable string representation of this Lane.
+        """
         cars_str = ", ".join(str(car) for car in self.cars)
-        return f"Lane(id={self.id}, " f"cars=[{cars_str}])"
+        return f"Lane(id={self.id}, cars=[{cars_str}])"

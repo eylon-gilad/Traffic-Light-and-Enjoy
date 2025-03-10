@@ -59,24 +59,68 @@ class Sim:
         if self.__thread and self.__thread.is_alive():
             # Simulation is already running.
             return
-        self.__thread = threading.Thread(target=self.__run, daemon=True)
-        self.__thread.start()
+
+        # Build each Junction on the server
+        for junction in self.__junctions:
+            try:
+                Client.send_build_junction(junction)
+            except Exception as exc:
+                self.__set_all_lights_red()
+                self.__client_failed = True
+
+            # Start the traffic-light algorithm on the server
+            try:
+                Client.start_algorithm()
+            except Exception as exc:
+                self.__set_all_lights_red()
+                self.__client_failed = True
+
+            # Start the main simulation loop on a background thread
+            self.__thread = threading.Thread(target=self.__run, daemon=True)
+            self.__thread.start()
 
     def __run(self) -> None:
         """
         Main simulation loop. Updates traffic lights, moves cars, and generates new cars,
         then sleeps for the remainder of the time step.
         """
-        while not self.__stop_event.is_set():
-            start_time = time.perf_counter()
+        # Send initial junction info
+        for junction in self.__junctions:
+            try:
+                Client.send_junction_info(junction)
+            except Exception as exc:
+                self.__set_all_lights_red()
+                self.__client_failed = True
 
-            self.__update_traffic_lights()
+        while not self.__stop_event.is_set():
+            start_time: float = time.perf_counter()
+
+            # 1) Update traffic lights from server if client is functional
+            if not self.__client_failed:
+                self.__update_traffic_lights()
+            else:
+                # Keep them forced red
+                self.__set_all_lights_red()
+
+            # 2) Advance the simulation
             self.__next()
+
+            # 3) Generate new cars in all lanes
             self.__gen_cars()
 
-            elapsed = time.perf_counter() - start_time
-            sleep_time = max(0.0, self.__time_step - elapsed)
+            # 4) Sleep the remainder of the time step
+            elapsed: float = time.perf_counter() - start_time
+            sleep_time: float = max(0.0, self.__time_step - elapsed)
             time.sleep(sleep_time)
+
+            # 5) Send updated junction info if still functional
+            if not self.__client_failed:
+                for junction in self.__junctions:
+                    try:
+                        Client.send_junction_info(junction)
+                    except Exception as exc:
+                        self.__set_all_lights_red()
+                        self.__client_failed = True
 
     def __next(self) -> None:
         """
@@ -212,10 +256,7 @@ class Sim:
         The actual toggling mechanism is either time-based or random, as commented out.
         """
         with self.__lock:
-            for junction in self.__junctions:
-                for tl in junction.get_traffic_lights():
-                    # TODO: Implement a proper time-based or probabilistic toggling mechanism.
-                    pass
+            self.__junctions[0].set_traffic_lights(Client.get_traffic_lights_states())
 
     def __gen_cars(self) -> None:
         """
@@ -236,7 +277,7 @@ class Sim:
                                 )
                                 car_id: int = int(time.time() * 1000)
                                 new_car: Car = Car(
-                                    id=car_id,
+                                    car_id=car_id,
                                     dist=lane.LENGTH,
                                     velocity=speed,
                                     dest=lane.get_id(),
@@ -353,3 +394,12 @@ class Sim:
         if lane_id >= 2 * division_lane:
             options.append(r_transform[road_id])
         return options
+
+    def __set_all_lights_red(self) -> None:
+        """
+        Set all traffic lights in the simulation to red (local state).
+        """
+        with self.__lock:
+            for junction in self.__junctions:
+                for tl in junction.get_traffic_lights():
+                    tl.red()

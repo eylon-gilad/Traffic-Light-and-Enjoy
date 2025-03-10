@@ -6,18 +6,19 @@ It sets up the display, builds the junction simulation, handles user input,
 and renders the simulation (roads, cars, traffic lights) on the screen.
 """
 
-import pygame
+import random
 import sys
 import time
-import random
 from typing import Dict, Tuple, List
+
+import pygame
+
 from sim.Sim import Sim
-from utils.Junction import Junction
-from utils.Road import Road
-from utils.Lane import Lane
 from utils.Car import Car
+from utils.Junction import Junction
+from utils.Lane import Lane
+from utils.Road import Road
 from utils.TrafficLight import TrafficLight
-from sim.creator.create_sim import create_junction
 
 #########################
 # SCREEN / RENDER CONFIG
@@ -139,20 +140,19 @@ def build_simple_plus_junction_sim() -> Sim:
             list: A list containing two Lane objects.
         """
         lane1 = Lane(
-            id=lane_id_start,
+            lane_id_start,
             lane_len=400,  # Adjustable lane length.
             car_creation=0.01,
         )
         lane2 = Lane(
-            id=lane_id_start + 1, lane_len=400, car_creation=0.01
+            lane_id_start + 1, lane_len=400, car_creation=0.01
         )
         return [lane1, lane2]
 
-    road_north = Road(id=1, lanes=make_lanes(100))
+    road_north = Road(1, lanes=make_lanes(100))
     setattr(road_north, "direction", "north")
-    
 
-    road_south = Road(id=2, lanes=make_lanes(200))
+    road_south = Road(road_id=2, lanes=make_lanes(200))
     setattr(road_south, "direction", "south")
 
     road_east = Road(id=3, lanes=make_lanes(300))
@@ -176,7 +176,7 @@ def build_simple_plus_junction_sim() -> Sim:
 
     # Create the junction with the roads and traffic lights.
     junction = Junction(
-        id=99,
+        junction_id=99,
         traffic_lights=[tl_north, tl_south, tl_east, tl_west],
         roads=[road_north, road_south, road_east, road_west],
     )

@@ -18,8 +18,9 @@ class Client:
     Sends requests to build junctions, retrieve traffic light states, and start
     traffic-light algorithms.
 
-    This class preserves existing behavior and data structures but adds improvements
-    in documentation, type hints, error handling, and readability.
+    Changes:
+    - Added docstrings, type hints, and improved error handling/logging.
+    - Preserved existing functionality.
     """
 
     JUNCTION_INFO_URL: str = "http://127.0.0.1:8080/junction-info"
@@ -62,11 +63,9 @@ class Client:
             response: Response = post(Client.BUILD_JUNCTION_URL, json=junction_json)
             logger.info(f"Build Junction - Status Code: {response.status_code}")
 
-            # Attempt to parse and log JSON response
             try:
                 logger.debug(f"Build Junction - Response JSON: {response.json()}")
             except ValueError:
-                # If the response cannot be parsed as JSON, log the raw text
                 logger.debug(f"Build Junction - Response Text: {response.text}")
         except RequestException as e:
             logger.error(f"Error sending build_junction request: {e}")
@@ -90,7 +89,6 @@ class Client:
             response: Response = post(Client.JUNCTION_INFO_URL, json=junction_json)
             logger.info(f"Junction Info - Status Code: {response.status_code}")
 
-            # Attempt to parse and log JSON response
             try:
                 logger.debug(f"Junction Info - Response JSON: {response.json()}")
             except ValueError:
@@ -149,9 +147,8 @@ class Client:
 
         for tl in traffic_lights_data:
             try:
-                # Convert the raw JSON data to strongly typed fields
                 traffic_lights.append(TrafficLight(
-                    id=int(tl["traffic_light_index"]),
+                    light_id=int(tl["traffic_light_index"]),
                     origins=list(tl["origins"]),
                     destinations=list(tl["destinations"]),
                     state=bool(tl["state"])
@@ -210,7 +207,6 @@ class Client:
         Returns:
             str: A JSON-formatted string representing the junction data.
         """
-        # Build the top-level dictionary
         junction_dict: Dict[str, Any] = {
             "junction": {
                 "traffic_lights": [],
@@ -231,8 +227,6 @@ class Client:
 
         # Populate roads
         for road in junction.get_roads():
-            # If you store the congestion level in 'road', retrieve it accordingly
-            # for example: congection_level = getattr(road, "congection_level", 0)
             congection_level = getattr(road, "congection_level", 0)
 
             road_info: Dict[str, Any] = {
@@ -242,19 +236,16 @@ class Client:
                 "lanes": []
             }
 
-            # Populate lanes for each road
             for lane in road.get_lanes():
                 lane_info: Dict[str, Any] = {
                     "lane_index": lane.get_id(),
                     "cars_creation": lane.get_car_creation(),
                     "cars": []
                 }
-
-                # Populate cars for each lane
                 for car in lane.get_cars():
                     car_info: Dict[str, Any] = {
                         "car_index": car.get_id(),
-                        "dist": [car.get_dist()],  # store distance in a single-item list
+                        "dist": [car.get_dist()],
                         "velocity": car.get_velocity(),
                         "dest": str(car.get_dest()),
                         "car_type": car.get_car_type(),
@@ -262,18 +253,16 @@ class Client:
                     lane_info["cars"].append(car_info)
 
                 road_info["lanes"].append(lane_info)
-
             junction_dict["junction"]["roads"].append(road_info)
 
-        # Return the final JSON string
         return json.dumps(junction_dict, indent=4)
 
     @staticmethod
     def __junction_to_build_junction_json(junction: Junction) -> str:
         """
-        Build a JSON representation of the given junction, including its roads,
-        lanes, and traffic lights. The JSON structure is nested under the "junction" key.
+        Build a JSON representation of the given junction for server consumption.
 
+        Example structure:
         {
             "junction": {
                 "traffic_lights": [
@@ -305,13 +294,7 @@ class Client:
 
         Returns:
             str: A JSON-formatted string representing the junction data.
-
-        Notes:
-            - The 'total_roads' key is set to the length of the roads list.
-            - The key 'congection_level' is intentionally misspelled in the original
-              design. Changing it could break external consumers.
         """
-        # Build the top-level dictionary structure for the junction
         junction_dict: Dict[str, Any] = {
             "junction": {
                 "traffic_lights": [],
@@ -338,7 +321,6 @@ class Client:
                 "lanes": []
             }
 
-            # Populate lanes within each road
             for lane in road.lanes:
                 lane_info: Dict[str, Any] = {
                     "lane_index": lane.id,
@@ -347,5 +329,4 @@ class Client:
 
             junction_dict["junction"]["roads"].append(road_info)
 
-        # Return the JSON string with indentation for readability
         return json.dumps(junction_dict, indent=4)
