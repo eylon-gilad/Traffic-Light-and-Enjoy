@@ -77,6 +77,13 @@ class Junction:
         """
         return self.roads
 
+
+
+    def get_traffic_light_by_id(self, traffic_light_id: int) -> TrafficLight:
+        for traffic_light in self.traffic_lights:
+            if traffic_light.id == traffic_light_id:
+                return traffic_light
+
     def set_roads(self, roads: List[Road]) -> None:
         """
         Set the roads for the junction.
@@ -128,3 +135,11 @@ class Junction:
             if lane.get_id() in lane_ids:
                 result.append(lane)
         return result
+
+    def __str__(self) -> str:
+        roads_str = ", ".join(str(road) for road in self.roads)
+        tls_str = ", ".join(str(tl) for tl in self.traffic_lights)
+        return (
+            f"Junction(id={self.id}, "
+            f"traffic_lights=[{tls_str}], roads=[{roads_str}])"
+        )

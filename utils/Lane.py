@@ -110,3 +110,8 @@ class Lane:
         else:
             # TODO: Confirm whether it's an error or normal scenario when removing a car not in the lane.
             logger.debug(f"Attempted to remove a car not in lane (Lane ID: {self.id}).")
+
+
+    def __str__(self):
+        cars_str = ", ".join(str(car) for car in self.cars)
+        return f"Lane(id={self.id}, " f"cars=[{cars_str}])"

@@ -13,6 +13,7 @@ Changes:
 from typing import List, Optional
 
 from utils.Lane import Lane
+from utils.RoadEnum import RoadEnum
 
 
 class Road:
@@ -27,8 +28,7 @@ class Road:
             road_id: int = 0,
             lanes: Optional[List[Lane]] = None,
             congection_level: int = 0,
-            from_side: Optional[int] = None,
-            to_side: Optional[int] = None,
+            from_side: RoadEnum = None, to_side: RoadEnum = None
     ) -> None:
         """
         Initialize a Road object.
@@ -42,8 +42,8 @@ class Road:
         """
         self.id: int = road_id
         self.lanes: List[Lane] = lanes if lanes is not None else []
-        self.from_side: Optional[int] = from_side
-        self.to_side: Optional[int] = to_side
+        self.from_side = from_side
+        self.to_side = to_side
         # Keeping the attribute name as provided to avoid breaking existing code.
         self.congection_level: int = congection_level
 
@@ -65,6 +65,13 @@ class Road:
         """
         return self.lanes
 
+    def get_lanes_by_ids(self, ids: List[int]) -> List[Lane]:
+        lanes = []
+        for lane in self.lanes:
+            if lane.id in ids:
+                lanes.append(lane)
+        return lanes
+
     def set_lanes(self, lanes: List[Lane]) -> None:
         """
         Set the lanes on the road.
@@ -73,3 +80,22 @@ class Road:
             lanes (List[Lane]): A new list of Lane objects.
         """
         self.lanes = lanes
+
+    def get_congection_level(self) -> int:
+        return self.congection_level
+
+    def set_congection_level(self, congection_level: int) -> None:
+        self.congection_level = congection_level
+
+    def get_from_side(self) -> RoadEnum:
+        return self.from_side
+
+    def get_to_side(self) -> RoadEnum:
+        return self.to_side
+
+    def __str__(self):
+        lanes_str = ", ".join(str(lane) for lane in self.lanes)
+        return (
+            f"Road(id={self.id}, "
+            f"congection_level=[{self.congection_level}], lanes=[{lanes_str}])"
+        )
