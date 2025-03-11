@@ -57,7 +57,7 @@ class Client:
         Logs response status code and JSON (or raw text if JSON is invalid).
         """
         logger.debug(f"Sending POST to build junction: {Client.BUILD_JUNCTION_URL}")
-        junction_json: str = Client.__junction_to_build_junction_json(junction)
+        junction_json: Dict = Client.__junction_to_build_junction_json(junction)
 
         try:
             response: Response = post(Client.BUILD_JUNCTION_URL, json=junction_json)
@@ -83,7 +83,7 @@ class Client:
         Logs response status code and JSON (or raw text if JSON is invalid).
         """
         logger.debug(f"Sending POST with junction info to: {Client.JUNCTION_INFO_URL}")
-        junction_json: str = Client.__junction_to_junction_info_json(junction)
+        junction_json: Dict = Client.__junction_to_junction_info_json(junction)
 
         try:
             response: Response = post(Client.JUNCTION_INFO_URL, json=junction_json)
@@ -161,7 +161,7 @@ class Client:
         return traffic_lights
 
     @staticmethod
-    def __junction_to_junction_info_json(junction: Junction) -> str:
+    def __junction_to_junction_info_json(junction: Junction) -> Dict:
         """
         Convert a Junction object into a JSON string with the structure:
 
@@ -255,10 +255,10 @@ class Client:
                 road_info["lanes"].append(lane_info)
             junction_dict["junction"]["roads"].append(road_info)
 
-        return json.dumps(junction_dict, indent=4)
+        return junction_dict
 
     @staticmethod
-    def __junction_to_build_junction_json(junction: Junction) -> str:
+    def __junction_to_build_junction_json(junction: Junction) -> Dict:
         """
         Build a JSON representation of the given junction for server consumption.
 
@@ -317,6 +317,8 @@ class Client:
             road_info: Dict[str, Any] = {
                 "road_index": road.id,
                 "num_lanes": len(road.get_lanes()),
+                "from": road.get_from_side().name,
+                "to": road.get_to_side().name,
                 "congection_level": 0,  # Intentionally left as 0 to match original code
                 "lanes": []
             }
@@ -329,4 +331,4 @@ class Client:
 
             junction_dict["junction"]["roads"].append(road_info)
 
-        return json.dumps(junction_dict, indent=4)
+        return junction_dict

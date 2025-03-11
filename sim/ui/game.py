@@ -18,6 +18,7 @@ from utils.Car import Car
 from utils.Junction import Junction
 from utils.Lane import Lane
 from utils.Road import Road
+from utils.RoadEnum import RoadEnum
 from utils.TrafficLight import TrafficLight
 
 #########################
@@ -149,34 +150,34 @@ def build_simple_plus_junction_sim() -> Sim:
         )
         return [lane1, lane2]
 
-    road_north = Road(1, lanes=make_lanes(100))
-    setattr(road_north, "direction", "north")
+    road_north = Road(road_id=12, from_side=RoadEnum.NORTH, to_side=RoadEnum.SOUTH, lanes=make_lanes(100))
+    setattr(road_north, "direction", "NORTH")
 
-    road_south = Road(road_id=2, lanes=make_lanes(200))
-    setattr(road_south, "direction", "south")
+    road_south = Road(road_id=11, from_side=RoadEnum.SOUTH, to_side=RoadEnum.NORTH, lanes=make_lanes(200))
+    setattr(road_south, "direction", "SOUTH")
 
-    road_east = Road(id=3, lanes=make_lanes(300))
-    setattr(road_east, "direction", "east")
+    road_east = Road(road_id=14, from_side=RoadEnum.EAST, to_side=RoadEnum.WEST, lanes=make_lanes(300))
+    setattr(road_east, "direction", "EAST")
 
-    road_west = Road(id=4, lanes=make_lanes(400))
-    setattr(road_west, "direction", "west")
+    road_west = Road(road_id=13, from_side=RoadEnum.WEST, to_side=RoadEnum.EAST, lanes=make_lanes(400))
+    setattr(road_west, "direction", "WEST")
 
     # Define traffic lights for each road approach.
-    tl_north = TrafficLight(id=10, origins=[100, 101], state=True)
+    tl_north = TrafficLight(light_id=2, origins=[123, 124], destinations=[123, 124], state=True)
     setattr(tl_north, "direction", "north")
 
-    tl_south = TrafficLight(id=11, origins=[200, 201], state=True)
+    tl_south = TrafficLight(light_id=1, origins=[111, 112], destinations=[111, 112], state=True)
     setattr(tl_south, "direction", "south")
 
-    tl_east = TrafficLight(id=12, origins=[300, 301], state=False)
+    tl_east = TrafficLight(light_id=4, origins=[147, 148], destinations=[147, 148], state=False)
     setattr(tl_east, "direction", "east")
 
-    tl_west = TrafficLight(id=13, origins=[400, 401], state=False)
+    tl_west = TrafficLight(light_id=3, origins=[135, 136], destinations=[135, 136], state=False)
     setattr(tl_west, "direction", "west")
 
     # Create the junction with the roads and traffic lights.
     junction = Junction(
-        junction_id=99,
+        junction_id=1,
         traffic_lights=[tl_north, tl_south, tl_east, tl_west],
         roads=[road_north, road_south, road_east, road_west],
     )

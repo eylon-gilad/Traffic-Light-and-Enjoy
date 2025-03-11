@@ -3,6 +3,7 @@ import threading
 
 from Algorithms.ExpCarsOnTime import ExpCarsOnTimeController
 from TrafficLightsCombinator import TrafficLightsCombinator
+from algo.Algorithms.RoundRobin import RoundRobinController
 from utils import Junction
 
 
@@ -24,8 +25,8 @@ class AlgoRunner:
         TrafficLightsCombinator.calculate_possible_active_lights(junction)
 
         # Choose which controller to use. (Comment/uncomment as needed)
-        # self.controller = RoundRobinController(junction)
-        self.controller = ExpCarsOnTimeController(junction)
+        self.controller = RoundRobinController(junction)
+        # self.controller = ExpCarsOnTimeController(junction)
 
         # A threading lock to ensure thread-safe operations on the controller.
         self.lock = threading.Lock()

@@ -16,6 +16,7 @@ from random import uniform
 from utils.Car import Car
 from utils.Junction import Junction
 from utils.Lane import Lane
+from sim.Client import Client
 
 
 class Sim:
@@ -50,6 +51,7 @@ class Sim:
         # Use a slower time step if UI is enabled; otherwise, use a faster step.
         self.__time_step: float = (1 / 30) if self.ui_enabled else (1 / 1000)
         self.__thread: Optional[threading.Thread] = None
+        self.__client_failed = False
 
     def start(self) -> None:
         """

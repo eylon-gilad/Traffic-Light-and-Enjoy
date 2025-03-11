@@ -62,7 +62,7 @@ def post_junction_info() -> Response:
         state: bool = bool(tl_info.get("state", False))
         traffic_lights.append(
             TrafficLight(
-                id=tl_id, origins=origins, destinations=destinations, state=state
+                light_id=tl_id, origins=origins, destinations=destinations, state=state
             )
         )
 
@@ -84,14 +84,14 @@ def post_junction_info() -> Response:
             cars: List[Car] = []
             for car_info in cars_data:
                 car_id: int = car_info.get("car_index", 0)
-                dist: List[float] = car_info.get("dist", [])
+                dist: float = car_info.get("dist", 0.0)
                 velocity: float = float(car_info.get("velocity", 0.0))
-                dest: str = car_info.get("dest", "")
+                dest: int = car_info.get("dest", 0)
                 car_type: str = car_info.get("car_type", "CAR")
 
                 cars.append(
                     Car(
-                        id=car_id,
+                        car_id=car_id,
                         dist=dist,
                         velocity=velocity,
                         dest=dest,
@@ -99,13 +99,13 @@ def post_junction_info() -> Response:
                     )
                 )
 
-            lanes.append(Lane(id=lane_id, cars=cars))
+            lanes.append(Lane(lane_id=lane_id, cars=cars))
 
-        roads.append(Road(id=road_id, lanes=lanes, congection_level=congection_level))
+        roads.append(Road(road_id=road_id, lanes=lanes, congection_level=congection_level))
 
     # Construct the Junction object
     junction_id: int = junction_data.get("id", 0)
-    junction = Junction(id=junction_id, traffic_lights=traffic_lights, roads=roads)
+    junction = Junction(junction_id=junction_id, traffic_lights=traffic_lights, roads=roads)
 
     # Update junction info in the existing algorithm runner
     if alg is not None:
@@ -165,7 +165,7 @@ def build_junction() -> Response:
         state: bool = bool(tl_info.get("state", False))
         traffic_lights.append(
             TrafficLight(
-                id=tl_id, origins=origins, destinations=destinations, state=state
+                light_id=tl_id, origins=origins, destinations=destinations, state=state
             )
         )
 
@@ -196,7 +196,7 @@ def build_junction() -> Response:
 
     # Construct the Junction object
     junction_id: int = junction_data.get("id", 0)
-    junction = Junction(id=junction_id, traffic_lights=traffic_lights, roads=roads)
+    junction = Junction(junction_id=junction_id, traffic_lights=traffic_lights, roads=roads)
 
     return jsonify({"message": "Junction was built successfully."}, 200)
 
