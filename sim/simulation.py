@@ -7,7 +7,7 @@ from utils.Junction import Junction
 
 
 def create_traffic_light(id, entry_angle, state):
-    tl = TrafficLight(id=id, origins=[], destinations=[], state=state)
+    tl = TrafficLight(light_id=id, origins=[], destinations=[], state=state)
     tl.entry_angle = entry_angle  # store the numeric entry angle
     return tl
 
@@ -57,10 +57,10 @@ class StaticIntersectionSimulation:
                     cars.append(car)
                 # Create lane ID as 11RRLL (with lanes numbered 1–4)
                 lane_id = road_id * 100 + (lane_index + 1)
-                lane = Lane(id=lane_id, cars=cars)
+                lane = Lane(lane_id=lane_id, cars=cars)
                 lanes.append(lane)
 
-            road = Road(id=road_id, lanes=lanes, congection_level=0)
+            road = Road(road_id=road_id, lanes=lanes, congection_level=0)
             road.entry_angle = entry_angle  # store the numeric entry angle
             self.roads.append(road)
 

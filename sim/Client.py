@@ -114,7 +114,7 @@ class Client:
             logger.info(f"Traffic Light State - Status Code: {response.status_code}")
 
             try:
-                response_data: Dict[str, Any] = response.json()
+                response_data: List[Dict[str, Any]] = response.json()
                 logger.debug(f"Traffic Light State - Response JSON: {response_data}")
                 traffic_lights = Client.__parse_traffic_lights_response(response_data)
             except ValueError:
@@ -127,7 +127,7 @@ class Client:
         return traffic_lights
 
     @staticmethod
-    def __parse_traffic_lights_response(response_json: Dict[str, Any]) -> List[TrafficLight]:
+    def __parse_traffic_lights_response(response_json: List[Dict[str, Any]]) -> List[TrafficLight]:
         """
         Parse the response JSON containing traffic lights data and construct a list of TrafficLight objects.
 
@@ -140,7 +140,7 @@ class Client:
         traffic_lights: List[TrafficLight] = []
 
         # Safely retrieve the traffic_lights data
-        traffic_lights_data: Optional[Any] = response_json.get("traffic_lights")
+        traffic_lights_data = response_json[0]["traffic_lights"]
         if not isinstance(traffic_lights_data, list):
             logger.error("Invalid traffic_lights data format.")
             return traffic_lights

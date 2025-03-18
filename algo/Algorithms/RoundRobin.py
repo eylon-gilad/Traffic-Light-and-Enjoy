@@ -19,7 +19,7 @@ class RoundRobinController(BaseAlgorithm):
         """
         super().__init__(junction)
         self.current_traffic_light_id: int = 100
-        self.time_interval: float = 5.0  # Interval in seconds
+        self.time_interval: float = 0.5  # Interval in seconds
 
     def start(self) -> None:
         """

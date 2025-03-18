@@ -105,7 +105,7 @@ class ExpCarsOnTimeController(BaseAlgorithm):
             if count_cars != 0:
                 # Original formula: cost = (count_cars+1)^(avg_time)
                 avg_time = time_sum / count_cars
-                self.costs[combination] = [(count_cars + 1) ** avg_time]
+                self.costs[combination] = [(count_cars + 1) ** (avg_time+1)]
 
     def set_cars_time(self) -> None:
         """

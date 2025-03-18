@@ -210,6 +210,16 @@ def create_all_json() -> str:
     return json.dumps(all_data, indent=4)
 
 
+def direction_to_index(direction: int, junction_id: int = 1):
+    """
+       returning index from directions
+       :input: two direction where the road starts and end
+       :output: the road index
+       """
+    dirction_index = [0, 2, 1, 3]
+    return junction_id * 10 + dirction_index[direction] + 1
+
+
 def main() -> None:
     test = create_junction(1)
     print(test)

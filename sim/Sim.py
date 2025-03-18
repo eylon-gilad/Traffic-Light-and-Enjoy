@@ -33,6 +33,7 @@ class Sim:
     """
 
     __DEFAULT_TIME_STEP: float = 1 / 30  # Default ~30 FPS for UI mode
+    CAR_ID:int = 0
 
     def __init__(
         self, junctions: Optional[List[Junction]] = None, if_ui: bool = True
@@ -97,25 +98,7 @@ class Sim:
         while not self.__stop_event.is_set():
             start_time: float = time.perf_counter()
 
-            # 1) Update traffic lights from server if client is functional
-            if not self.__client_failed:
-                self.__update_traffic_lights()
-            else:
-                # Keep them forced red
-                self.__set_all_lights_red()
-
-            # 2) Advance the simulation
-            self.__next()
-
-            # 3) Generate new cars in all lanes
-            self.__gen_cars()
-
-            # 4) Sleep the remainder of the time step
-            elapsed: float = time.perf_counter() - start_time
-            sleep_time: float = max(0.0, self.__time_step - elapsed)
-            time.sleep(sleep_time)
-
-            # 5) Send updated junction info if still functional
+            # 1) Send updated junction info if still functional
             if not self.__client_failed:
                 for junction in self.__junctions:
                     try:
@@ -123,6 +106,24 @@ class Sim:
                     except Exception as exc:
                         self.__set_all_lights_red()
                         self.__client_failed = True
+
+            # 2) Update traffic lights from server if client is functional
+            if not self.__client_failed:
+                self.__update_traffic_lights()
+            else:
+                # Keep them forced red
+                self.__set_all_lights_red()
+
+            # 3) Advance the simulation
+            self.__next()
+
+            # 4) Generate new cars in all lanes
+            self.__gen_cars()
+
+            # 4) Sleep the remainder of the time step
+            elapsed: float = time.perf_counter() - start_time
+            sleep_time: float = max(0.0, self.__time_step - elapsed)
+            time.sleep(sleep_time)
 
     def __next(self) -> None:
         """
@@ -206,7 +207,7 @@ class Sim:
 
         # Remove the car if it has moved beyond the exit threshold.
         exit_threshold: float = (
-            -2 * lane.LENGTH
+            -1 * lane.LENGTH
         )  # Example threshold for leaving the simulation.
         if new_dist < exit_threshold:
             lane.remove_car(car)
@@ -277,7 +278,8 @@ class Sim:
                                 speed: float = uniform(
                                     lane.max_vel * 0.5, lane.max_vel * 1.2
                                 )
-                                car_id: int = int(time.time() * 1000)
+                                car_id: int = self.CAR_ID
+                                self.CAR_ID += 1
                                 new_car: Car = Car(
                                     car_id=car_id,
                                     dist=lane.LENGTH,

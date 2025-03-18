@@ -198,6 +198,8 @@ def build_junction() -> Response:
     junction_id: int = junction_data.get("id", 0)
     junction = Junction(junction_id=junction_id, traffic_lights=traffic_lights, roads=roads)
 
+    print(junction.__str__())
+
     return jsonify({"message": "Junction was built successfully."}, 200)
 
 
