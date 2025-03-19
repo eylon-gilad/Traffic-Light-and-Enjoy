@@ -19,7 +19,7 @@ class LanesGenerator:
         self.current_lane_index = 0
 
         # [key=road id, value=list of the lanes in this road]
-        self.lanes_of_roads: Dict[int, List[Lane]] = self.generate_lanes_for_roads()
+        self.lanes_of_roads: Dict[int, List[Lane]] = self.__generate_lanes_for_roads()
 
     def get_lanes_for_road(self, road_id: int) -> List[Lane]:
         """
@@ -27,13 +27,13 @@ class LanesGenerator:
         """
         return self.lanes_of_roads[road_id]
 
-    def generate_lanes_for_roads(self) -> Dict[int, List[Lane]]:
+    def __generate_lanes_for_roads(self) -> Dict[int, List[Lane]]:
         """
         Generate random lanes for the given roads
         """
         lanes_of_roads: Dict[int, List[Lane]] = defaultdict(list)
 
-        num_of_lanes_in_road: List[int] = LanesGenerator.generate_num_of_lanes_in_road(
+        num_of_lanes_in_road: List[int] = LanesGenerator.__generate_num_of_lanes_in_road(
             len(self.road_ids),
             LanesGenerator.MAX_TOTAL_LANES,
             LanesGenerator.MIN_LANES_IN_ROAD,
@@ -57,8 +57,8 @@ class LanesGenerator:
         return lanes_of_roads
 
     @staticmethod
-    def generate_num_of_lanes_in_road(num_of_roads: int, max_total_lanes: int,
-                                      min_lanes_in_road: int, max_lanes_in_road: int) -> List[int]:
+    def __generate_num_of_lanes_in_road(num_of_roads: int, max_total_lanes: int,
+                                        min_lanes_in_road: int, max_lanes_in_road: int) -> List[int]:
         """
         Returns a list with random num of lanes in each road
         Num of lanes in all roads together is maximum "max_total_lanes"
@@ -67,7 +67,8 @@ class LanesGenerator:
         remaining_sum: int = max_total_lanes
 
         for _ in range(num_of_roads):
-            max_possible: int = min(max_lanes_in_road, remaining_sum - (num_of_roads - len(result) - 1) * min_lanes_in_road)
+            max_possible: int = min(max_lanes_in_road,
+                                    remaining_sum - (num_of_roads - len(result) - 1) * min_lanes_in_road)
             min_possible: int = min_lanes_in_road
             if remaining_sum - (num_of_roads - len(result) - 1) * min_lanes_in_road < min_lanes_in_road:
                 num: int = min_lanes_in_road
