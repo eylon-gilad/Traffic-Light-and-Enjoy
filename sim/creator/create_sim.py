@@ -3,6 +3,7 @@ import random
 from utils.Lane import Lane
 from utils.Junction import Junction
 from utils.Road import Road
+from utils.RoadEnum import RoadEnum
 from utils.TrafficLight import TrafficLight
 
 VELOCITY_OPTIONS: list[int] = [30, 50, 80, 100, 110, 120]
@@ -210,14 +211,16 @@ def create_all_json() -> str:
     return json.dumps(all_data, indent=4)
 
 
-def direction_to_index(direction: int, junction_id: int = 1):
+def direction_to_index(direction: RoadEnum, junction: Junction):
     """
        returning index from directions
        :input: two direction where the road starts and end
        :output: the road index
        """
-    dirction_index = [0, 2, 1, 3]
-    return junction_id * 10 + dirction_index[direction] + 1
+    for road in junction.get_roads():
+        if road.from_side == direction:
+            return road.get_id()
+    # return junction_id * 10 + dirction_index[direction] + 1
 
 
 def main() -> None:

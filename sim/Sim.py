@@ -109,7 +109,9 @@ class Sim:
 
             # 2) Update traffic lights from server if client is functional
             if not self.__client_failed:
-                self.__update_traffic_lights()
+                thread = threading.Thread(target=self.__update_traffic_lights, daemon=True)
+                thread.start()
+                # self.__update_traffic_lights()
             else:
                 # Keep them forced red
                 self.__set_all_lights_red()
@@ -196,18 +198,17 @@ class Sim:
 
         # If the car reaches the junction, try to transfer it to its destination lane.
         if new_dist <= 0:
-            dest_lane: Optional[Lane] = next(
-                iter(junction.get_lanes_by_ids([car.get_dest()])), None
-            )
+            dest_lane: Lane = random.choice(junction.get_lanes_by_ids([car.get_dest()]))
+
             if dest_lane and dest_lane.get_id() != lane.get_id():
                 lane.remove_car(car)
                 dest_lane.add_car(car)
                 # Reset the distance for the new lane.
-                car.set_dist(dest_lane.LENGTH)
+                # car.set_dist(dest_lane.LENGTH)
 
         # Remove the car if it has moved beyond the exit threshold.
         exit_threshold: float = (
-            -1 * lane.LENGTH
+            -2 * lane.LENGTH
         )  # Example threshold for leaving the simulation.
         if new_dist < exit_threshold:
             lane.remove_car(car)
@@ -284,7 +285,7 @@ class Sim:
                                     car_id=car_id,
                                     dist=lane.LENGTH,
                                     velocity=speed,
-                                    dest=lane.get_id(),
+                                    dest=random.choice(junction.get_traffic_light_by_lane_id(lane_id=lane.get_id()).get_destinations()),
                                     car_type="CAR",
                                 )
                                 lane.add_car(new_car)

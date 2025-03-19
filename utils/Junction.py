@@ -60,6 +60,17 @@ class Junction:
         """
         return self.traffic_lights
 
+    def get_traffic_light_by_lane_id(self, lane_id: int) -> TrafficLight:
+        """
+        Get the traffic light that points to the lane.
+
+        Returns:
+            List[TrafficLight]: Traffic lights controlling this lane.
+        """
+        for traffic_light in self.traffic_lights:
+            if lane_id in traffic_light.get_origins():
+                return traffic_light
+
     def set_traffic_lights(self, traffic_lights: List[TrafficLight]) -> None:
         """
         Set the traffic lights for the junction.

@@ -5,7 +5,7 @@ This module implements the main game loop for the plus-junction simulation using
 It sets up the display, builds the junction simulation, handles user input,
 and renders the simulation (roads, cars, traffic lights) on the screen.
 """
-import math
+
 import pygame
 import sys
 import time
@@ -17,7 +17,7 @@ from utils.Road import Road
 from utils.Lane import Lane
 from utils.Car import Car
 from utils.TrafficLight import TrafficLight
-from sim.creator.create_sim import create_junction, index_to_directions
+from sim.creator.create_sim import create_junction, index_to_directions, direction_to_index
 from utils.RoadEnum import RoadEnum
 
 #########################
@@ -90,8 +90,9 @@ def main() -> None:
         bg_image = None
 
     # Build the simulation with a plus-junction configuration.
+    # sim: Sim = build_simple_plus_junction_sim()
     sim: Sim = dummy_build_junction()
-    #enable_time_based_lights(sim, period_seconds=5.0)
+    # sim.enable_time_based_lights(period_seconds=5.0)
     sim.start()  # Start the simulation thread in the background
 
     # Load car images from assets.
@@ -99,15 +100,15 @@ def main() -> None:
         num_images=8, folder="../assets/", size=(40, 40)
     )
 
-    def get_len_lanes(road_num: int) -> int:
-        return len(sim.get_junctions()[0].get_road_by_id(road_id=road_num).get_lanes())
+    def get_len_lanes(road_id: int) -> int:
+        return len(sim.get_junctions()[0].get_road_by_id(road_id=road_id).get_lanes())
 
     # We define the SHIFT dictionary so we can pass it to draw_full_road() and compute_car_position().
     shifts = {
-        "NORTH": -10 - get_road_total_width(get_len_lanes(12)),
-        "SOUTH": 10 - get_road_total_width(get_len_lanes(11)),
-        "WEST": 10 - get_road_total_width(get_len_lanes(13)),
-        "EAST": -10 - get_road_total_width(get_len_lanes(14)),
+        "NORTH": -10 - get_road_total_width(get_len_lanes(direction_to_index(RoadEnum.WEST, sim.get_junctions()[0]))),
+        "SOUTH": 10,
+        "WEST": 10,
+        "EAST": -10 - get_road_total_width(get_len_lanes(direction_to_index(RoadEnum.NORTH, sim.get_junctions()[0]))),
     }
 
     while running:
@@ -139,6 +140,67 @@ def main() -> None:
 #########################
 # BUILD THE JUNCTION
 #########################
+def build_simple_plus_junction_sim() -> Sim:
+    """
+    Creates a plus-junction simulation with dynamic lane counts for each road
+    (NORTH, EAST, SOUTH, WEST). Returns a Sim instance.
+    """
+
+    # Helper function to generate a specified number of lanes.
+    def make_lanes(lane_id_start: int, num_lanes: int) -> List[Lane]:
+        return [
+            Lane(
+                lane_id=lane_id_start + i,
+                lane_len = 400,  # e.g., 400 "units" from intersection outward
+                car_creation = 0.01  # Probability of new car creation
+            )
+            for i in range(num_lanes)]
+
+    # Define how many lanes each direction should have.
+    road_configs = {
+        RoadEnum.NORTH: 2,  # e.g., 3 lanes on the north road
+        RoadEnum.EAST: 4,  # 2 lanes on the east road
+        RoadEnum.SOUTH: 4,  # 1 lanes on the south road
+        RoadEnum.WEST: 1,  # 2 lane on the west road
+    }
+
+    roads: List[Road] = []
+    lane_id_base = 100
+
+    # Build each road according to the lane counts in 'road_configs'.1
+    for side, num_lanes in road_configs.items():
+        road = Road(
+            road_id=10 + side.value,  # Road ID = 0,1,2,3 for N,E,S,W
+            lanes=make_lanes(lane_id_base, num_lanes)
+        )
+        setattr(road, "from_side", side.value)  # 0=NORTH,1=EAST,2=SOUTH,3=WEST
+        lane_id_base += 10  # Jump lane IDs in blocks of 100
+        roads.append(road)
+
+    # Build traffic lights for each road approach
+    # (NORTH & SOUTH start green, EAST & WEST start red)
+    traffic_lights: List[TrafficLight] = []
+    for side, road in zip(road_configs.keys(), roads):
+        init_state = side in (RoadEnum.NORTH, RoadEnum.SOUTH)
+        tl = TrafficLight(
+            light_id=side.value + 10,  # e.g., 10, 11, 12, 13 for N,E,S,W
+            origins=[lane.get_id() for lane in road.get_lanes()],
+            state=init_state
+        )
+        traffic_lights.append(tl)
+
+    # Create one Junction with these roads and traffic lights
+    junction = Junction(
+        junction_id=1,
+        traffic_lights=traffic_lights,
+        roads=roads
+    )
+
+    # Finally create and return the Sim instance
+    sim = Sim(junctions=[junction], if_ui=True)
+    # sim = Sim(junctions=[create_junction()], if_ui=True)
+    return sim
+
 def dummy_build_junction() -> Sim:
     """
     Creates a simple plus-junction simulation with one junction and four roads
@@ -181,22 +243,26 @@ def dummy_build_junction() -> Sim:
     setattr(road_west, "direction", "WEST")
 
     # Define traffic lights for each road approach.
-    tl_north = TrafficLight(light_id=2, origins=[123, 124], destinations=[123, 124], state=True)
-    setattr(tl_north, "direction", "north")
+    tl_1 = TrafficLight(light_id=1, origins=[111], destinations=[111], state=True)
 
-    tl_south = TrafficLight(light_id=1, origins=[111, 112], destinations=[111, 112], state=True)
-    setattr(tl_south, "direction", "south")
+    tl_8 = TrafficLight(light_id=1, origins=[112], destinations=[112], state=True)
 
-    tl_east = TrafficLight(light_id=4, origins=[147, 148], destinations=[147, 148], state=False)
-    setattr(tl_east, "direction", "east")
+    tl_2 = TrafficLight(light_id=2, origins=[135], destinations=[135], state=True)
 
-    tl_west = TrafficLight(light_id=3, origins=[135, 136], destinations=[135, 136], state=False)
-    setattr(tl_west, "direction", "west")
+    tl_3 = TrafficLight(light_id=3, origins=[136], destinations=[112], state=False)
+
+    tl_4 = TrafficLight(light_id=4, origins=[124], destinations=[124, 148], state=False)
+
+    tl_5 = TrafficLight(light_id=5, origins=[123], destinations=[123, 136], state=True)
+
+    tl_6 = TrafficLight(light_id=6, origins=[148], destinations=[148, 111], state=True)
+
+    tl_7 = TrafficLight(light_id=7, origins=[147], destinations=[147], state=False)
 
     # Create the junction with the roads and traffic lights.
     junction = Junction(
         junction_id=1,
-        traffic_lights=[tl_north, tl_south, tl_east, tl_west],
+        traffic_lights=[tl_1, tl_2, tl_3, tl_4, tl_5, tl_6, tl_7, tl_8],
         roads=[road_north, road_south, road_east, road_west],
     )
 
@@ -204,69 +270,6 @@ def dummy_build_junction() -> Sim:
     sim: Sim = Sim(junctions=[junction], if_ui=True)
     return sim
 
-
-
-
-def build_simple_plus_junction_sim() -> Sim:
-    """
-    Creates a plus-junction simulation with dynamic lane counts for each road
-    (NORTH, EAST, SOUTH, WEST). Returns a Sim instance.
-    """
-
-    # Helper function to generate a specified number of lanes.
-    def make_lanes(lane_id_start: int, num_lanes: int) -> List[Lane]:
-        return [
-            Lane(
-                lane_id=lane_id_start + i,
-                lane_len=400,  # e.g., 400 "units" from intersection outward
-                car_creation=0.01  # Probability of new car creation
-            )
-            for i in range(num_lanes)
-        ]
-
-    # Define how many lanes each direction should have.
-    road_configs = {
-        RoadEnum.NORTH: 4,  # e.g., 3 lanes on the north road
-        RoadEnum.EAST: 3,  # 2 lanes on the east road
-        RoadEnum.SOUTH: 1,  # 1 lanes on the south road
-        RoadEnum.WEST: 5,  # 2 lane on the west road
-    }
-
-    roads: List[Road] = []
-    lane_id_base = 100
-
-    # Build each road according to the lane counts in 'road_configs'.1
-    for side, num_lanes in road_configs.items():
-        road = Road(
-            road_id=side.value,  # Road ID = 0,1,2,3 for N,E,S,W
-            lanes=make_lanes(lane_id_base, num_lanes)
-        )
-        setattr(road, "from_side", side.value)  # 0=NORTH,1=EAST,2=SOUTH,3=WEST
-        lane_id_base += 100  # Jump lane IDs in blocks of 100
-        roads.append(road)
-
-    # Build traffic lights for each road approach
-    # (NORTH & SOUTH start green, EAST & WEST start red)
-    traffic_lights: List[TrafficLight] = []
-    for side, road in zip(road_configs.keys(), roads):
-        init_state = side in (RoadEnum.NORTH, RoadEnum.SOUTH)
-        tl = TrafficLight(
-            light_id=side.value + 10,  # e.g., 10, 11, 12, 13 for N,E,S,W
-            origins=[lane.get_id() for lane in road.get_lanes()],
-            state=init_state
-        )
-        traffic_lights.append(tl)
-
-    # Create one Junction with these roads and traffic lights
-    junction = Junction(
-        junction_id=1,
-        traffic_lights=traffic_lights,
-        roads=roads
-    )
-
-    # Finally create and return the Sim instance
-    sim = Sim(junctions=[junction], if_ui=True)
-    return sim
 
 #########################
 # TIME-BASED LIGHTS
@@ -295,7 +298,7 @@ def enable_time_based_lights(self: Sim, period_seconds: float = 5.0) -> None:
 
 
 # Monkey-patch the Sim class with the new time-based lights functionality.
-# Sim.enable_time_based_lights = enable_time_based_lights
+Sim.enable_time_based_lights = enable_time_based_lights
 
 
 #########################
@@ -343,10 +346,10 @@ def draw_junction_ui(
     for road in junction.get_roads():
         draw_full_road(screen, road, shifts)
 
-    start_y = CY - get_road_total_width((len(sim.get_junctions()[0].get_road_by_id(12).get_lanes()))) - 10
-    start_x = CX - get_road_total_width(len(sim.get_junctions()[0].get_road_by_id(14).get_lanes())) - 10
-    end_y = get_road_width_from_id(sim, 12) + get_road_width_from_id(sim, 11) + 2*10 + LANE_GAP / 4
-    end_x = get_road_width_from_id(sim, 14) + get_road_width_from_id(sim, 13) + 2*10 + LANE_GAP / 4
+    start_y = CY - get_road_total_width((len(sim.get_junctions()[0].get_road_by_id(direction_to_index(RoadEnum.WEST, junction)).get_lanes()))) - 10
+    start_x = CX - get_road_total_width(len(sim.get_junctions()[0].get_road_by_id(direction_to_index(RoadEnum.NORTH, junction)).get_lanes())) - 10
+    end_y = get_road_width_from_id(sim, direction_to_index(RoadEnum.WEST, junction)) + get_road_width_from_id(sim, direction_to_index(RoadEnum.EAST, junction)) + 2*10 + LANE_GAP / 4
+    end_x = get_road_width_from_id(sim, direction_to_index(RoadEnum.NORTH, junction)) + get_road_width_from_id(sim, direction_to_index(RoadEnum.SOUTH, junction)) + 2*10 + LANE_GAP / 4
     # 2) Draw the intersection box over the roads
     intersection_rect = pygame.Rect(
         start_y,
@@ -354,8 +357,6 @@ def draw_junction_ui(
         end_y,
         end_x,
     )
-
-
 
     pygame.draw.rect(screen, INTERSECTION_COLOR, intersection_rect)
 
@@ -368,7 +369,8 @@ def draw_junction_ui(
                 car_img: pygame.Surface = car_images[car.img_index]
 
                 x, y, angle = compute_car_position(
-                    road, lane_idx, lane, car, shifts, sim
+                    road, lane_idx, lane, car, shifts, sim,
+                    screen
                 )
                 rotated = pygame.transform.rotate(car_img, angle)
                 rect = rotated.get_rect(center=(int(x), int(y)))
@@ -502,57 +504,64 @@ def draw_traffic_light(
     is_green: bool = tl.get_state()
     color: Tuple[int, int, int] = (0, 255, 0) if is_green else (255, 0, 0)
 
+    junctions: List[Junction] = sim.get_junctions()
+    if not junctions:
+        return
+    junction: Junction = junctions[0]
+
     # Use the lane ID to figure out direction
     origins = tl.get_origins()
     if not origins:
         return
 
-    direction_val = (origins[0] // 10)
+    direction_val = junction.get_road_by_id(origins[0] // 10).get_from_side()
+
+    min_lane_in_road = min([lane.get_id() for lane in junction.get_road_by_id(origins[0] // 10).get_lanes()])
 
     lw: int = 12
     lh: int = 30
 
     lane_offsets = [
         LANE_WIDTH*i
-        for i in range(get_num_lanes_from_id(sim, road_id=direction_val))
+        for i in range(get_num_lanes_from_id(sim, road_id=direction_to_index(direction_val, junction)))
     ]
 
-    if direction_val == 0:  # north
+    if direction_val == RoadEnum.NORTH:  # north
         start_x = CX + shifts.get(RoadEnum(direction_val).name) + (LANE_WIDTH - lw) / 2
-        y = CY - get_road_width_from_id(sim, road_id=12) - 4*LANE_GAP
+        y = CY - get_road_width_from_id(sim, road_id=direction_to_index(RoadEnum.NORTH, junction)) - 4*LANE_GAP
 
-        for origin in origins:
-            x = start_x + lane_offsets[origin % 100]
+        for i, origin in enumerate(origins):
+            x = start_x + lane_offsets[origin - min_lane_in_road]
             housing = pygame.Rect(x, y, lw, lh)
             pygame.draw.rect(screen, (20, 20, 20), housing)
             pygame.draw.circle(screen, color, housing.center, 5)
 
-    elif direction_val == 1:  # east
+    elif direction_val == RoadEnum.EAST:  # east
         start_y = CY + shifts.get(RoadEnum(direction_val).name) + (LANE_WIDTH - lw) / 2
-        x = CX + get_road_width_from_id(sim, road_id=14) + 1.25 * LANE_GAP
+        x = CX + get_road_width_from_id(sim, road_id=direction_to_index(RoadEnum.EAST, junction)) + 1.25 * LANE_GAP
 
-        for origin in origins:
-            y = start_y + lane_offsets[origin % 100]
+        for i, origin in enumerate(origins):
+            y = start_y + lane_offsets[origin - min_lane_in_road]
             housing = pygame.Rect(x, y, lw, lh)
             pygame.draw.rect(screen, (20, 20, 20), housing)
             pygame.draw.circle(screen, color, housing.center, 5)
 
-    elif direction_val == 2:  # south
+    elif direction_val == RoadEnum.SOUTH:  # south
         start_x = CX + shifts.get(RoadEnum(direction_val).name) + (LANE_WIDTH - lw) / 2
-        y = CY + get_road_width_from_id(sim, road_id=11) + 1.25 * LANE_GAP
+        y = CY + get_road_width_from_id(sim, road_id=direction_to_index(RoadEnum.SOUTH, junction)) + 1.25 * LANE_GAP
 
-        for origin in origins:
-            x = start_x + lane_offsets[origin % 100]
+        for i, origin in enumerate(origins):
+            x = start_x + lane_offsets[origin - min_lane_in_road]
             housing = pygame.Rect(x, y, lw, lh)
             pygame.draw.rect(screen, (20, 20, 20), housing)
             pygame.draw.circle(screen, color, housing.center, 5)
 
-    elif direction_val == 3:  # west
+    elif direction_val == RoadEnum.WEST:  # west
         start_y = CY + shifts.get(RoadEnum(direction_val).name) + (LANE_WIDTH - lw) / 2
-        x = CX - get_road_width_from_id(sim, road_id=13) - 2.25 * LANE_GAP
+        x = CX - get_road_width_from_id(sim, road_id=direction_to_index(RoadEnum.WEST, junction)) - 2.25 * LANE_GAP
 
-        for origin in origins:
-            y = start_y + lane_offsets[origin % 100]
+        for i, origin in enumerate(origins):
+            y = start_y + lane_offsets[origin - min_lane_in_road]
             housing = pygame.Rect(x, y, lw, lh)
             pygame.draw.rect(screen, (20, 20, 20), housing)
             pygame.draw.circle(screen, color, housing.center, 5)
@@ -573,7 +582,8 @@ def compute_car_position(
         lane: Lane,
         car: Car,
         shifts: dict,
-        sim
+        sim,
+        screen # TODO remove this just for debug
 ) -> Tuple[float, float, float]:
     """
     Computes the (x, y, angle) of a car on a dynamic-width road,
@@ -603,50 +613,56 @@ def compute_car_position(
         left_boundary = CX + shift
         x = left_boundary + lane_center_offset
 
-        #start_y = CY + shifts.get(RoadEnum(direction_val).name) + (LANE_WIDTH - lw) / 2
-        #x = CX - get_road_width_from_id(sim, road_id=0) - 2.25 * LANE_GAP
-        shift_y = shifts.get(RoadEnum(1).name)
+        shift_y = CY - get_road_width_from_id(sim, road_id=road.get_id()) - 10
 
         if dist >= 0:
-            top_of_road = (CY - 100) - lane.LENGTH
+            top_of_road = shift_y - lane.LENGTH
             frac = (lane.LENGTH - dist) / lane.LENGTH
-            y = top_of_road + frac * ((CY - 100) - top_of_road)
+            y = top_of_road + frac * lane.LENGTH
         else:
-            y = (CY - 100) + abs(dist)
+            y = shift_y + abs(dist)
 
     elif direction_str == "SOUTH":
         angle = 90
         left_boundary = CX + shift
         x = left_boundary + lane_center_offset
 
+        shift_y = CY + get_road_width_from_id(sim, road_id=road.get_id()) + 10
+
         if dist >= 0:
-            bottom_of_road = (CY + half_int) + lane.LENGTH
+            bottom_of_road = shift_y + lane.LENGTH
             frac = (lane.LENGTH - dist) / lane.LENGTH
-            y = bottom_of_road - frac * (bottom_of_road - (CY + half_int))
+            y = bottom_of_road - frac * lane.LENGTH
         else:
-            y = (CY + half_int) - abs(dist)
+            y = shift_y - abs(dist)
 
     elif direction_str == "EAST":
         angle = 180
         top_boundary = CY + shift
         y = top_boundary + lane_center_offset
+
+        shift_x = CX + get_road_width_from_id(sim, road_id=road.get_id()) + 10
+
         if dist >= 0:
-            right_of_road = (CX + half_int) + lane.LENGTH
+            right_of_road = shift_x + lane.LENGTH
             frac = (lane.LENGTH - dist) / lane.LENGTH
-            x = right_of_road - frac * (right_of_road - (CX + half_int))
+            x = right_of_road - frac * lane.LENGTH
         else:
-            x = (CX + half_int) - abs(dist)
+            x = shift_x - abs(dist)
 
     elif direction_str == "WEST":
         angle = 0
         top_boundary = CY + shift
         y = top_boundary + lane_center_offset
+
+        shift_x = CX - get_road_width_from_id(sim, road_id=road.get_id()) - 10
+
         if dist >= 0:
-            left_of_road = (CX - half_int) - lane.LENGTH
+            left_of_road = shift_x - lane.LENGTH
             frac = (lane.LENGTH - dist) / lane.LENGTH
-            x = left_of_road + frac * ((CX - half_int) - left_of_road)
+            x = left_of_road + frac * lane.LENGTH
         else:
-            x = (CX - half_int) + abs(dist)
+            x = shift_x + abs(dist)
 
     return x, y, angle
 
