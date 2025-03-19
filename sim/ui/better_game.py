@@ -46,13 +46,6 @@ CAR_DEBUG_COLOR: Tuple[int, int, int] = (255, 0, 0)
 
 FPS: int = 60
 
-# ------------------------------
-# NEW: Local "yellow" logic data
-# ------------------------------
-light_prev_states: Dict[int, bool] = {}
-light_green_times: Dict[int, float] = {}
-YELLOW_DELAY = 1.0  # seconds of "yellow" after turning green
-
 
 def get_road_total_width(num_lanes: int) -> int:
     """
@@ -143,7 +136,7 @@ def main() -> None:
         else:
             screen.fill(BACKGROUND_COLOR)
 
-        # Render the junction and simulation elements
+        # Render the junction and simulation elements, now passing 'shifts' and debug info.
         draw_junction_ui(screen, sim, car_images, shifts, show_debug, debug_font)
 
         pygame.display.flip()
@@ -199,7 +192,7 @@ def draw_junction_ui(
     for road in junction.get_roads():
         draw_full_road(screen, road, shifts)
 
-    # 2) Draw the intersection box
+    # 2) Draw the intersection box over the roads
     start_y = CY - get_road_total_width(len(sim.get_junctions()[0]
                   .get_road_by_id(direction_to_index(RoadEnum.NORTH, junction))
                   .get_lanes())) - 10
@@ -240,7 +233,7 @@ def draw_junction_ui(
     for tl in junction.get_traffic_lights():
         draw_traffic_light(screen, sim, tl, shifts)
 
-        # Optionally label traffic lights in debug mode
+        # (Optional) If you want to label traffic lights in debug mode:
         if show_debug and debug_font is not None:
             draw_traffic_light_id(screen, tl, sim, debug_font, shifts)
 
@@ -269,7 +262,7 @@ def draw_lane_debug_info(
     x, y, _ = compute_position_at_dist(road, lane_idx, dist_mid, shifts, sim)
 
     debug_text = f"{lane.get_id()} ({len(lane.get_cars())}) - {lane.get_car_creation()}"
-    text_surf = font.render(debug_text, True, (0, 0, 0))
+    text_surf = font.render(debug_text, True, (0, 0, 0))  # black text
     text_rect = text_surf.get_rect(center=(x, y))
     screen.blit(text_surf, text_rect)
 
@@ -289,7 +282,7 @@ def compute_position_at_dist(
     direction_str = RoadEnum(direction_int).name
     num_lanes = len(road.get_lanes())
 
-    # Lane-center offsets for each lane index, reversed
+    # Lane-center offsets for each lane index, but reversed
     lane_offsets = [
         LANE_WIDTH * (num_lanes - 1 - i) + (LANE_WIDTH // 2)
         for i in range(num_lanes)
@@ -313,6 +306,7 @@ def compute_position_at_dist(
         left_boundary = CX + shift
         x = left_boundary + lane_center_offset
         shift_y = CY + get_road_width_from_id(sim, road_id=road.get_id()) + 10
+        # The lane extends from shift_y to (shift_y + length)
         y = shift_y + (length - dist)
 
     elif direction_str == "EAST":
@@ -349,9 +343,12 @@ def draw_full_road(
     num_lanes = len(road.get_lanes())
     lane_len = road.get_lanes()[0].LENGTH if road.get_lanes() else 400
 
+    # Dynamic road width
     road_width = get_road_total_width(num_lanes)
+    # Extend beyond intersection on both sides
     total_length = 2 * lane_len
 
+    # Shift offset for this direction
     shift = shifts.get(direction_str, 0)
 
     if direction_str == "NORTH":
@@ -440,40 +437,17 @@ def draw_traffic_light(
         shifts: Dict[str, int]
 ) -> None:
     """
-    Renders a traffic light near the center of the intersection,
-    showing a local "yellow" color if the light turned green < YELLOW_DELAY seconds ago.
+    Renders a traffic light near the center of the intersection.
     """
-    global light_prev_states, light_green_times, YELLOW_DELAY
-
-    # Check the previous known state for this light
-    tl_id = tl.get_id()
-    old_state = light_prev_states.get(tl_id, False)  # default: red
-    new_state = tl.get_state()                      # current server state
-
-    # If the light just switched from red->green, record time
-    if old_state is False and new_state is True:
-        light_green_times[tl_id] = time.time()
-
-    light_prev_states[tl_id] = new_state
-
-    # Decide color
-    if new_state is True:
-        # It's "green", but check how long it's been green
-        turned_green_at = light_green_times.get(tl_id, 0.0)
-        time_since_green = time.time() - turned_green_at
-        if time_since_green < YELLOW_DELAY:
-            # Draw it yellow if it's been green for < 1 second
-            color = (255, 255, 0)  # YELLOW
-        else:
-            color = (0, 255, 0)    # GREEN
-    else:
-        color = (255, 0, 0)       # RED
+    is_green: bool = tl.get_state()
+    color: Tuple[int, int, int] = (0, 255, 0) if is_green else (255, 0, 0)
 
     junctions: List[Junction] = sim.get_junctions()
     if not junctions:
         return
     junction: Junction = junctions[0]
 
+    # Use the lane ID to figure out direction
     origins = tl.get_origins()
     if not origins:
         return
@@ -484,7 +458,7 @@ def draw_traffic_light(
     lw: int = 12
     lh: int = 30
 
-    # We'll invert lane indexing here too
+    # We invert lane indexing here too
     num_lanes_in_road = get_num_lanes_from_id(sim, road_id=direction_to_index(direction_val, junction))
     lane_offsets = [
         LANE_WIDTH * (num_lanes_in_road - 1 - i)
@@ -531,7 +505,7 @@ def draw_traffic_light(
             pygame.draw.rect(screen, (20, 20, 20), housing)
             pygame.draw.circle(screen, color, housing.center, 5)
     else:
-        # fallback if direction is missing
+        # fallback if direction is somehow missing
         x, y = CX, CY
         housing = pygame.Rect(x, y, lw, lh)
         pygame.draw.rect(screen, (20, 20, 20), housing)
@@ -546,7 +520,8 @@ def draw_traffic_light_id(
     shifts: Dict[str, int]
 ) -> None:
     """
-    (Debug) Displays the traffic light's ID near its first origin lane.
+    When in debug mode, displays the traffic light's ID near its first origin lane.
+    You can expand this to show any additional TL properties you want.
     """
     junctions: List[Junction] = sim.get_junctions()
     if not junctions or not tl.get_origins():
@@ -561,7 +536,10 @@ def draw_traffic_light_id(
     min_lane_in_road = min(l.get_id() for l in road.get_lanes())
     offset_idx = lane_id - min_lane_in_road
 
+    # We'll place the label near the same spot as the traffic light housing
+    # (just offset a bit so it doesn't overlap).
     lw: int = 12
+    # Same logic as in draw_traffic_light but only for the first origin:
     direction_str = RoadEnum(direction_val).name
     shift = shifts.get(direction_str, 0)
 
@@ -572,29 +550,29 @@ def draw_traffic_light_id(
     if direction_val == RoadEnum.NORTH:
         start_x = CX + shift + (LANE_WIDTH - lw) / 2
         y = CY - get_road_width_from_id(sim, road_id=direction_to_index(RoadEnum.EAST, junction)) - 4 * LANE_GAP
-        x = start_x + (LANE_WIDTH * (offset_idx))
-        label_rect.center = (x, y - 10)
+        x = start_x + (LANE_WIDTH * (offset_idx))  # same offset reversed
+        label_rect.center = (x, y - 10)  # slightly above
         screen.blit(text_surf, label_rect)
 
     elif direction_val == RoadEnum.EAST:
         start_y = CY + shift + (LANE_WIDTH - lw) / 2
         x = CX + get_road_width_from_id(sim, road_id=direction_to_index(RoadEnum.SOUTH, junction)) + 1.25 * LANE_GAP
         y = start_y + (LANE_WIDTH * (offset_idx))
-        label_rect.center = (x + 25, y)
+        label_rect.center = (x + 25, y)  # slightly to the right
         screen.blit(text_surf, label_rect)
 
     elif direction_val == RoadEnum.SOUTH:
         start_x = CX + shift + (LANE_WIDTH - lw) / 2
         y = CY + get_road_width_from_id(sim, road_id=direction_to_index(RoadEnum.WEST, junction)) + 1.25 * LANE_GAP
         x = start_x + (LANE_WIDTH * (offset_idx))
-        label_rect.center = (x, y + 20)
+        label_rect.center = (x, y + 20)  # slightly below
         screen.blit(text_surf, label_rect)
 
     elif direction_val == RoadEnum.WEST:
         start_y = CY + shift + (LANE_WIDTH - lw) / 2
         x = CX - get_road_width_from_id(sim, road_id=direction_to_index(RoadEnum.NORTH, junction)) - 2.25 * LANE_GAP
         y = start_y + (LANE_WIDTH * (offset_idx))
-        label_rect.center = (x - 25, y)
+        label_rect.center = (x - 25, y)  # slightly to the left
         screen.blit(text_surf, label_rect)
 
 
