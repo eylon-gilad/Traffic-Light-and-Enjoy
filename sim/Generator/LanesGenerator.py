@@ -11,8 +11,8 @@ class LanesGenerator:
     Generates lanes for given roads (need only to pass road ids)
     """
     MAX_TOTAL_LANES = 10
-    MIN_LANES_IN_ROAD = 1
-    MAX_LANES_IN_ROAD = 4
+    MIN_LANES_IN_ROAD = 2
+    MAX_LANES_IN_ROAD = 3
 
     def __init__(self, road_ids: List[int]):
         self.road_ids: List[int] = road_ids
@@ -47,7 +47,8 @@ class LanesGenerator:
             # Create "num_of_lanes" lanes for the road
             for _ in range(num_of_lanes):
                 lanes.append(Lane(
-                    lane_id=int(str(self.road_ids[i]) + str(self.current_lane_index))
+                    lane_id=int(str(self.road_ids[i]) + str(self.current_lane_index)),
+                    car_creation=0.01
                 ))
 
                 self.current_lane_index += 1

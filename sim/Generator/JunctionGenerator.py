@@ -6,7 +6,7 @@ from utils.Road import Road
 from utils.TrafficLight import TrafficLight
 from utils.RoadEnum import RoadEnum
 
-from LanesGenerator import LanesGenerator
+from sim.Generator.LanesGenerator import LanesGenerator
 
 
 class JunctionGenerator:
@@ -16,7 +16,6 @@ class JunctionGenerator:
     NEW_JUNCTION_ID = 1
 
     MAX_ROADS = 4
-    MAX_LANES_IN_ROAD = 3
 
     @staticmethod
     def generate_junction():

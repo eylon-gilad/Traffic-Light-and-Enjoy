@@ -19,6 +19,7 @@ from utils.Car import Car
 from utils.TrafficLight import TrafficLight
 from sim.creator.create_sim import create_junction, index_to_directions, direction_to_index
 from utils.RoadEnum import RoadEnum
+from sim.Generator.JunctionGenerator import JunctionGenerator
 
 #########################
 # SCREEN / RENDER CONFIG
@@ -91,7 +92,8 @@ def main() -> None:
 
     # Build the simulation with a plus-junction configuration.
     # sim: Sim = build_simple_plus_junction_sim()
-    sim: Sim = dummy_build_junction()
+    # sim: Sim = dummy_build_junction()
+    sim: Sim = Sim(junctions=[JunctionGenerator.generate_junction()], if_ui=True)
     # sim.enable_time_based_lights(period_seconds=5.0)
     sim.start()  # Start the simulation thread in the background
 
