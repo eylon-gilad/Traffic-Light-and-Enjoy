@@ -29,7 +29,6 @@ class ExpCarsOnTimeController(BaseAlgorithm):
         # self.cars_time_tracker[ (light_id_tuple) ][car_id ] = [time_waiting, start_time]
         self.cars_time_tracker: Dict[Tuple[int, ...], Dict[int, List[float]]] = defaultdict(dict)
         self.combinations: List[Tuple[int, ...]] = TrafficLightsCombinator(junction).get_combinations()
-
         for comb in self.combinations:
             self.cars_time_tracker[comb] = defaultdict()
 
@@ -43,6 +42,8 @@ class ExpCarsOnTimeController(BaseAlgorithm):
         (i.e., presumably the largest waiting times) and sets those lights to green.
         """
         while True:
+            print(self.combinations)
+
             try:
                 self.remove_unrelevant_cars()
                 self.set_cars_time()

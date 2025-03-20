@@ -256,10 +256,18 @@ class TrafficLightsCombinator:
         :param to_sides: The list of road sides.
         :return: True if any destination side is directly opposite from_side.
         """
+
         for to_side in to_sides:
-            if (from_side.value + to_side.value) % 2 == 0:
+            if from_side == RoadEnum.WEST and to_side == RoadEnum.EAST:
                 return True
-        return False
+            if from_side == RoadEnum.SOUTH and to_side == RoadEnum.NORTH:
+                return True
+            if from_side == RoadEnum.EAST and to_side == RoadEnum.WEST:
+                return True
+            if from_side == RoadEnum.NORTH and to_side == RoadEnum.SOUTH:
+                return True
+
+        return True
 
     @staticmethod
     def check_if_turn_only_right(from_side: RoadEnum, to_sides: List[RoadEnum]) -> bool:

@@ -243,8 +243,8 @@ class Client:
                     "cars": []
                 }
                 for car in lane.get_cars():
-                    if car.get_dist() <= 0:
-                        continue
+                    # if car.get_dist() <= 0:
+                    #     continue
                     car_info: Dict[str, Any] = {
                         "car_index": car.get_id(),
                         "dist": [car.get_dist()],
