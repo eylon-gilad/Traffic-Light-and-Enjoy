@@ -13,9 +13,10 @@ def main() -> None:
     Run two simple tests for TrafficLightsCombinator using
     pre-built dummy junctions.
     """
-    test1()
-    test2()
-    test3()
+    # test1()
+    # test2()
+    # test3()
+    test4()
 
 
 def test1() -> None:
@@ -41,6 +42,15 @@ def test3() -> None:
     Build another dummy junction and print the valid traffic lights combinations.
     """
     junction: Junction = build_junction3()
+    tlc: TrafficLightsCombinator = TrafficLightsCombinator(junction)
+    print(tlc.get_combinations())
+
+
+def test4() -> None:
+    """
+    Build another dummy junction and print the valid traffic lights combinations.
+    """
+    junction: Junction = build_junction4()
     tlc: TrafficLightsCombinator = TrafficLightsCombinator(junction)
     print(tlc.get_combinations())
 
@@ -72,6 +82,16 @@ def build_junction3() -> Junction:
     j_id: int = 1
     traffic_lights: List[TrafficLight] = build_traffic_lights3()
     roads: List[Road] = build_roads_2()
+    return Junction(junction_id=j_id, traffic_lights=traffic_lights, roads=roads)
+
+
+def build_junction4() -> Junction:
+    """
+    Construct a second sample Junction object with different lights.
+    """
+    j_id: int = 1
+    traffic_lights: List[TrafficLight] = build_traffic_lights4()
+    roads: List[Road] = build_roads_4()
     return Junction(junction_id=j_id, traffic_lights=traffic_lights, roads=roads)
 
 
@@ -121,6 +141,60 @@ def build_traffic_lights3() -> List[TrafficLight]:
         TrafficLight(light_id=8, origins=[137], destinations=[137], state=False),
         TrafficLight(light_id=9, origins=[148], destinations=[112, 148], state=False),
         TrafficLight(light_id=10, origins=[149], destinations=[149], state=False)
+    ]
+
+
+def build_traffic_lights4() -> List[TrafficLight]:
+    """
+    Create another set of traffic lights with different origins/destinations.
+    """
+    return [
+        TrafficLight(light_id=1, origins=[110], destinations=[110, 136], state=False),
+        TrafficLight(light_id=2, origins=[111], destinations=[111], state=False),
+        TrafficLight(light_id=3, origins=[112], destinations=[148], state=False),
+        TrafficLight(light_id=4, origins=[123], destinations=[137], state=False),
+        TrafficLight(light_id=5, origins=[124], destinations=[124], state=False),
+        TrafficLight(light_id=6, origins=[125], destinations=[149], state=False),
+        TrafficLight(light_id=7, origins=[136], destinations=[125], state=False),
+        TrafficLight(light_id=8, origins=[137], destinations=[137], state=False),
+        TrafficLight(light_id=9, origins=[148], destinations=[123], state=False),
+        TrafficLight(light_id=10, origins=[149], destinations=[110], state=False)
+    ]
+
+
+def build_roads_4() -> List[Road]:
+    """
+    Create a set of roads with specific lane configurations.
+    """
+    return [
+        Road(
+            road_id=11,
+            lanes=[Lane(lane_id=110), Lane(lane_id=111), Lane(lane_id=112)],
+            congection_level=5,
+            from_side=RoadEnum.SOUTH,
+            to_side=RoadEnum.NORTH,
+        ),
+        Road(
+            road_id=12,
+            lanes=[Lane(lane_id=123), Lane(lane_id=124), Lane(lane_id=125)],
+            congection_level=5,
+            from_side=RoadEnum.NORTH,
+            to_side=RoadEnum.SOUTH,
+        ),
+        Road(
+            road_id=13,
+            lanes=[Lane(lane_id=136), Lane(lane_id=137)],
+            congection_level=5,
+            from_side=RoadEnum.WEST,
+            to_side=RoadEnum.EAST,
+        ),
+        Road(
+            road_id=14,
+            lanes=[Lane(lane_id=148), Lane(lane_id=149)],
+            congection_level=5,
+            from_side=RoadEnum.EAST,
+            to_side=RoadEnum.WEST,
+        ),
     ]
 
 

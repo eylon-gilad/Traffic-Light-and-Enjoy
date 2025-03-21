@@ -63,26 +63,29 @@ class TrafficLightsCombinator:
         for traffic_light in traffic_lights:
             all_key_combs[traffic_light.get_id()] = [possible_combinations[traffic_light.get_id()]]
 
-        # for comb in possible_combinations:
-        #     for val in possible_combinations[comb]:
-        #         all_key_combs[val].append(possible_combinations[comb])
+        for comb in possible_combinations:
+            for val in possible_combinations[comb]:
+                all_key_combs[val].append(possible_combinations[comb])
+
+        print(possible_combinations)
+        print(all_key_combs)
 
         for tl_id in all_key_combs:
             for comb in all_key_combs[tl_id]:
                 bad_comb: bool = False
-                for i, val_1 in enumerate(comb):
-                    for val_2 in comb[i:]:
+                for val_1 in comb:
+                    for val_2 in comb:
                         if not TrafficLightsCombinator.can_light_together(junction, junction.get_traffic_light_by_id(val_1), junction.get_traffic_light_by_id(val_2)):
                             bad_comb = True
                 if bad_comb:
                     all_key_combs[tl_id].remove(comb)
 
-
+        print(all_key_combs)
         final_combs = []
 
         for tl_id in all_key_combs:
             if all_key_combs[tl_id]:
-                final_combs.append(tuple([tl_id, *max(all_key_combs[tl_id], key=len)]))
+                final_combs.append(tuple([tl_id, *min(all_key_combs[tl_id], key=len)]))
 
         final_combs = list(map(tuple, {frozenset(s) for s in final_combs}))
 
@@ -257,11 +260,19 @@ class TrafficLightsCombinator:
             if (from_side_1 == from_side_2
                     or TrafficLightsCombinator.check_if_turn_only_right(from_side_2, to_side_dest_2)):
                 return True
+            elif ((from_side_1.value + from_side_2.value) % 2 == 0
+                  and TrafficLightsCombinator.check_if_turn_only_left(from_side_2, to_side_dest_2)):
+                return True
+
             return False
         elif TrafficLightsCombinator.check_if_turn_left(from_side_2, to_side_dest_2):
             if (from_side_1 == from_side_2
                     or TrafficLightsCombinator.check_if_turn_only_right(from_side_1, to_side_dest_1)):
                 return True
+            elif ((from_side_1.value + from_side_2.value) % 2 == 0
+                  and TrafficLightsCombinator.check_if_turn_only_left(from_side_1, to_side_dest_1)):
+                return True
+
             return False
 
         return True
@@ -302,7 +313,7 @@ class TrafficLightsCombinator:
             if from_side == RoadEnum.NORTH and to_side == RoadEnum.SOUTH:
                 return True
 
-        return True
+        return False
 
     @staticmethod
     def check_if_turn_only_right(from_side: RoadEnum, to_sides: List[RoadEnum]) -> bool:
@@ -319,6 +330,25 @@ class TrafficLightsCombinator:
             if from_side == RoadEnum.EAST and to_side != RoadEnum.NORTH:
                 return False
             if from_side == RoadEnum.NORTH and to_side != RoadEnum.WEST:
+                return False
+
+        return True
+
+    @staticmethod
+    def check_if_turn_only_left(from_side: RoadEnum, to_sides: List[RoadEnum]) -> bool:
+        """
+        Check if from_side to all of the to_sides is strictly a left turn.
+
+        :return: True if every movement is a left turn, else False.
+        """
+        for to_side in to_sides:
+            if from_side == RoadEnum.WEST and to_side != RoadEnum.NORTH:
+                return False
+            if from_side == RoadEnum.SOUTH and to_side != RoadEnum.WEST:
+                return False
+            if from_side == RoadEnum.EAST and to_side != RoadEnum.SOUTH:
+                return False
+            if from_side == RoadEnum.NORTH and to_side != RoadEnum.EAST:
                 return False
 
         return True
