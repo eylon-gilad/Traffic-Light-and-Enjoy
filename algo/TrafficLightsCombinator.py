@@ -2,6 +2,8 @@ import itertools
 from collections import defaultdict
 from typing import List, Dict, Set, Tuple, DefaultDict
 
+import numpy as np
+
 from utils.Junction import Junction
 from utils.Road import Road
 from utils.RoadEnum import RoadEnum
@@ -49,11 +51,7 @@ class TrafficLightsCombinator:
         # Compare every traffic light to every other to see if they can safely be on together.
         for traffic_light_1 in traffic_lights:
             for traffic_light_2 in traffic_lights:
-                if (TrafficLightsCombinator.not_entering_the_same_road(traffic_light_1, traffic_light_2)
-                        and TrafficLightsCombinator.not_intersect_on_straight(junction, traffic_light_1,
-                                                                              traffic_light_2)
-                        and TrafficLightsCombinator.not_intersect_on_turn_left(junction, traffic_light_1,
-                                                                               traffic_light_2)):
+                if TrafficLightsCombinator.can_light_together(junction, traffic_light_1, traffic_light_2):
                     possible_combinations[traffic_light_1.id].append(traffic_light_2.id)
 
         # Remove self from its own possible list.
@@ -61,7 +59,44 @@ class TrafficLightsCombinator:
             if key in value:
                 value.remove(key)
 
-        return TrafficLightsCombinator.find_max_combinations(possible_combinations)
+        all_key_combs = {}
+        for traffic_light in traffic_lights:
+            all_key_combs[traffic_light.get_id()] = [possible_combinations[traffic_light.get_id()]]
+
+        # for comb in possible_combinations:
+        #     for val in possible_combinations[comb]:
+        #         all_key_combs[val].append(possible_combinations[comb])
+
+        for tl_id in all_key_combs:
+            for comb in all_key_combs[tl_id]:
+                bad_comb: bool = False
+                for i, val_1 in enumerate(comb):
+                    for val_2 in comb[i:]:
+                        if not TrafficLightsCombinator.can_light_together(junction, junction.get_traffic_light_by_id(val_1), junction.get_traffic_light_by_id(val_2)):
+                            bad_comb = True
+                if bad_comb:
+                    all_key_combs[tl_id].remove(comb)
+
+
+        final_combs = []
+
+        for tl_id in all_key_combs:
+            if all_key_combs[tl_id]:
+                final_combs.append(tuple([tl_id, *max(all_key_combs[tl_id], key=len)]))
+
+        final_combs = list(map(tuple, {frozenset(s) for s in final_combs}))
+
+        return final_combs
+
+        # return TrafficLightsCombinator.find_max_combinations(possible_combinations)
+
+    @staticmethod
+    def can_light_together(junction: Junction, traffic_light_1: TrafficLight, traffic_light_2: TrafficLight):
+        return (TrafficLightsCombinator.not_entering_the_same_road(traffic_light_1, traffic_light_2)
+                and TrafficLightsCombinator.not_intersect_on_straight(junction, traffic_light_1,
+                                                                      traffic_light_2)
+                and TrafficLightsCombinator.not_intersect_on_turn_left(junction, traffic_light_1,
+                                                                       traffic_light_2))
 
     @staticmethod
     def power_set(s: Set[int]) -> List[Set[int]]:
@@ -97,7 +132,7 @@ class TrafficLightsCombinator:
             for subset in p_set:
                 for j, candidate_items in enumerate(item_sets):
                     if j != i:
-                        if subset.issubset(candidate_items):
+                        if subset.issubset(candidate_items) and subset not in valid_subsets:
                             valid_subsets.append(subset)
 
         # Sort and remove duplicates
