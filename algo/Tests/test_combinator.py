@@ -13,9 +13,9 @@ def main() -> None:
     Run two simple tests for TrafficLightsCombinator using
     pre-built dummy junctions.
     """
-    # test1()
-    # test2()
-    # test3()
+    test1()
+    test2()
+    test3()
     test4()
 
 

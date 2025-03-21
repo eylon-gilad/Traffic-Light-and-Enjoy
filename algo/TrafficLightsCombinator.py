@@ -67,29 +67,52 @@ class TrafficLightsCombinator:
             for val in possible_combinations[comb]:
                 all_key_combs[val].append(possible_combinations[comb])
 
-        print(possible_combinations)
-        print(all_key_combs)
+        for tl_id in all_key_combs:
+            for i, comb in enumerate(all_key_combs[tl_id]):
+                all_key_combs[tl_id][i] = TrafficLightsCombinator.power_set(set(comb))
 
         for tl_id in all_key_combs:
-            for comb in all_key_combs[tl_id]:
-                bad_comb: bool = False
-                for val_1 in comb:
-                    for val_2 in comb:
-                        if not TrafficLightsCombinator.can_light_together(junction, junction.get_traffic_light_by_id(val_1), junction.get_traffic_light_by_id(val_2)):
+            for i, comb in enumerate(all_key_combs[tl_id]):
+                for j, sub_comb in enumerate(comb):
+                    bad_comb: bool = False
+                    for val_1 in sub_comb:
+                        for val_2 in sub_comb:
+                            if not TrafficLightsCombinator.can_light_together(junction, junction.get_traffic_light_by_id(val_1), junction.get_traffic_light_by_id(val_2)):
+                                bad_comb = True
+                        if not TrafficLightsCombinator.can_light_together(junction, junction.get_traffic_light_by_id(val_1), junction.get_traffic_light_by_id(tl_id)):
                             bad_comb = True
-                if bad_comb:
-                    all_key_combs[tl_id].remove(comb)
+                    if bad_comb:
+                        all_key_combs[tl_id][i][j] = set()
 
-        print(all_key_combs)
-        final_combs = []
-
+        max_lens = []
         for tl_id in all_key_combs:
-            if all_key_combs[tl_id]:
-                final_combs.append(tuple([tl_id, *min(all_key_combs[tl_id], key=len)]))
+            max_l = 0
+            for comb in all_key_combs[tl_id]:
+                for sub_comb in comb:
+                    if len(sub_comb) > max_l:
+                        max_l = len(sub_comb)
+            max_lens.append(max_l)
 
-        final_combs = list(map(tuple, {frozenset(s) for s in final_combs}))
+        final_combs = {}
+        for tl_id in all_key_combs:
+            final_combs[tl_id] = []
 
-        return final_combs
+        for i, tl_id in enumerate(all_key_combs):
+            for comb in all_key_combs[tl_id]:
+                for sub_comb in comb:
+                    if len(sub_comb) == max_lens[i] and tl_id not in sub_comb:
+                        final_combs[tl_id].append(sub_comb)
+
+        #     if all_key_combs[tl_id]:
+        #         final_combs.append(tuple([tl_id, *max(all_key_combs[tl_id], key=len)]))
+        final_final_combs = []
+        for tl_id in final_combs:
+            for comb in final_combs[tl_id]:
+                comb.add(tl_id)
+                final_final_combs.append(comb)
+        final_final_combs = list(map(tuple, {frozenset(s) for s in final_final_combs}))
+
+        return final_final_combs
 
         # return TrafficLightsCombinator.find_max_combinations(possible_combinations)
 
