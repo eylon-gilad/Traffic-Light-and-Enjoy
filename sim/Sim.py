@@ -16,6 +16,7 @@ from random import uniform
 from utils.Car import Car
 from utils.Junction import Junction
 from utils.Lane import Lane
+from utils.Road import Road
 from sim.Client import Client
 
 
@@ -33,7 +34,8 @@ class Sim:
     """
 
     __DEFAULT_TIME_STEP: float = 1 / 30  # Default ~30 FPS for UI mode
-    CAR_ID:int = 0
+    LANE_WIDTH: int = 50
+    CAR_ID: int = 0
 
     def __init__(
         self, junctions: Optional[List[Junction]] = None, if_ui: bool = True
@@ -201,10 +203,27 @@ class Sim:
             dest_lane: Lane = random.choice(junction.get_lanes_by_ids([car.get_dest()]))
 
             if dest_lane and dest_lane.get_id() != lane.get_id():
-                lane.remove_car(car)
-                dest_lane.add_car(car)
-                # Reset the distance for the new lane.
-                # car.set_dist(dest_lane.LENGTH)
+                cur_road: Road = junction.get_road_by_id(lane.get_id() // 10)
+                dest_road: Road = junction.get_road_by_id(dest_lane.get_id() // 10)
+                for road in junction.get_roads():
+                    if (road.get_from_side().value - cur_road.get_from_side().value) % 4 == 2:
+                        cur_parr_road: Road = road
+                    elif (road.get_from_side().value - dest_road.get_from_side().value) % 4 == 2:
+                        dest_parr_road: Road = road
+
+                turn_type = (dest_road.get_from_side().value - cur_road.get_from_side().value) % 4
+                if turn_type == 1:  # Right Turn
+                    shift = (len(cur_road.get_lanes()) + len(cur_parr_road.get_lanes())) * self.LANE_WIDTH + 20
+                    car.set_dist(-shift)
+                    lane.remove_car(car)
+                    dest_lane.add_car(car)
+                elif turn_type == 3:  # Left Turn
+                    dist_to_shift = (len(dest_parr_road.get_lanes())) * self.LANE_WIDTH + 20
+                    shift = (len(cur_road.get_lanes())) * self.LANE_WIDTH
+                    if new_dist <= -dist_to_shift:
+                        car.set_dist(-shift)
+                        lane.remove_car(car)
+                        dest_lane.add_car(car)
 
         # Remove the car if it has moved beyond the exit threshold.
         exit_threshold: float = (
