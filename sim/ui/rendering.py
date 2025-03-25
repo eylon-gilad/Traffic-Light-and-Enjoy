@@ -9,7 +9,7 @@ from typing import Dict, Tuple, List
 
 import pygame
 
-from config import (
+from sim.ui.config import (
     SCREEN_WIDTH, SCREEN_HEIGHT, CX, CY,
     BACKGROUND_COLOR, ASPHALT_COLOR, INTERSECTION_COLOR,
     LANE_MARKING_COLOR, CAR_DEBUG_COLOR,
