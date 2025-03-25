@@ -7,7 +7,7 @@ managing the simulation loop on a separate background thread.
 """
 
 import math
-import random  # Added for get_random_directions usage.
+import random
 import threading
 import time
 from typing import List, Optional
@@ -54,7 +54,8 @@ class Sim:
         # Use a slower time step if UI is enabled; otherwise, use a faster step.
         self.__time_step: float = (1 / 30) if self.ui_enabled else (1 / 1000)
         self.__thread: Optional[threading.Thread] = None
-        self.__client_failed = False
+        self.__client_failed: bool = False
+        self.has_yellow: bool = False
 
     def start(self) -> None:
         """
@@ -113,7 +114,6 @@ class Sim:
             if not self.__client_failed:
                 thread = threading.Thread(target=self.__update_traffic_lights, daemon=True)
                 thread.start()
-                # self.__update_traffic_lights()
             else:
                 # Keep them forced red
                 self.__set_all_lights_red()
@@ -267,7 +267,7 @@ class Sim:
             bool: True if any traffic light for the lane is green, False otherwise.
         """
         for tl in junction.get_traffic_lights():
-            if lane.get_id() in tl.get_origins() and tl.get_state() is True:
+            if lane.get_id() in tl.get_origins() and tl.get_state() is True and not tl.get_is_yellow():
                 return True
         return False
 
@@ -279,7 +279,27 @@ class Sim:
         The actual toggling mechanism is either time-based or random, as commented out.
         """
         with self.__lock:
+            if self.has_yellow:
+                return
+            prev_tls = self.__junctions[0].get_traffic_lights()
             self.__junctions[0].set_traffic_lights(Client.get_traffic_lights_states())
+            cur_tls = self.__junctions[0].get_traffic_lights()
+            for prev_tl in prev_tls:
+                for cur_tl in cur_tls:
+                    if cur_tl.get_id() == prev_tl.get_id() and cur_tl.get_state() != prev_tl.get_state():
+                        cur_tl.set_is_yellow(True)
+                        if not self.has_yellow:
+                            self.has_yellow = True
+                            wait_time = self.__time_step * 30 * 2.5
+
+                            def change_all_yellow():
+                                self.has_yellow = False
+                                for tl in self.__junctions[0].get_traffic_lights():
+                                    if tl.get_is_yellow():
+                                        tl.set_is_yellow(False)
+
+                            timer = threading.Timer(wait_time, change_all_yellow)
+                            timer.start()
 
     def __gen_cars(self) -> None:
         """

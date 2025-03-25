@@ -38,6 +38,7 @@ class TrafficLight:
         self.origins: List[int] = origins if origins is not None else []
         self.destinations: List[int] = destinations if destinations is not None else []
         self.state: bool = state
+        self.is_yellow: bool = False
 
     def get_id(self) -> int:
         """
@@ -92,6 +93,21 @@ class TrafficLight:
             bool: True if the light is green; otherwise, False.
         """
         return self.state
+
+    def get_is_yellow(self) -> bool:
+        """
+        Get the current yellow state of the traffic light.
+
+        Returns:
+            bool: True if the light is yellow; otherwise, False.
+        """
+        return self.is_yellow
+
+    def set_is_yellow(self, is_yellow) -> None:
+        """
+        Set the current yellow state of the traffic light.
+        """
+        self.is_yellow = is_yellow
 
     def green(self) -> None:
         """

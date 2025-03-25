@@ -381,7 +381,7 @@ def _draw_traffic_light(
     from sim.creator.create_sim import direction_to_index
 
     is_green: bool = tl.get_state()
-    color: Tuple[int, int, int] = (0, 255, 0) if is_green else (255, 0, 0)
+    color: Tuple[int, int, int] = (255, 255, 0) if tl.get_is_yellow() else (0, 255, 0) if is_green else (255, 0, 0)
 
     junction = sim.get_junctions()[0] if sim.get_junctions() else None
     if not junction or not tl.get_origins():
