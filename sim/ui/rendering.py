@@ -72,6 +72,11 @@ def draw_game_screen(
 
                 x, y, angle = _compute_car_position(road, lane_idx, lane, car, shifts, sim)
                 rotated = pygame.transform.rotate(car_img, angle)
+
+                # Flip the sprite horizontally when facing EAST
+                if RoadEnum(road.get_from_side()).name == "EAST":
+                    rotated = pygame.transform.flip(rotated, True, False)
+
                 rect = rotated.get_rect(center=(int(x), int(y)))
                 screen.blit(rotated, rect)
 
@@ -265,7 +270,7 @@ def _compute_car_position(
             y = shift_y - abs(dist)
 
     elif direction_str == "EAST":
-        angle = 180
+        angle = 0
         top_boundary = CY + shift
         y = top_boundary + lane_center_offset
         shift_x = CX + _get_road_width_from_id(sim, direction_to_index(RoadEnum.SOUTH, sim.get_junctions()[0])) + 10
