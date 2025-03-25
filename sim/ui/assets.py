@@ -21,10 +21,23 @@ def load_background_image(path: str = "../assets/background.png") -> Optional[py
         return None
 
 
+def load_tl_image(
+        turn: str = "s",
+        folder: str = "../assets/turns",
+        size: Tuple[int, int] = (40, 40),
+) -> pygame.Surface:
+    """
+    Loads and scales a background image. Returns None if loading fails.
+    """
+    path: str = f"{folder}/{turn}.png"
+    tl_image = pygame.image.load(path).convert_alpha()
+    return pygame.transform.scale(tl_image, size)
+
+
 def load_car_images(
-    num_images: int = 8,
-    folder: str = "../assets/",
-    size: Tuple[int, int] = (40, 40),
+        num_images: int = 8,
+        folder: str = "../assets/",
+        size: Tuple[int, int] = (40, 40),
 ) -> Dict[int, pygame.Surface]:
     """
     Loads car images from the specified folder.

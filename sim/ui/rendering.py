@@ -23,6 +23,7 @@ from utils.Junction import Junction
 from utils.Road import Road
 from utils.Lane import Lane
 from utils.Car import Car
+from sim.ui.assets import  load_tl_image
 
 
 def draw_game_screen(
@@ -415,6 +416,16 @@ def _draw_traffic_light(
             housing = pygame.Rect(x, y, lw, lh)
             pygame.draw.rect(screen, (20, 20, 20), housing)
             pygame.draw.circle(screen, color, housing.center, 5)
+
+            c_lane = CX + shifts.get(direction_str) + lane_offsets[offset_idx] + LANE_WIDTH / 2
+
+            # pygame.draw.circle(screen, color, (c_lane, y - 35), 25)
+
+            image = load_tl_image(size=(50, 50))
+            image = pygame.transform.rotate(image, 180)
+            # screen.blit(image, (CX + shifts.get(direction_str) + lane_offsets[offset_idx], y - 60))
+
+
 
     elif direction_val == RoadEnum.EAST:
         start_y = CY + shifts.get(direction_str) + (LANE_WIDTH - lw) / 2
