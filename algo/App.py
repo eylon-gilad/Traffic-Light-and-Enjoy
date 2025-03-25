@@ -1,8 +1,9 @@
-import time
+import logging
 from typing import Any, Dict, List, Optional
 
 from flask import Flask, request, jsonify, Response
 
+from algo.AlgoRunner import AlgoRunner
 from utils.Car import Car
 from utils.Junction import Junction
 from utils.Lane import Lane
@@ -10,77 +11,87 @@ from utils.Road import Road
 from utils.RoadEnum import RoadEnum
 from utils.TrafficLight import TrafficLight
 
-from TrafficLightsCombinator import TrafficLightsCombinator
-
-from algo.Algorithms.ExpCarsOnTime import ExpCarsOnTimeController
-
-from algo.AlgoRunner import AlgoRunner
-from algo.Algorithms.BaseAlgorithm import BaseAlgorithm
-
 app = Flask(__name__)
 
-# Store the Junction object here after parsing the JSON
+# Global references to the current Junction and the algorithm runner.
 junction: Optional[Junction] = None
-alg: AlgoRunner = None
+alg: Optional[AlgoRunner] = None
+
+# Configure a basic logger (for demonstration).
+logging.basicConfig(level=logging.INFO)
 
 
-# TODO move this file to the api folder
 @app.route("/junction-info", methods=["POST"])
 def post_junction_info() -> Response:
     """
     Receives JSON containing information about a junction, including
     roads, lanes, cars, and traffic lights, then constructs the
-    corresponding objects.
+    corresponding objects and updates the global junction reference.
+
+    Expected JSON format:
+    {
+        "junction": {
+            "traffic_lights": [...],
+            "roads": [...],
+            ...
+        }
+    }
+
+    :return: A JSON response indicating success or failure.
     """
     global junction, alg
 
-    data: Optional[Dict[str, Any]] = request.get_json()
+    try:
+        data: Optional[Dict[str, Any]] = request.get_json()
+    except Exception as e:
+        logging.error(f"Error parsing JSON: {e}")
+        return jsonify({"error": "Invalid JSON data."}, 400)
+
     if not data or "junction" not in data:
         return jsonify({"error": "Invalid request. 'junction' key not found."}, 400)
 
-    # Extract the junction portion of the data
     junction_data: Dict[str, Any] = data["junction"]
 
-    # Parse traffic lights data
-    traffic_light_data: List[Dict[str, Any]] = junction_data.get("traffic_lights", [])
+    # Parse traffic lights
+    traffic_light_info: List[Dict[str, Any]] = junction_data.get("traffic_lights", [])
     traffic_lights: List[TrafficLight] = []
-    for tl in traffic_light_data:
-        tl_id: int = tl.get("traffic_light_index", 0)
-        origins: List[int] = tl.get("input_index", [])
-        destinations: List[int] = tl.get("output_index", [])
-        state: bool = tl.get("state", False)
+    for tl_info in traffic_light_info:
+        tl_id: int = tl_info.get("traffic_light_index", 0)
+        origins: List[int] = tl_info.get("input_index", [])
+        destinations: List[int] = tl_info.get("output_index", [])
+        state: bool = bool(tl_info.get("state", False))
         traffic_lights.append(
             TrafficLight(
-                id=tl_id, origins=origins, destinations=destinations, state=state
+                light_id=tl_id, origins=origins, destinations=destinations, state=state
             )
         )
 
-    # Parse roads data
+    # Parse roads
     roads_data: List[Dict[str, Any]] = junction_data.get("roads", [])
     roads: List[Road] = []
-    for rd in roads_data:
-        road_id: int = rd.get("road_index", 0)
-        congection_level: int = rd.get("congection_level", 0)
+    for road_data in roads_data:
+        road_id: int = road_data.get("road_index", 0)
+        congection_level: int = road_data.get("congection_level", 0)
 
-        # Parse lanes data for this road
-        lanes_data: List[Dict[str, Any]] = rd.get("lanes", [])
+        # Parse lanes for this road
+        lanes_data: List[Dict[str, Any]] = road_data.get("lanes", [])
         lanes: List[Lane] = []
-        for ln in lanes_data:
-            lane_id: int = ln.get("lane_index", 0)
+        for lane_data in lanes_data:
+            lane_id: int = lane_data.get("lane_index", 0)
 
-            # Parse cars data for this lane
-            cars_data: List[Dict[str, Any]] = ln.get("cars", [])
+            # Parse cars for this lane
+            cars_data: List[Dict[str, Any]] = lane_data.get("cars", [])
             cars: List[Car] = []
-            for car in cars_data:
-                car_id: int = car.get("car_index", 0)
-                dist: List[float] = car.get("dist", [])
-                velocity: float = car.get("velocity", 0.0)
-                dest: str = car.get("dest", "")
-                car_type: str = car.get("car_type", "CAR")
+            for car_info in cars_data:
+                car_id: int = car_info.get("car_index", 0)
+                dist: float = car_info.get("dist", 0.0)
+                velocity: float = float(car_info.get("velocity", 0.0))
+                dest: int = car_info.get("dest", 0)
+                car_type: str = car_info.get("car_type", "CAR")
 
                 cars.append(
                     Car(
-                        id=car_id,
+                        car_id=car_id,
                         dist=dist,
                         velocity=velocity,
                         dest=dest,
@@ -88,74 +99,106 @@ def post_junction_info() -> Response:
                     )
                 )
 
-            lanes.append(Lane(id=lane_id, cars=cars))
+            lanes.append(Lane(lane_id=lane_id, cars=cars))
 
-        roads.append(Road(id=road_id, lanes=lanes, congection_level=congection_level))
+        roads.append(Road(road_id=road_id, lanes=lanes, congection_level=congection_level))
 
     # Construct the Junction object
     junction_id: int = junction_data.get("id", 0)
-    junction = Junction(id=junction_id, traffic_lights=traffic_lights, roads=roads)
+    junction = Junction(junction_id=junction_id, traffic_lights=traffic_lights, roads=roads)
 
-    alg.set_junction_info(junction)
+    # Update junction info in the existing algorithm runner
+    if alg is not None:
+        alg.set_junction_info(junction)
+
     return jsonify({"message": "Junction information updated successfully."}, 200)
 
 
 @app.route("/start-algorithm", methods=["GET"])
 def start_algorithm() -> Response:
+    """
+    Instantiates the AlgoRunner with the global junction and starts
+    the chosen traffic algorithm in a background thread.
+    """
     global junction, alg
 
-    alg = AlgoRunner(junction)
-    alg.run()
+    if junction is None:
+        return jsonify({"error": "No junction data available to start the algorithm."}, 400)
 
-    return jsonify({"message": "Algorithm runner started successfully."}, 200)
+    try:
+        alg = AlgoRunner(junction)
+        alg.run()
+        return jsonify({"message": "Algorithm runner started successfully."}, 200)
+    except Exception as e:
+        logging.error(f"Failed to start algorithm: {e}")
+        return jsonify({"error": "Could not start the algorithm."}, 500)
 
 
 @app.route("/build-junction", methods=["POST"])
-def build_junction():
-    global junction, alg
+def build_junction() -> Response:
+    """
+    Receives JSON to build a new Junction object, without cars,
+    typically used for initial setup or placeholder.
+    """
+    global junction
 
-    data: Optional[Dict[str, Any]] = request.get_json()
+    print("build-junction cos ameck")
+
+    try:
+        data: Optional[Dict[str, Any]] = request.get_json()
+    except Exception as e:
+        logging.error(f"Error parsing JSON in build-junction: {e}")
+        return jsonify({"error": "Invalid JSON data."}, 400)
+
     if not data or "junction" not in data:
-        return jsonify({"error": "Invalid request. 'junction' key not found."}, 400)
+        return jsonify(({"error": "Invalid request. 'junction' key not found."}), 400)
 
-    # Extract the junction portion of the data
     junction_data: Dict[str, Any] = data["junction"]
 
-    # Parse traffic lights data
-    traffic_light_data: List[Dict[str, Any]] = junction_data.get("traffic_lights", [])
+    # Parse traffic lights
+    traffic_light_info: List[Dict[str, Any]] = junction_data.get("traffic_lights", [])
     traffic_lights: List[TrafficLight] = []
-    for tl in traffic_light_data:
-        tl_id: int = tl.get("traffic_light_index", 0)
-        origins: List[int] = tl.get("input_index", [])
-        destinations: List[int] = tl.get("output_index", [])
-        state: bool = tl.get("state", False)
+    for tl_info in traffic_light_info:
+        tl_id: int = tl_info.get("traffic_light_index", 0)
+        origins: List[int] = tl_info.get("input_index", [])
+        destinations: List[int] = tl_info.get("output_index", [])
+        state: bool = bool(tl_info.get("state", False))
         traffic_lights.append(
             TrafficLight(
-                id=tl_id, origins=origins, destinations=destinations, state=state
+                light_id=tl_id, origins=origins, destinations=destinations, state=state
             )
         )
 
-    # Parse roads data
+    # Parse roads
     roads_data: List[Dict[str, Any]] = junction_data.get("roads", [])
     roads: List[Road] = []
-    for rd in roads_data:
-        road_id: int = rd.get("road_index", 0)
-        from_side: RoadEnum = RoadEnum.from_string(rd.get("from", 0))
-        to_side: RoadEnum = RoadEnum.from_string(rd.get("to", 0))
-        congection_level: int = rd.get("congection_level", 0)
+    for road_data in roads_data:
+        road_id: int = road_data.get("road_index", 0)
+        from_side: RoadEnum = RoadEnum.from_string(road_data.get("from", 0))
+        to_side: RoadEnum = RoadEnum.from_string(road_data.get("to", 0))
+        congection_level: int = road_data.get("congection_level", 0)
 
-        # Parse lanes data for this road
-        lanes_data: List[Dict[str, Any]] = rd.get("lanes", [])
-        lanes: List[Lane] = []
-        for ln in lanes_data:
-            lane_id: int = ln.get("lane_index", 0)
-            lanes.append(Lane(id=lane_id))
+        lanes_data: List[Dict[str, Any]] = road_data.get("lanes", [])
+        lane_objects: List[Lane] = []
+        for ln_data in lanes_data:
+            lane_id: int = ln_data.get("lane_index", 0)
+            lane_objects.append(Lane(lane_id=lane_id))
 
-        roads.append(Road(id=road_id, lanes=lanes, congection_level=congection_level, from_side=from_side, to_side=to_side))
+        roads.append(
+            Road(
+                road_id=road_id,
+                lanes=lane_objects,
+                congection_level=congection_level,
+                from_side=from_side,
+                to_side=to_side,
+            )
+        )
 
     # Construct the Junction object
     junction_id: int = junction_data.get("id", 0)
-    junction = Junction(id=junction_id, traffic_lights=traffic_lights, roads=roads)
+    junction = Junction(junction_id=junction_id, traffic_lights=traffic_lights, roads=roads)
+
+    print(junction.__str__())
 
     return jsonify({"message": "Junction was built successfully."}, 200)
 
@@ -164,27 +207,31 @@ def build_junction():
 def get_traffic_light_state() -> Response:
     """
     Returns the current state of all traffic lights in the junction.
-    If the junction is not yet set, returns an error.
+    If the junction or algorithm runner has not been set, an error is returned.
     """
+    global junction, alg
 
-    global junction
+    if junction is None or alg is None:
+        return jsonify({"error": "Junction or algorithm runner not set yet."}, 400)
 
-    if junction is None:
-        return jsonify({"error": "Junction not set yet."}, 400)
-
-    traffic_light_states: List[Dict[str, Any]] = []
-    for tl in alg.get_current_state():
-        traffic_light_states.append(
-            {
-                "traffic_light_index": tl.get_id(),
-                "origins": tl.get_origins(),
-                "destinations": tl.get_destinations(),
-                "state": tl.get_state(),
-            }
-        )
-
-    return jsonify({"traffic_lights": traffic_light_states}, 200)
+    try:
+        current_lights = alg.get_current_state()
+        traffic_light_states: List[Dict[str, Any]] = []
+        for tl in current_lights:
+            traffic_light_states.append(
+                {
+                    "traffic_light_index": tl.get_id(),
+                    "origins": tl.get_origins(),
+                    "destinations": tl.get_destinations(),
+                    "state": tl.get_state(),
+                }
+            )
+        return jsonify(({"traffic_lights": traffic_light_states}), 200)
+    except Exception as e:
+        logging.error(f"Failed to retrieve traffic light state: {e}")
+        return jsonify(({"error": "Could not get traffic light state."}), 500)
 
 
 if __name__ == "__main__":
+    # Note: In production, debug and host/port might be set differently.
     app.run(debug=True, host="127.0.0.1", port=8080)
