@@ -1,8 +1,10 @@
 import logging
 import threading
 
-from Algorithms.ExpCarsOnTime import ExpCarsOnTimeController
-from TrafficLightsCombinator import TrafficLightsCombinator
+from algo.Algorithms.ExpCarsOnTime import ExpCarsOnTimeController
+from algo.TrafficLightsCombinator import TrafficLightsCombinator
+#from Algorithms.ExpCarsOnTime import ExpCarsOnTimeController
+#from TrafficLightsCombinator import TrafficLightsCombinator
 from algo.Algorithms.RoundRobin import RoundRobinController
 from utils import Junction
 

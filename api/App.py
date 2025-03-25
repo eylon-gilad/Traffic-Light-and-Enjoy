@@ -1,4 +1,6 @@
 # app.py
+import random
+
 from fastapi import FastAPI
 from typing import List
 from utils.Road import Road
@@ -101,3 +103,18 @@ def get_road_congestion(road: Road):
         return "Moderate"
     else:
         return "Low"
+
+
+if __name__ == "__main__":
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    plt.axis([0, 100, 0, 100])
+    ploting = []
+    for i in range(100):
+        y = random.randint(0, 100)
+        ploting.append([i, y])
+        plt.scatter(i, y)
+        plt.pause(0.0001)
+
+    # plt.show()
