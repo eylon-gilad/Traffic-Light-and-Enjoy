@@ -124,6 +124,9 @@ class Sim:
             # 4) Generate new cars in all lanes
             self.__gen_cars()
 
+            # 5) Check if cars collide
+            # self.__check_cars_collision()
+
             # 4) Sleep the remainder of the time step
             elapsed: float = time.perf_counter() - start_time
             sleep_time: float = max(0.0, self.__time_step - elapsed)
@@ -232,6 +235,55 @@ class Sim:
         if new_dist < exit_threshold:
             lane.remove_car(car)
 
+    def __does_collide(self, car1: Car, car2: Car) -> bool:
+        road_dest_1_id: int = (car1.dest // 10) % 10
+        road_dest_2_id: int = (car2.dest // 10) % 10
+
+        road_origin_1_id: int = (car1.origin // 10) % 10
+        road_origin_2_id: int = (car2.origin // 10) % 10
+
+        road_dest_1: Road = self.__junctions[0].get_road_by_id(int(str(self.__junctions[0].id) + str(road_dest_1_id)))
+        road_dest_2: Road = self.__junctions[0].get_road_by_id(int(str(self.__junctions[0].id) + str(road_dest_2_id)))
+
+        if road_origin_1_id != road_origin_2_id:
+            # Check if roads perpendicular
+            if (road_dest_1.get_to_side().value + road_dest_2.get_to_side().value) % 2 == 1:
+                return True
+
+            # Check if going to the same road but not from the same origin
+            if road_dest_1_id == road_dest_2_id :
+                return True
+
+        return False
+
+    def __is_car_in_junction(self, car: Car) -> bool:
+        junction_width: float = len(self.__junctions[0].get_road_by_id(
+            int(str(self.__junctions[0].id) + str(1))).get_lanes()) + \
+            + len(self.__junctions[0].get_road_by_id(int(str(self.__junctions[0].id) + str(2))).get_lanes()) + 20
+
+        junction_height: float = len(self.__junctions[0].get_road_by_id(
+            int(str(self.__junctions[0].id) + str(3))).get_lanes()) + \
+            + len(self.__junctions[0].get_road_by_id(int(str(self.__junctions[0].id) + str(4))).get_lanes()) + 20
+
+        junction_size = min(junction_width, junction_height)
+
+        return -junction_size < car.dist < 0
+
+    def __check_cars_collision(self) -> int:
+        """
+        Returns how many collisions happen
+        """
+        cars: List[Car] = self.get_junctions()[0].get_all_cars()
+        collision_count: int = 0
+
+        for car1 in cars:
+            for car2 in cars:
+                if self.__is_car_in_junction(car1) and self.__is_car_in_junction(car2):
+                    if self.__does_collide(car1, car2):
+                        collision_count += 1
+
+        return collision_count // 2
+
     @staticmethod
     def __distance_to_car_ahead(lane: Lane, this_car: Car) -> float:
         """
@@ -326,6 +378,7 @@ class Sim:
                                     velocity=speed,
                                     dest=random.choice(junction.get_traffic_light_by_lane_id(lane_id=lane.get_id()).get_destinations()),
                                     car_type="CAR",
+                                    origin=lane.get_id()
                                 )
                                 lane.add_car(new_car)
 

@@ -16,6 +16,7 @@ from typing import List, Optional
 from utils.Lane import Lane
 from utils.Road import Road
 from utils.TrafficLight import TrafficLight
+from utils.Car import Car
 
 
 class Junction:
@@ -155,6 +156,16 @@ class Junction:
             if lane.get_id() in lane_ids:
                 result.append(lane)
         return result
+
+    def get_all_cars(self):
+        cars: List[Car] = []
+
+        for road in self.roads:
+            for lane in road.get_lanes():
+                for car in lane.get_cars():
+                    cars.append(car)
+
+        return cars
 
     def __str__(self) -> str:
         """
