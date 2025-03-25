@@ -18,7 +18,8 @@ from utils.Junction import Junction
 from utils.Lane import Lane
 from utils.Road import Road
 from sim.Client import Client
-
+# from sim.Statistics import Statistics
+# from algo.Tests.plt_test import Statistics
 
 class Sim:
     """
@@ -38,8 +39,7 @@ class Sim:
     CAR_ID: int = 0
 
     def __init__(
-        self, junctions: Optional[List[Junction]] = None, if_ui: bool = True
-    ) -> None:
+        self, junctions: Optional[List[Junction]] = None, if_ui: bool = True, ) -> None:
         """
         Initializes the simulation.
 
@@ -55,6 +55,8 @@ class Sim:
         self.__time_step: float = (1 / 30) if self.ui_enabled else (1 / 1000)
         self.__thread: Optional[threading.Thread] = None
         self.__client_failed = False
+
+        # self.stats = Statistics()
 
     def start(self) -> None:
         """
@@ -123,6 +125,10 @@ class Sim:
 
             # 4) Generate new cars in all lanes
             self.__gen_cars()
+
+            # with self.__lock:
+            #     self.stats.plot(self.__junctions[0])
+            Client.send_junction_info_to_statistics(self.__junctions[0])
 
             # 4) Sleep the remainder of the time step
             elapsed: float = time.perf_counter() - start_time

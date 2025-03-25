@@ -38,10 +38,14 @@ def main() -> None:
     debug_font = pygame.font.SysFont(None, 18)
 
     # Build the simulation (plus-junction) and start it
+
     sim = Sim(junctions=[JunctionGenerator.generate_junction()], if_ui=True)
     sim.start()
-
     while running:
+
+
+
+
         dt = clock.tick(FPS) / 1000.0  # Delta time in seconds (currently unused, but could pass to sim updates)
 
         # Handle events (quit, toggle debug)

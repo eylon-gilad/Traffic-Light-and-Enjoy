@@ -27,6 +27,7 @@ class Client:
     TRAFFIC_LIGHT_STATE_URL: str = "http://127.0.0.1:8080/traffic-light-state"
     START_ALGORITHM_URL: str = "http://127.0.0.1:8080/start-algorithm"
     BUILD_JUNCTION_URL: str = "http://127.0.0.1:8080/build-junction"
+    UPDATE_STATISTICS_URL: str = "http://127.0.0.1:80/update-data"
 
     @staticmethod
     def start_algorithm() -> None:
@@ -87,6 +88,32 @@ class Client:
 
         try:
             response: Response = post(Client.JUNCTION_INFO_URL, json=junction_json)
+            logger.info(f"Junction Info - Status Code: {response.status_code}")
+
+            try:
+                logger.debug(f"Junction Info - Response JSON: {response.json()}")
+            except ValueError:
+                logger.debug(f"Junction Info - Response Text: {response.text}")
+        except RequestException as e:
+            logger.error(f"Error sending junction info request: {e}")
+        except Exception as e:
+            logger.error(f"Unexpected error in send_junction_info: {e}")
+
+    @staticmethod
+    def send_junction_info_to_statistics(junction: Junction) -> None:
+        """
+        Sends the junction information to the server via a POST request.
+
+        Args:
+            junction (Junction): The junction object to send.
+
+        Logs response status code and JSON (or raw text if JSON is invalid).
+        """
+        logger.debug(f"Sending POST with junction info to: {Client.UPDATE_STATISTICS_URL}")
+        junction_json: Dict = Client.__junction_to_junction_info_json(junction)
+
+        try:
+            response: Response = post(Client.UPDATE_STATISTICS_URL, json=junction_json)
             logger.info(f"Junction Info - Status Code: {response.status_code}")
 
             try:
@@ -243,7 +270,7 @@ class Client:
                     "cars": []
                 }
                 for car in lane.get_cars():
-                    # if car.get_dist() <= 0:
+                    # if car.get_dist() <= -200:
                     #     continue
                     car_info: Dict[str, Any] = {
                         "car_index": car.get_id(),
