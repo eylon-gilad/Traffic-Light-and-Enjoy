@@ -9,7 +9,6 @@ from typing import Dict, Tuple, Optional
 
 from sim.ui.config import SCREEN_WIDTH, SCREEN_HEIGHT
 
-
 def load_background_image(path: str = "../assets/background.png") -> Optional[pygame.Surface]:
     """
     Loads and scales a background image. Returns None if loading fails.
