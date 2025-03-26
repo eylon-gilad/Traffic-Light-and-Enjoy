@@ -16,7 +16,6 @@ from pages import page2_cars_per_road
 from pages import page3_lane_speed
 from pages import page4_collisions
 from pages import page5_correlation
-from pages import page6_collision_time
 
 # Main layout with multi-page routing
 app.layout = html.Div([
@@ -38,12 +37,10 @@ def display_page(pathname):
         return page4_collisions.layout
     elif pathname == "/page-5":
         return page5_correlation.layout
-    elif pathname == "/page-6":
-        return page6_collision_time.layout
     else:
         # Default page-1 if blank or unknown
         return page1_car_time.layout
 
 if __name__ == "__main__":
     # Run on port 8050 by default; no need for root privileges
-    app.run(debug=True, host="127.0.0.1", port=8050)
+    app.run(debug=False, host="127.0.0.1", port=8050)

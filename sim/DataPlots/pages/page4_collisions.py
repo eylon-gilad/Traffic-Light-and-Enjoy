@@ -4,8 +4,8 @@ import pandas as pd
 from server import collisions
 
 layout = html.Div([
-    html.H1("Page 4: Traffic Light States"),
-    html.P("A line chart showing the state of each traffic light (0=Red, 1=Green)."),
+    html.H1("Page 4: collisions over time"),
+    html.P("A line chart showing the number of collisions over time."),
     dcc.Graph(id="collisions-plot"),
     html.Br(),
     dcc.Link("Go to Page 1", href="/"), html.Br(),

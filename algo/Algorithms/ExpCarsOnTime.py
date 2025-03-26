@@ -42,7 +42,6 @@ class ExpCarsOnTimeController(BaseAlgorithm):
         (i.e., presumably the largest waiting times) and sets those lights to green.
         """
         while True:
-            print(self.combinations)
 
             try:
                 self.remove_unrelevant_cars()
@@ -55,7 +54,6 @@ class ExpCarsOnTimeController(BaseAlgorithm):
                     traffic_lights_max_cost_ids = max(self.costs, key=self.costs.get)
                     for traffic_light in self.junction.get_traffic_lights():
                         if traffic_light.get_id() in traffic_lights_max_cost_ids:
-                            print(traffic_light.get_id())
                             traffic_light.green()
                         else:
                             traffic_light.red()

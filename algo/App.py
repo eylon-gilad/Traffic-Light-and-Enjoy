@@ -142,7 +142,6 @@ def build_junction() -> Response:
     """
     global junction
 
-    print("build-junction cos ameck")
 
     try:
         data: Optional[Dict[str, Any]] = request.get_json()
@@ -198,7 +197,6 @@ def build_junction() -> Response:
     junction_id: int = junction_data.get("id", 0)
     junction = Junction(junction_id=junction_id, traffic_lights=traffic_lights, roads=roads)
 
-    print(junction.__str__())
 
     return jsonify({"message": "Junction was built successfully."}, 200)
 
@@ -234,4 +232,4 @@ def get_traffic_light_state() -> Response:
 
 if __name__ == "__main__":
     # Note: In production, debug and host/port might be set differently.
-    app.run(debug=True, host="127.0.0.1", port=8080)
+    app.run(debug=False, host="127.0.0.1", port=8080)
