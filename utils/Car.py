@@ -35,7 +35,6 @@ class Car:
         self.dest: int = dest
         self.origin: int = origin
         self.car_type: str = car_type
-
     def get_id(self) -> int:
         """
         Get the car's unique identifier.
