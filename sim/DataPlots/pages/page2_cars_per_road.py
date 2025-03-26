@@ -11,7 +11,8 @@ layout = html.Div([
     dcc.Link("Go to Page 1", href="/"), html.Br(),
     dcc.Link("Go to Page 3", href="/page-3"), html.Br(),
     dcc.Link("Go to Page 4", href="/page-4"), html.Br(),
-    dcc.Link("Go to Page 5", href="/page-5"),
+    dcc.Link("Go to Page 5", href="/page-5"), html.Br(),
+    dcc.Link("Go to Page 6", href="/page-6"),
 ])
 
 @callback(Output("cars-per-road-plot", "figure"),

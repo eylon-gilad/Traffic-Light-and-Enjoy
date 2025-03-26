@@ -18,6 +18,7 @@ traffic_light_state_history: Dict[int, List[int]] = {}
 # For correlation:
 total_cars_history: List[int] = []
 avg_velocity_history: List[float] = []
+collision_history: List[Any] = []  # Store collision data
 
 iteration_count = 0
 
@@ -64,6 +65,9 @@ def parse_json_to_junction(data: Dict[str, Any]) -> Junction:
     return Junction(junction_id, traffic_lights, roads)
 
 
+
+
+
 @server.route("/update-data", methods=["POST"])
 def update_data():
     """
@@ -73,6 +77,7 @@ def update_data():
       3) lane_avg_speeds_history
       4) traffic_light_state_history
       5) total_cars_history, avg_velocity_history
+      6) collision data
     """
     global iteration_count
     iteration_count += 1
@@ -133,5 +138,10 @@ def update_data():
     else:
         avg_vel_now = 0.0
     avg_velocity_history.append(avg_vel_now)
+
+    # (6) Collision data
+    collisions = junction.collision
+    if collisions:
+        collision_history.append(collisions)
 
     return jsonify({"message": "Data updated"}), 200
