@@ -34,7 +34,7 @@ def main() -> None:
 
     # Load assets
     bg_image = load_background_image()
-    car_images = load_car_images(num_images=7, folder="../assets/", size=(40, 40))
+    car_images = load_car_images(num_images=7, folder="../assets/", size=(35, 35))
     debug_font = pygame.font.SysFont(None, 18)
 
     # Build the simulation (plus-junction) and start it

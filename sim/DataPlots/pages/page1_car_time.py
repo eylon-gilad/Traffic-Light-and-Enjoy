@@ -12,7 +12,7 @@ layout = html.Div([
     dcc.Link("Go to Page 3", href="/page-3"), html.Br(),
     dcc.Link("Go to Page 4", href="/page-4"), html.Br(),
     dcc.Link("Go to Page 5", href="/page-5"),html.Br(),
-    dcc.Link("Go to Page 6", href="/page-6"),
+
 ])
 
 @callback(
@@ -31,7 +31,7 @@ def update_car_time_histogram(_):
             title="Distribution of Car Times (No Data)"
         )
         fig.update_layout(
-            xaxis_title="Time in Simulation (s)",
+            xaxis_title="Time in Simulation (ms)",
             yaxis_title="Number of Cars"
         )
         return fig
@@ -46,10 +46,10 @@ def update_car_time_histogram(_):
         title="Distribution of Car Times in Simulation"
     )
     fig.update_layout(
-        xaxis_title="Time in Simulation (s)",
+        xaxis_title="Time in Simulation (ms)",
         yaxis_title="Number of Cars"
     )
     fig.update_traces(
-        hovertemplate="Time in Sim: %{x} s<br>Count: %{y}"
+        hovertemplate="Time in Sim: %{x} ms<br>Count: %{y}"
     )
     return fig
