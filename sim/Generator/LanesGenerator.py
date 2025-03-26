@@ -42,7 +42,7 @@ class LanesGenerator:
             for _ in range(num_of_lanes):
                 lanes.append(Lane(
                     lane_id=int(str(self.road_ids[i]) + str(current_lane_index)),
-                    car_creation=random.uniform(0.005, 0.015),
+                    car_creation=0.03,#random.uniform(0.005, 0.015),
                     lane_max_vel=random.gauss(100, 1/3)
                 ))
 
