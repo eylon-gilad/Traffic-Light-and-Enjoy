@@ -18,6 +18,7 @@ from utils.Junction import Junction
 from utils.Lane import Lane
 from utils.Road import Road
 from sim.Client import Client
+import threading
 
 
 class Sim:
@@ -123,12 +124,6 @@ class Sim:
 
             # 4) Generate new cars in all lanes
             self.__gen_cars()
-
-            #5) Check if cars collide
-            junction.collision = self.__check_cars_collision()
-            print(junction.collision)
-            if(junction.collision>0):
-                print(junction.collision)
 
             Client.send_junction_info_to_statistics(self.__junctions[0])
             Client.send_collision_info_to_statistics(self.__check_cars_collision())

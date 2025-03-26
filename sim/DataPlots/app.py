@@ -16,7 +16,6 @@ from pages import page2_cars_per_road
 from pages import page3_lane_speed
 from pages import page4_collisions
 from pages import page5_correlation
-from pages import page6_collision_time
 
 # Main layout with multi-page routing
 app.layout = html.Div([

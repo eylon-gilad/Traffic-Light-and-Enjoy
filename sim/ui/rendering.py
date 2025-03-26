@@ -24,7 +24,7 @@ from utils.Junction import Junction
 from utils.Road import Road
 from utils.Lane import Lane
 from utils.Car import Car
-from sim.ui.assets import  load_tl_image
+from sim.ui.assets import load_tl_image, load_thwomp_image
 
 
 def draw_game_screen(
@@ -62,7 +62,7 @@ def draw_game_screen(
         _draw_full_road(screen, road, shifts)
 
     # 2) Draw intersection box
-    _draw_intersection(screen, sim, junction)
+    _draw_intersection(screen, sim, junction, show_debug)
 
     # 3) Draw traffic lights
     for tl in junction.get_traffic_lights():
@@ -182,7 +182,7 @@ def _draw_lane_boundaries_horizontal(
         y_top += LANE_WIDTH
 
 
-def _draw_intersection(screen: pygame.Surface, sim: Sim, junction: Junction) -> None:
+def _draw_intersection(screen: pygame.Surface, sim: Sim, junction: Junction, show_debug: bool) -> None:
     """
     Draw the intersection rectangle on top of the roads.
     """
@@ -205,6 +205,10 @@ def _draw_intersection(screen: pygame.Surface, sim: Sim, junction: Junction) -> 
 
     intersection_rect = pygame.Rect(start_y, start_x, end_y, end_x)
     pygame.draw.rect(screen, INTERSECTION_COLOR, intersection_rect)
+
+    if show_debug:
+        image = load_thwomp_image(size=(end_y, end_x))
+        screen.blit(image, (start_y, start_x))
 
 
 def _get_road_width_from_id(sim: Sim, road_id: int) -> int:

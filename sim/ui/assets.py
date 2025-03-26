@@ -21,6 +21,18 @@ def load_background_image(path: str = "../assets/background.png") -> Optional[py
         return None
 
 
+def load_thwomp_image(path: str = "../assets/thwomp.png", size=(200, 200)) -> Optional[pygame.Surface]:
+    """
+    Loads and scales the thwomp image to the exact given size,
+    without preserving the original aspect ratio. Returns None if loading fails.
+    """
+    try:
+        bg_image = pygame.image.load(path).convert_alpha()
+        return pygame.transform.smoothscale(bg_image, size)  # Forces the exact size
+    except Exception:
+        return None
+
+
 def load_tl_image(
         turn: str = "s",
         folder: str = "../assets/turns",
