@@ -30,6 +30,7 @@ class Junction:
             junction_id: int = 0,
             traffic_lights: Optional[List[TrafficLight]] = None,
             roads: Optional[List[Road]] = None,
+            collision:int=0
     ) -> None:
         """
         Initialize a Junction object.
@@ -42,6 +43,7 @@ class Junction:
         self.id: int = junction_id
         self.traffic_lights: List[TrafficLight] = traffic_lights if traffic_lights is not None else []
         self.roads: List[Road] = roads if roads is not None else []
+        self.collision=collision
 
     def get_id(self) -> int:
         """
