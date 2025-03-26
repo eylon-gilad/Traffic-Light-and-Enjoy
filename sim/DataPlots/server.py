@@ -18,6 +18,8 @@ traffic_light_state_history: Dict[int, List[int]] = {}
 # For correlation:
 total_cars_history: List[int] = []
 avg_velocity_history: List[float] = []
+collisions: List[int] = [0]
+
 
 iteration_count = 0
 
@@ -135,3 +137,13 @@ def update_data():
     avg_velocity_history.append(avg_vel_now)
 
     return jsonify({"message": "Data updated"}), 200
+
+
+@server.route("/send_collision", methods=["POST"])
+def get_collisions():
+    data = request.get_json()
+    collisions.append(int(data["Collisions"]))
+
+    return jsonify({"message": "Data updated"}), 200
+
+

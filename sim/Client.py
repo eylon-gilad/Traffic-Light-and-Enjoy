@@ -28,6 +28,8 @@ class Client:
     START_ALGORITHM_URL: str = "http://127.0.0.1:8080/start-algorithm"
     BUILD_JUNCTION_URL: str = "http://127.0.0.1:8080/build-junction"
     UPDATE_STATISTICS_URL: str = "http://127.0.0.1:8050/update-data"
+    SEND_COLLISIONS: str = "http://127.0.0.1:8050/send_collision"
+
 
     @staticmethod
     def start_algorithm() -> None:
@@ -114,6 +116,24 @@ class Client:
 
         try:
             response: Response = post(Client.UPDATE_STATISTICS_URL, json=junction_json)
+            logger.info(f"Junction Info - Status Code: {response.status_code}")
+
+            try:
+                logger.debug(f"Junction Info - Response JSON: {response.json()}")
+            except ValueError:
+                logger.debug(f"Junction Info - Response Text: {response.text}")
+        except RequestException as e:
+            logger.error(f"Error sending junction info request: {e}")
+        except Exception as e:
+            logger.error(f"Unexpected error in send_junction_info: {e}")
+
+    @staticmethod
+    def send_collision_info_to_statistics(collisions: int) -> None:
+        logger.debug(f"Sending POST with junction info to: {Client.SEND_COLLISIONS}")
+        collisions_json: Dict[str, int] = {"Collisions": collisions}
+
+        try:
+            response: Response = post(Client.SEND_COLLISIONS, json=collisions_json)
             logger.info(f"Junction Info - Status Code: {response.status_code}")
 
             try:
@@ -361,3 +381,5 @@ class Client:
             junction_dict["junction"]["roads"].append(road_info)
 
         return junction_dict
+
+

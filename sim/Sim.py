@@ -128,6 +128,7 @@ class Sim:
             # self.__check_cars_collision()
 
             Client.send_junction_info_to_statistics(self.__junctions[0])
+            Client.send_collision_info_to_statistics(self.__check_cars_collision())
 
             # 4) Sleep the remainder of the time step
             elapsed: float = time.perf_counter() - start_time
