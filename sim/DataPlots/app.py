@@ -14,7 +14,7 @@ app = dash.Dash(
 from pages import page1_car_time
 from pages import page2_cars_per_road
 from pages import page3_lane_speed
-from pages import page4_traffic_light
+from pages import page4_collisions
 from pages import page5_correlation
 
 # Main layout with multi-page routing
@@ -34,7 +34,7 @@ def display_page(pathname):
     elif pathname == "/page-3":
         return page3_lane_speed.layout
     elif pathname == "/page-4":
-        return page4_traffic_light.layout
+        return page4_collisions.layout
     elif pathname == "/page-5":
         return page5_correlation.layout
     else:
