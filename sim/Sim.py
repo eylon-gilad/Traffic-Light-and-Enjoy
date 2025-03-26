@@ -228,6 +228,7 @@ class Sim:
                     dest_lane.add_car(car)
                 elif turn_type == 3:  # Left Turn
                     dist_to_shift = (len(dest_parr_road.get_lanes())) * self.LANE_WIDTH + 20
+                    dist_to_end_road = (len(dest_road.get_lanes()) + len(dest_parr_road.get_lanes())) * self.LANE_WIDTH + 20
                     shift = (len(cur_road.get_lanes())) * self.LANE_WIDTH
                     if new_dist <= -dist_to_shift:
                         car.set_dist(-shift)
