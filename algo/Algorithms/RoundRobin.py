@@ -1,10 +1,12 @@
 import logging
 import time
-from typing import List
+from typing import List, Dict, Tuple
 
 from algo.Algorithms.BaseAlgorithm import BaseAlgorithm
 from utils.Junction import Junction
 from utils.TrafficLight import TrafficLight
+
+from algo.TrafficLightsCombinator import TrafficLightsCombinator
 
 
 class RoundRobinController(BaseAlgorithm):
@@ -19,17 +21,19 @@ class RoundRobinController(BaseAlgorithm):
         """
         super().__init__(junction)
         self.current_traffic_light_id: int = 100
-        self.time_interval: float = 0.5  # Interval in seconds
+        self.time_interval: float = 1  # Interval in seconds
+        self.combinations: List[Tuple[int, ...]] = TrafficLightsCombinator(junction).get_combinations()
 
     def start(self) -> None:
         """
         Continuously cycle through traffic lights, turning them on one by one.
         """
         is_first_time = True
+        i = 0
         while True:
             try:
                 if self.junction is None:
-                    time.sleep(self.time_interval)
+                    time.sleep(0.1)
                     continue
 
                 if is_first_time:
@@ -37,7 +41,7 @@ class RoundRobinController(BaseAlgorithm):
                     all_lights = self.junction.get_traffic_lights()
                     if not all_lights:
                         logging.warning("No traffic lights available in junction.")
-                        time.sleep(self.time_interval)
+                        time.sleep(0.1)
                         continue
                     self.current_traffic_light_id = all_lights[0].id
                     is_first_time = False
@@ -45,13 +49,14 @@ class RoundRobinController(BaseAlgorithm):
                 lights: List[TrafficLight] = self.junction.get_traffic_lights()
                 logging.debug(f"Junction: {self.junction}")
                 for light in lights:
-                    if light.id == self.current_traffic_light_id:
+                    if light.id in self.combinations[i % len(self.combinations)]:
                         light.state = True
                     else:
                         light.state = False
 
                 self.current_traffic_light_id = self.get_next_traffic_light_id()
                 time.sleep(self.time_interval)
+                i += 1
             except Exception as e:
                 logging.error(f"Error in RoundRobinController loop: {e}")
                 # Keep running despite errors
