@@ -142,7 +142,7 @@ def _draw_full_road(screen: pygame.Surface, road: Road, shifts: dict) -> None:
     else:  # EAST, WEST
         left = 0
         top = CY + shift
-        width = total_length
+        width = SCREEN_WIDTH
         height = road_width
         pygame.draw.rect(screen, ASPHALT_COLOR, (left, top, width, height))
         _draw_lane_boundaries_horizontal(screen, left, top, width, height)
@@ -260,8 +260,6 @@ def _compute_car_position(
 
     elif direction_str == "SOUTH":
         angle = 90
-        if car.get_angle() == 0:
-            car.set_angle(90)
         left_boundary = CX + shift
         x = left_boundary + lane_center_offset
         shift_y = CY + _get_road_width_from_id(sim, direction_to_index(RoadEnum.WEST, sim.get_junctions()[0])) + 10
