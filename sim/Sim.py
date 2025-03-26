@@ -201,6 +201,12 @@ class Sim:
         car.set_velocity(new_velocity)
         car.set_dist(new_dist)
 
+        if car.get_is_turning() and car.get_half_turn() and car.get_dist() <= car.get_turn_end():
+            print("Finished Turn")
+            car.set_is_turning(False)
+            car.set_half_turn(False)
+            car.set_turn_end(0)
+
         # If the car reaches the junction, try to transfer it to its destination lane.
         if new_dist <= 0:
             dest_lane: Lane = random.choice(junction.get_lanes_by_ids([car.get_dest()]))
@@ -222,8 +228,13 @@ class Sim:
                     dest_lane.add_car(car)
                 elif turn_type == 3:  # Left Turn
                     dist_to_shift = (len(dest_parr_road.get_lanes())) * self.LANE_WIDTH + 20
+                    dist_to_end_road = (len(dest_road.get_lanes()) + len(dest_parr_road.get_lanes())) * self.LANE_WIDTH + 20
                     shift = (len(cur_road.get_lanes())) * self.LANE_WIDTH
+                    car.set_is_turning(True)
+                    car.set_turn_end(-dist_to_end_road)
+                    car.set_half_turn(False)
                     if new_dist <= -dist_to_shift:
+                        car.set_half_turn(True)
                         car.set_dist(-shift)
                         lane.remove_car(car)
                         dest_lane.add_car(car)

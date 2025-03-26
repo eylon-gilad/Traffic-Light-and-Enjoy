@@ -35,7 +35,7 @@ def load_tl_image(
 
 
 def load_car_images(
-        num_images: int = 8,
+        num_images: int = 7,
         folder: str = "../assets/",
         size: Tuple[int, int] = (40, 40),
 ) -> Dict[int, pygame.Surface]:

@@ -36,6 +36,11 @@ class Car:
         self.origin: int = origin
         self.car_type: str = car_type
 
+        self.is_turning: bool = False
+        self.turn_end: int = 0
+        self.half_turn: bool = False
+        self.angle: float = 0.0
+
     def get_id(self) -> int:
         """
         Get the car's unique identifier.
@@ -81,6 +86,34 @@ class Car:
         """
         return self.car_type
 
+    def get_is_turning(self) -> bool:
+        """ Get the turning status of the car.
+        Returns:
+        bool: Whether the car is currently turning.
+        """
+        return self.is_turning
+
+    def get_turn_end(self) -> int:
+        """ Get the end of the turning maneuver.
+        Returns:
+        int: The turning end point or identifier.
+        """
+        return self.turn_end
+
+    def get_half_turn(self) -> bool:
+        """ Get the half-turn status of the car.
+        Returns:
+        bool: Whether the car is in a half-turn state.
+        """
+        return self.half_turn
+
+    def get_angle(self) -> float:
+        """ Get the current angle of the car.
+        Returns:
+        float: The car's current angle.
+        """
+        return self.angle
+
     def set_dist(self, dist: float) -> None:
         """
         Set the car's distance along the lane.
@@ -116,6 +149,34 @@ class Car:
             car_type (str): New car type.
         """
         self.car_type = car_type
+
+    def set_is_turning(self, is_turning: bool) -> None:
+        """ Set the turning status of the car.
+        Args:
+        is_turning (bool): New turning status.
+        """
+        self.is_turning = is_turning
+
+    def set_turn_end(self, turn_end: int) -> None:
+        """ Set the end of the turning maneuver.
+        Args:
+        turn_end (int): New turning end point or identifier.
+        """
+        self.turn_end = turn_end
+
+    def set_half_turn(self, half_turn: bool) -> None:
+        """ Set the half-turn status of the car.
+        Args:
+        half_turn (bool): New half-turn status.
+        """
+        self.half_turn = half_turn
+
+    def set_angle(self, angle: float) -> None:
+        """ Set the car's angle.
+        Args:
+        angle (float): New angle value.
+        """
+        self.angle = angle
 
     def __str__(self) -> str:
         """
