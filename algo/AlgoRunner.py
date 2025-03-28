@@ -1,9 +1,14 @@
 import logging
+import random
 import threading
 
 from Algorithms.ExpCarsOnTime import ExpCarsOnTimeController
 from TrafficLightsCombinator import TrafficLightsCombinator
+from Algorithms.wightedAvg import wightedAvg
+from algo.Algorithms.AdaptiveFlowController import AdaptiveFlowController
+from algo.Algorithms.DynamicWeightedTrafficController import DynamicWeightedTrafficController
 from algo.Algorithms.RoundRobin import RoundRobinController
+from algo.Algorithms.VolumeBasedController import VolumeBasedController
 from utils import Junction
 
 
@@ -24,11 +29,21 @@ class AlgoRunner:
         # the chosen algorithm has them precomputed if needed.
         TrafficLightsCombinator.calculate_possible_active_lights(junction)
 
-        # Choose which controller to use. (Comment/uncomment as needed)
-        # self.controller = RoundRobinController(junction)
-        self.controller = ExpCarsOnTimeController(junction)
+        # Choose which controller to use.
+        # A threading lock to ensure thread-safe operations on the controller. (random for now)
+        all_controllers = [ExpCarsOnTimeController, wightedAvg, AdaptiveFlowController, DynamicWeightedTrafficController, RoundRobinController, VolumeBasedController]
+        # Randomly select one of the controllers.
+        selected_controller = random.choice(all_controllers)
+        print(selected_controller)
+        # Initialize the selected controller with the junction.
+        self.controller = selected_controller(junction)
+        #self.controller = DynamicWeightedTrafficController(junction)
+        #self.controller = AdaptiveFlowController(junction)
+        #self.controller = RoundRobinController(junction)
+        #self.controller = VolumeBasedController(junction)
+        #self.controller = ExpCarsOnTimeController(junction)
+        #self.controller = wightedAvg(junction)
 
-        # A threading lock to ensure thread-safe operations on the controller.
         self.lock = threading.Lock()
 
     def run(self) -> None:
