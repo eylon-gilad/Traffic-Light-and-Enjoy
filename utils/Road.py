@@ -23,12 +23,12 @@ class Road:
     """
 
     def __init__(
-            self,
-            road_id: int = 0,
-            lanes: Optional[List[Lane]] = None,
-            congection_level: int = 0,
-            from_side: Optional[RoadEnum] = None,
-            to_side: Optional[RoadEnum] = None
+        self,
+        road_id: int = 0,
+        lanes: Optional[List[Lane]] = None,
+        congection_level: int = 0,
+        from_side: Optional[RoadEnum] = None,
+        to_side: Optional[RoadEnum] = None,
     ) -> None:
         """
         Initialize a Road object.

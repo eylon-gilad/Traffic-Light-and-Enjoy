@@ -24,7 +24,9 @@ class VolumeBasedController(BaseAlgorithm):
         """
         super().__init__(junction)
         # Retrieve possible combinations of traffic lights from the combinator
-        self.combinations: List[Tuple[int, ...]] = TrafficLightsCombinator(junction).get_combinations()
+        self.combinations: List[Tuple[int, ...]] = TrafficLightsCombinator(
+            junction
+        ).get_combinations()
         # Dictionary to store the computed car volume score for each combination
         self.scores: Dict[Tuple[int, ...], int] = {}
 
@@ -52,7 +54,9 @@ class VolumeBasedController(BaseAlgorithm):
             seen_roads = set()  # To avoid counting the same road multiple times
             for traffic_light_id in comb:
                 tl = self.junction.get_traffic_light_by_id(traffic_light_id)
-                origins = tl.get_origins()  # List of origin lane IDs associated with this traffic light
+                origins = (
+                    tl.get_origins()
+                )  # List of origin lane IDs associated with this traffic light
                 road_id = origins[0] // 10  # Deduce road id from the first origin
                 if road_id not in seen_roads:
                     road: Road = self.junction.get_road_by_id(road_id)
@@ -60,7 +64,9 @@ class VolumeBasedController(BaseAlgorithm):
                     lanes = road.get_lanes_by_ids(origins)
                     for lane in lanes:
                         # Retrieve the list of cars (using get_cars() if available)
-                        cars = lane.get_cars() if hasattr(lane, "get_cars") else lane.cars
+                        cars = (
+                            lane.get_cars() if hasattr(lane, "get_cars") else lane.cars
+                        )
                         score += len(cars)
                     seen_roads.add(road_id)
             self.scores[comb] = score

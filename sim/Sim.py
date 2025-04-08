@@ -113,7 +113,9 @@ class Sim:
 
             # 2) Update traffic lights from server if client is functional
             if not self.__client_failed:
-                thread = threading.Thread(target=self.__update_traffic_lights, daemon=True)
+                thread = threading.Thread(
+                    target=self.__update_traffic_lights, daemon=True
+                )
                 thread.start()
             else:
                 # Keep them forced red
@@ -210,20 +212,32 @@ class Sim:
                 cur_road: Road = junction.get_road_by_id(lane.get_id() // 10)
                 dest_road: Road = junction.get_road_by_id(dest_lane.get_id() // 10)
                 for road in junction.get_roads():
-                    if (road.get_from_side().value - cur_road.get_from_side().value) % 4 == 2:
+                    if (
+                        road.get_from_side().value - cur_road.get_from_side().value
+                    ) % 4 == 2:
                         cur_parr_road: Road = road
-                    elif (road.get_from_side().value - dest_road.get_from_side().value) % 4 == 2:
+                    elif (
+                        road.get_from_side().value - dest_road.get_from_side().value
+                    ) % 4 == 2:
                         dest_parr_road: Road = road
 
-                turn_type = (dest_road.get_from_side().value - cur_road.get_from_side().value) % 4
+                turn_type = (
+                    dest_road.get_from_side().value - cur_road.get_from_side().value
+                ) % 4
                 if turn_type == 1:  # Right Turn
-                    shift = (len(cur_road.get_lanes()) + len(cur_parr_road.get_lanes())) * self.LANE_WIDTH + 20
+                    shift = (
+                        len(cur_road.get_lanes()) + len(cur_parr_road.get_lanes())
+                    ) * self.LANE_WIDTH + 20
                     car.set_dist(-shift)
                     lane.remove_car(car)
                     dest_lane.add_car(car)
                 elif turn_type == 3:  # Left Turn
-                    dist_to_shift = (len(dest_parr_road.get_lanes())) * self.LANE_WIDTH + 20
-                    dist_to_end_road = (len(dest_road.get_lanes()) + len(dest_parr_road.get_lanes())) * self.LANE_WIDTH + 20
+                    dist_to_shift = (
+                        len(dest_parr_road.get_lanes())
+                    ) * self.LANE_WIDTH + 20
+                    dist_to_end_road = (
+                        len(dest_road.get_lanes()) + len(dest_parr_road.get_lanes())
+                    ) * self.LANE_WIDTH + 20
                     shift = (len(cur_road.get_lanes())) * self.LANE_WIDTH
                     if new_dist <= -dist_to_shift:
                         car.set_dist(-shift)
@@ -244,28 +258,54 @@ class Sim:
         road_origin_1_id: int = (car1.origin // 10) % 10
         road_origin_2_id: int = (car2.origin // 10) % 10
 
-        road_dest_1: Road = self.__junctions[0].get_road_by_id(int(str(self.__junctions[0].id) + str(road_dest_1_id)))
-        road_dest_2: Road = self.__junctions[0].get_road_by_id(int(str(self.__junctions[0].id) + str(road_dest_2_id)))
+        road_dest_1: Road = self.__junctions[0].get_road_by_id(
+            int(str(self.__junctions[0].id) + str(road_dest_1_id))
+        )
+        road_dest_2: Road = self.__junctions[0].get_road_by_id(
+            int(str(self.__junctions[0].id) + str(road_dest_2_id))
+        )
 
         if road_origin_1_id != road_origin_2_id:
             # Check if roads perpendicular
-            if (road_dest_1.get_to_side().value + road_dest_2.get_to_side().value) % 2 == 1:
+            if (
+                road_dest_1.get_to_side().value + road_dest_2.get_to_side().value
+            ) % 2 == 1:
                 return True
 
             # Check if going to the same road but not from the same origin
-            if road_dest_1_id == road_dest_2_id :
+            if road_dest_1_id == road_dest_2_id:
                 return True
 
         return False
 
     def __is_car_in_junction(self, car: Car) -> bool:
-        junction_width: float = len(self.__junctions[0].get_road_by_id(
-            int(str(self.__junctions[0].id) + str(1))).get_lanes()) + \
-            + len(self.__junctions[0].get_road_by_id(int(str(self.__junctions[0].id) + str(2))).get_lanes()) + 20
+        junction_width: float = (
+            len(
+                self.__junctions[0]
+                .get_road_by_id(int(str(self.__junctions[0].id) + str(1)))
+                .get_lanes()
+            )
+            + +len(
+                self.__junctions[0]
+                .get_road_by_id(int(str(self.__junctions[0].id) + str(2)))
+                .get_lanes()
+            )
+            + 20
+        )
 
-        junction_height: float = len(self.__junctions[0].get_road_by_id(
-            int(str(self.__junctions[0].id) + str(3))).get_lanes()) + \
-            + len(self.__junctions[0].get_road_by_id(int(str(self.__junctions[0].id) + str(4))).get_lanes()) + 20
+        junction_height: float = (
+            len(
+                self.__junctions[0]
+                .get_road_by_id(int(str(self.__junctions[0].id) + str(3)))
+                .get_lanes()
+            )
+            + +len(
+                self.__junctions[0]
+                .get_road_by_id(int(str(self.__junctions[0].id) + str(4)))
+                .get_lanes()
+            )
+            + 20
+        )
 
         junction_size = min(junction_width, junction_height)
 
@@ -321,7 +361,11 @@ class Sim:
             bool: True if any traffic light for the lane is green, False otherwise.
         """
         for tl in junction.get_traffic_lights():
-            if lane.get_id() in tl.get_origins() and tl.get_state() is True and not tl.get_is_yellow():
+            if (
+                lane.get_id() in tl.get_origins()
+                and tl.get_state() is True
+                and not tl.get_is_yellow()
+            ):
                 return True
         return False
 
@@ -340,7 +384,10 @@ class Sim:
             cur_tls = self.__junctions[0].get_traffic_lights()
             for prev_tl in prev_tls:
                 for cur_tl in cur_tls:
-                    if cur_tl.get_id() == prev_tl.get_id() and cur_tl.get_state() != prev_tl.get_state():
+                    if (
+                        cur_tl.get_id() == prev_tl.get_id()
+                        and cur_tl.get_state() != prev_tl.get_state()
+                    ):
                         cur_tl.set_is_yellow(True)
                         if not self.has_yellow:
                             self.has_yellow = True
@@ -378,9 +425,13 @@ class Sim:
                                     car_id=car_id,
                                     dist=lane.LENGTH,
                                     velocity=speed,
-                                    dest=random.choice(junction.get_traffic_light_by_lane_id(lane_id=lane.get_id()).get_destinations()),
+                                    dest=random.choice(
+                                        junction.get_traffic_light_by_lane_id(
+                                            lane_id=lane.get_id()
+                                        ).get_destinations()
+                                    ),
                                     car_type="CAR",
-                                    origin=lane.get_id()
+                                    origin=lane.get_id(),
                                 )
                                 lane.add_car(new_car)
 

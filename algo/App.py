@@ -101,11 +101,15 @@ def post_junction_info() -> Response:
 
             lanes.append(Lane(lane_id=lane_id, cars=cars))
 
-        roads.append(Road(road_id=road_id, lanes=lanes, congection_level=congection_level))
+        roads.append(
+            Road(road_id=road_id, lanes=lanes, congection_level=congection_level)
+        )
 
     # Construct the Junction object
     junction_id: int = junction_data.get("id", 0)
-    junction = Junction(junction_id=junction_id, traffic_lights=traffic_lights, roads=roads)
+    junction = Junction(
+        junction_id=junction_id, traffic_lights=traffic_lights, roads=roads
+    )
 
     # Update junction info in the existing algorithm runner
     if alg is not None:
@@ -123,7 +127,9 @@ def start_algorithm() -> Response:
     global junction, alg
 
     if junction is None:
-        return jsonify({"error": "No junction data available to start the algorithm."}, 400)
+        return jsonify(
+            {"error": "No junction data available to start the algorithm."}, 400
+        )
 
     try:
         alg = AlgoRunner(junction)
@@ -141,7 +147,6 @@ def build_junction() -> Response:
     typically used for initial setup or placeholder.
     """
     global junction
-
 
     try:
         data: Optional[Dict[str, Any]] = request.get_json()
@@ -195,8 +200,9 @@ def build_junction() -> Response:
 
     # Construct the Junction object
     junction_id: int = junction_data.get("id", 0)
-    junction = Junction(junction_id=junction_id, traffic_lights=traffic_lights, roads=roads)
-
+    junction = Junction(
+        junction_id=junction_id, traffic_lights=traffic_lights, roads=roads
+    )
 
     return jsonify({"message": "Junction was built successfully."}, 200)
 

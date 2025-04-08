@@ -11,6 +11,7 @@ class RoadEnum(Enum):
     """
     Enumeration of cardinal directions for roads in the simulation.
     """
+
     NORTH: int = 0
     EAST: int = 1
     SOUTH: int = 2

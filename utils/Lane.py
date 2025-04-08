@@ -26,12 +26,12 @@ class Lane:
     """
 
     def __init__(
-            self,
-            lane_id: int = 0,
-            cars: Optional[List[Car]] = None,
-            car_creation: float = 0.0,
-            lane_len: int = 400,
-            lane_max_vel: float = 100.0,
+        self,
+        lane_id: int = 0,
+        cars: Optional[List[Car]] = None,
+        car_creation: float = 0.0,
+        lane_len: int = 400,
+        lane_max_vel: float = 100.0,
     ) -> None:
         """
         Initialize a Lane object.

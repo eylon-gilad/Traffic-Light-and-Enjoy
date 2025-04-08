@@ -59,7 +59,9 @@ def parse_json_to_junction(data: Dict[str, Any]) -> Junction:
                 cars.append(Car(c_id, dist, velocity, dest, car_type))
             lanes.append(Lane(lane_id=lane_id, cars=cars))
 
-        roads.append(Road(road_id=road_id, lanes=lanes, congection_level=congestion_level))
+        roads.append(
+            Road(road_id=road_id, lanes=lanes, congection_level=congestion_level)
+        )
 
     # Build final Junction
     junction_id = junction_data.get("id", 0)
@@ -111,7 +113,9 @@ def update_data():
             lane_id = lane.get_id()
             cars_in_lane = lane.get_cars()
             if cars_in_lane:
-                avg_speed = sum(c.get_velocity() for c in cars_in_lane) / len(cars_in_lane)
+                avg_speed = sum(c.get_velocity() for c in cars_in_lane) / len(
+                    cars_in_lane
+                )
             else:
                 avg_speed = 0.0
 
@@ -145,5 +149,3 @@ def get_collisions():
     collisions.append(int(data["Collisions"]))
 
     return jsonify({"message": "Data updated"}), 200
-
-

@@ -19,11 +19,11 @@ class TrafficLight:
     """
 
     def __init__(
-            self,
-            light_id: int = 0,
-            origins: Optional[List[int]] = None,
-            destinations: Optional[List[int]] = None,
-            state: bool = False,
+        self,
+        light_id: int = 0,
+        origins: Optional[List[int]] = None,
+        destinations: Optional[List[int]] = None,
+        state: bool = False,
     ) -> None:
         """
         Initialize a TrafficLight object.

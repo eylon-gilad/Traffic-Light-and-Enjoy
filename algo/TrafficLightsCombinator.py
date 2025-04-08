@@ -25,7 +25,9 @@ class TrafficLightsCombinator:
         :param junction: The Junction object to evaluate.
         """
         self.junction: Junction = junction
-        self.combinations: List[Tuple[int, ...]] = self.calculate_possible_active_lights(self.junction)
+        self.combinations: List[Tuple[int, ...]] = (
+            self.calculate_possible_active_lights(self.junction)
+        )
 
     def get_combinations(self) -> List[Tuple[int, ...]]:
         """
@@ -51,7 +53,9 @@ class TrafficLightsCombinator:
         # Compare every traffic light to every other to see if they can safely be on together.
         for traffic_light_1 in traffic_lights:
             for traffic_light_2 in traffic_lights:
-                if TrafficLightsCombinator.can_light_together(junction, traffic_light_1, traffic_light_2):
+                if TrafficLightsCombinator.can_light_together(
+                    junction, traffic_light_1, traffic_light_2
+                ):
                     possible_combinations[traffic_light_1.id].append(traffic_light_2.id)
 
         # Remove self from its own possible list.
@@ -61,7 +65,9 @@ class TrafficLightsCombinator:
 
         all_key_combs = {}
         for traffic_light in traffic_lights:
-            all_key_combs[traffic_light.get_id()] = [possible_combinations[traffic_light.get_id()]]
+            all_key_combs[traffic_light.get_id()] = [
+                possible_combinations[traffic_light.get_id()]
+            ]
 
         for comb in possible_combinations:
             for val in possible_combinations[comb]:
@@ -77,9 +83,17 @@ class TrafficLightsCombinator:
                     bad_comb: bool = False
                     for val_1 in sub_comb:
                         for val_2 in sub_comb:
-                            if not TrafficLightsCombinator.can_light_together(junction, junction.get_traffic_light_by_id(val_1), junction.get_traffic_light_by_id(val_2)):
+                            if not TrafficLightsCombinator.can_light_together(
+                                junction,
+                                junction.get_traffic_light_by_id(val_1),
+                                junction.get_traffic_light_by_id(val_2),
+                            ):
                                 bad_comb = True
-                        if not TrafficLightsCombinator.can_light_together(junction, junction.get_traffic_light_by_id(val_1), junction.get_traffic_light_by_id(tl_id)):
+                        if not TrafficLightsCombinator.can_light_together(
+                            junction,
+                            junction.get_traffic_light_by_id(val_1),
+                            junction.get_traffic_light_by_id(tl_id),
+                        ):
                             bad_comb = True
                     if bad_comb:
                         all_key_combs[tl_id][i][j] = set()
@@ -117,12 +131,20 @@ class TrafficLightsCombinator:
         # return TrafficLightsCombinator.find_max_combinations(possible_combinations)
 
     @staticmethod
-    def can_light_together(junction: Junction, traffic_light_1: TrafficLight, traffic_light_2: TrafficLight):
-        return (TrafficLightsCombinator.not_entering_the_same_road(traffic_light_1, traffic_light_2)
-                and TrafficLightsCombinator.not_intersect_on_straight(junction, traffic_light_1,
-                                                                      traffic_light_2)
-                and TrafficLightsCombinator.not_intersect_on_turn_left(junction, traffic_light_1,
-                                                                       traffic_light_2))
+    def can_light_together(
+        junction: Junction, traffic_light_1: TrafficLight, traffic_light_2: TrafficLight
+    ):
+        return (
+            TrafficLightsCombinator.not_entering_the_same_road(
+                traffic_light_1, traffic_light_2
+            )
+            and TrafficLightsCombinator.not_intersect_on_straight(
+                junction, traffic_light_1, traffic_light_2
+            )
+            and TrafficLightsCombinator.not_intersect_on_turn_left(
+                junction, traffic_light_1, traffic_light_2
+            )
+        )
 
     @staticmethod
     def power_set(s: Set[int]) -> List[Set[int]]:
@@ -132,10 +154,16 @@ class TrafficLightsCombinator:
         :param s: A set of integers.
         :return: A list of subsets (as sets).
         """
-        return [set(subset) for r in range(len(s) + 1) for subset in itertools.combinations(s, r)]
+        return [
+            set(subset)
+            for r in range(len(s) + 1)
+            for subset in itertools.combinations(s, r)
+        ]
 
     @staticmethod
-    def find_max_combinations(possible_combinations: Dict[int, List[int]]) -> List[Tuple[int, ...]]:
+    def find_max_combinations(
+        possible_combinations: Dict[int, List[int]],
+    ) -> List[Tuple[int, ...]]:
         """
         Determine the largest valid subsets from the possible combinations.
 
@@ -158,7 +186,10 @@ class TrafficLightsCombinator:
             for subset in p_set:
                 for j, candidate_items in enumerate(item_sets):
                     if j != i:
-                        if subset.issubset(candidate_items) and subset not in valid_subsets:
+                        if (
+                            subset.issubset(candidate_items)
+                            and subset not in valid_subsets
+                        ):
                             valid_subsets.append(subset)
 
         # Sort and remove duplicates
@@ -174,7 +205,9 @@ class TrafficLightsCombinator:
                         removable_indices.append(i)
 
         final_subsets = [
-            valid_subsets[i] for i in range(len(valid_subsets)) if i not in removable_indices
+            valid_subsets[i]
+            for i in range(len(valid_subsets))
+            if i not in removable_indices
         ]
 
         # Additional filtering based on the original dictionary
@@ -184,11 +217,15 @@ class TrafficLightsCombinator:
             # TODO: Investigate if we need more robust checks for multi-item combos
             # in possible_combinations. The original logic removes subsets if
             # the subset minus the first item is not in possible_combinations.
-            if not set(final_subsets[i][1:]).issubset(set(possible_combinations[first_item])):
+            if not set(final_subsets[i][1:]).issubset(
+                set(possible_combinations[first_item])
+            ):
                 removable_indices.append(i)
 
         final_valid_subsets = [
-            final_subsets[i] for i in range(len(final_subsets)) if i not in removable_indices
+            final_subsets[i]
+            for i in range(len(final_subsets))
+            if i not in removable_indices
         ]
         return final_valid_subsets
 
@@ -209,13 +246,18 @@ class TrafficLightsCombinator:
                 dest_road_id_1 = dest_1 // 10
                 dest_road_id_2 = dest_2 // 10
 
-                if origin_road_id_1 != origin_road_id_2 and dest_road_id_1 == dest_road_id_2:
+                if (
+                    origin_road_id_1 != origin_road_id_2
+                    and dest_road_id_1 == dest_road_id_2
+                ):
                     return False
 
         return True
 
     @staticmethod
-    def not_intersect_on_straight(junction: Junction, tl1: TrafficLight, tl2: TrafficLight) -> bool:
+    def not_intersect_on_straight(
+        junction: Junction, tl1: TrafficLight, tl2: TrafficLight
+    ) -> bool:
         """
         Check if two traffic lights do not create an intersection
         when both are going straight across perpendicular roads.
@@ -244,14 +286,19 @@ class TrafficLightsCombinator:
 
         # Check if roads are perpendicular and both lights go straight
         if (from_side_1.value + from_side_2.value) % 2 == 1:
-            if (TrafficLightsCombinator.check_if_continue_straight(from_side_1, to_side_dest_1)
-                    and TrafficLightsCombinator.check_if_continue_straight(from_side_2, to_side_dest_2)):
+            if TrafficLightsCombinator.check_if_continue_straight(
+                from_side_1, to_side_dest_1
+            ) and TrafficLightsCombinator.check_if_continue_straight(
+                from_side_2, to_side_dest_2
+            ):
                 return False
 
         return True
 
     @staticmethod
-    def not_intersect_on_turn_left(junction: Junction, tl1: TrafficLight, tl2: TrafficLight) -> bool:
+    def not_intersect_on_turn_left(
+        junction: Junction, tl1: TrafficLight, tl2: TrafficLight
+    ) -> bool:
         """
         Check whether two traffic lights do not intersect if at least one is turning left.
 
@@ -280,20 +327,34 @@ class TrafficLightsCombinator:
 
         # If tl1 or tl2 is turning left, check certain conditions.
         if TrafficLightsCombinator.check_if_turn_left(from_side_1, to_side_dest_1):
-            if (from_side_1 == from_side_2
-                    or TrafficLightsCombinator.check_if_turn_only_right(from_side_2, to_side_dest_2)):
+            if (
+                from_side_1 == from_side_2
+                or TrafficLightsCombinator.check_if_turn_only_right(
+                    from_side_2, to_side_dest_2
+                )
+            ):
                 return True
-            elif ((from_side_1.value + from_side_2.value) % 2 == 0
-                  and TrafficLightsCombinator.check_if_turn_only_left(from_side_2, to_side_dest_2)):
+            elif (
+                from_side_1.value + from_side_2.value
+            ) % 2 == 0 and TrafficLightsCombinator.check_if_turn_only_left(
+                from_side_2, to_side_dest_2
+            ):
                 return True
 
             return False
         elif TrafficLightsCombinator.check_if_turn_left(from_side_2, to_side_dest_2):
-            if (from_side_1 == from_side_2
-                    or TrafficLightsCombinator.check_if_turn_only_right(from_side_1, to_side_dest_1)):
+            if (
+                from_side_1 == from_side_2
+                or TrafficLightsCombinator.check_if_turn_only_right(
+                    from_side_1, to_side_dest_1
+                )
+            ):
                 return True
-            elif ((from_side_1.value + from_side_2.value) % 2 == 0
-                  and TrafficLightsCombinator.check_if_turn_only_left(from_side_1, to_side_dest_1)):
+            elif (
+                from_side_1.value + from_side_2.value
+            ) % 2 == 0 and TrafficLightsCombinator.check_if_turn_only_left(
+                from_side_1, to_side_dest_1
+            ):
                 return True
 
             return False
@@ -317,7 +378,9 @@ class TrafficLightsCombinator:
         return False
 
     @staticmethod
-    def check_if_continue_straight(from_side: RoadEnum, to_sides: List[RoadEnum]) -> bool:
+    def check_if_continue_straight(
+        from_side: RoadEnum, to_sides: List[RoadEnum]
+    ) -> bool:
         """
         Check if the traffic movement is effectively going straight across.
 

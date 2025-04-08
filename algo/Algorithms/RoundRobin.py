@@ -22,7 +22,9 @@ class RoundRobinController(BaseAlgorithm):
         super().__init__(junction)
         self.current_traffic_light_id: int = 100
         self.time_interval: float = 1  # Interval in seconds
-        self.combinations: List[Tuple[int, ...]] = TrafficLightsCombinator(junction).get_combinations()
+        self.combinations: List[Tuple[int, ...]] = TrafficLightsCombinator(
+            junction
+        ).get_combinations()
 
     def start(self) -> None:
         """

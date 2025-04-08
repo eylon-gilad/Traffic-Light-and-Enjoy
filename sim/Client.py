@@ -30,7 +30,6 @@ class Client:
     UPDATE_STATISTICS_URL: str = "http://127.0.0.1:8050/update-data"
     SEND_COLLISIONS: str = "http://127.0.0.1:8050/send_collision"
 
-
     @staticmethod
     def start_algorithm() -> None:
         """
@@ -111,7 +110,9 @@ class Client:
 
         Logs response status code and JSON (or raw text if JSON is invalid).
         """
-        logger.debug(f"Sending POST with junction info to: {Client.UPDATE_STATISTICS_URL}")
+        logger.debug(
+            f"Sending POST with junction info to: {Client.UPDATE_STATISTICS_URL}"
+        )
         junction_json: Dict = Client.__junction_to_junction_info_json(junction)
 
         try:
@@ -154,7 +155,9 @@ class Client:
             List[TrafficLight]: A list of TrafficLight objects representing
             the current state of each traffic light.
         """
-        logger.debug(f"Requesting traffic light states from: {Client.TRAFFIC_LIGHT_STATE_URL}")
+        logger.debug(
+            f"Requesting traffic light states from: {Client.TRAFFIC_LIGHT_STATE_URL}"
+        )
         traffic_lights: List[TrafficLight] = []
         try:
             response: Response = get(Client.TRAFFIC_LIGHT_STATE_URL)
@@ -174,7 +177,9 @@ class Client:
         return traffic_lights
 
     @staticmethod
-    def __parse_traffic_lights_response(response_json: List[Dict[str, Any]]) -> List[TrafficLight]:
+    def __parse_traffic_lights_response(
+        response_json: List[Dict[str, Any]],
+    ) -> List[TrafficLight]:
         """
         Parse the response JSON containing traffic lights data and construct a list of TrafficLight objects.
 
@@ -194,14 +199,18 @@ class Client:
 
         for tl in traffic_lights_data:
             try:
-                traffic_lights.append(TrafficLight(
-                    light_id=int(tl["traffic_light_index"]),
-                    origins=list(tl["origins"]),
-                    destinations=list(tl["destinations"]),
-                    state=bool(tl["state"])
-                ))
+                traffic_lights.append(
+                    TrafficLight(
+                        light_id=int(tl["traffic_light_index"]),
+                        origins=list(tl["origins"]),
+                        destinations=list(tl["destinations"]),
+                        state=bool(tl["state"]),
+                    )
+                )
             except (KeyError, ValueError, TypeError) as ex:
-                logger.error(f"Skipping malformed traffic light data: {tl}, Error: {ex}")
+                logger.error(
+                    f"Skipping malformed traffic light data: {tl}, Error: {ex}"
+                )
                 # TODO: Confirm how to handle partial or malformed traffic light data
                 continue
 
@@ -258,19 +267,21 @@ class Client:
             "junction": {
                 "traffic_lights": [],
                 "total_roads": len(junction.get_roads()),
-                "roads": []
+                "roads": [],
             }
         }
 
         # Populate traffic_lights
         for tl in junction.get_traffic_lights():
             traffic_light_state: int = 1 if tl.get_state() else 0
-            junction_dict["junction"]["traffic_lights"].append({
-                "traffic_light_index": tl.get_id(),
-                "input_index": tl.get_origins(),
-                "output_index": tl.get_destinations(),
-                "state": traffic_light_state
-            })
+            junction_dict["junction"]["traffic_lights"].append(
+                {
+                    "traffic_light_index": tl.get_id(),
+                    "input_index": tl.get_origins(),
+                    "output_index": tl.get_destinations(),
+                    "state": traffic_light_state,
+                }
+            )
 
         # Populate roads
         for road in junction.get_roads():
@@ -280,14 +291,14 @@ class Client:
                 "road_index": road.get_id(),
                 "num_lanes": len(road.get_lanes()),
                 "congection_level": congection_level,
-                "lanes": []
+                "lanes": [],
             }
 
             for lane in road.get_lanes():
                 lane_info: Dict[str, Any] = {
                     "lane_index": lane.get_id(),
                     "cars_creation": lane.get_car_creation(),
-                    "cars": []
+                    "cars": [],
                 }
                 for car in lane.get_cars():
                     # if car.get_dist() <= -200:
@@ -348,18 +359,20 @@ class Client:
             "junction": {
                 "traffic_lights": [],
                 "total_roads": len(junction.get_roads()),
-                "roads": []
+                "roads": [],
             }
         }
 
         # Populate traffic lights data
         for traffic_light in junction.traffic_lights:
-            junction_dict["junction"]["traffic_lights"].append({
-                "traffic_light_index": traffic_light.id,
-                "input_index": traffic_light.origins,
-                "output_index": traffic_light.destinations,
-                "state": traffic_light.state
-            })
+            junction_dict["junction"]["traffic_lights"].append(
+                {
+                    "traffic_light_index": traffic_light.id,
+                    "input_index": traffic_light.origins,
+                    "output_index": traffic_light.destinations,
+                    "state": traffic_light.state,
+                }
+            )
 
         # Populate roads data
         for road in junction.roads:
@@ -369,7 +382,7 @@ class Client:
                 "from": road.get_from_side().name,
                 "to": road.get_to_side().name,
                 "congection_level": 0,  # Intentionally left as 0 to match original code
-                "lanes": []
+                "lanes": [],
             }
 
             for lane in road.lanes:
@@ -381,5 +394,3 @@ class Client:
             junction_dict["junction"]["roads"].append(road_info)
 
         return junction_dict
-
-

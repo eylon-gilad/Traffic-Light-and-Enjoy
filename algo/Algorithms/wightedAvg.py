@@ -24,8 +24,12 @@ class wightedAvg(BaseAlgorithm):
         self.epsilon: float = 0.01
         # Tracks waiting times for each traffic-light combination:
         # self.cars_time_tracker[(light_id_tuple)][car_id] = [time_waiting, start_time]
-        self.cars_time_tracker: Dict[Tuple[int, ...], Dict[int, List[float]]] = defaultdict(dict)
-        self.combinations: List[Tuple[int, ...]] = TrafficLightsCombinator(junction).get_combinations()
+        self.cars_time_tracker: Dict[Tuple[int, ...], Dict[int, List[float]]] = (
+            defaultdict(dict)
+        )
+        self.combinations: List[Tuple[int, ...]] = TrafficLightsCombinator(
+            junction
+        ).get_combinations()
         for comb in self.combinations:
             self.cars_time_tracker[comb] = {}
         # Holds the final cost for each combination
@@ -108,4 +112,6 @@ class wightedAvg(BaseAlgorithm):
                             self.cars_time_tracker[comb][car_id] = [0.0, current_time]
                         else:
                             start_time = self.cars_time_tracker[comb][car_id][1]
-                            self.cars_time_tracker[comb][car_id][0] = current_time - start_time
+                            self.cars_time_tracker[comb][car_id][0] = (
+                                current_time - start_time
+                            )

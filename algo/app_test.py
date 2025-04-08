@@ -347,7 +347,9 @@ def test_get_traffic_light_state() -> None:
     print()
 
 
-def repeated_get_traffic_light_state(url: str, iterations: int = 100, delay: float = 5.0) -> None:
+def repeated_get_traffic_light_state(
+    url: str, iterations: int = 100, delay: float = 5.0
+) -> None:
     """
     Repeatedly call the '/traffic-light-state' endpoint `iterations` times,
     pausing for `delay` seconds between each call.

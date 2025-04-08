@@ -10,7 +10,9 @@ from typing import Dict, Tuple, Optional
 from sim.ui.config import SCREEN_WIDTH, SCREEN_HEIGHT
 
 
-def load_background_image(path: str = "../assets/background.png") -> Optional[pygame.Surface]:
+def load_background_image(
+    path: str = "../assets/background.png",
+) -> Optional[pygame.Surface]:
     """
     Loads and scales a background image. Returns None if loading fails.
     """
@@ -21,7 +23,9 @@ def load_background_image(path: str = "../assets/background.png") -> Optional[py
         return None
 
 
-def load_thwomp_image(path: str = "../assets/thwomp.png", size=(200, 200)) -> Optional[pygame.Surface]:
+def load_thwomp_image(
+    path: str = "../assets/thwomp.png", size=(200, 200)
+) -> Optional[pygame.Surface]:
     """
     Loads and scales the thwomp image to the exact given size,
     without preserving the original aspect ratio. Returns None if loading fails.
@@ -34,9 +38,9 @@ def load_thwomp_image(path: str = "../assets/thwomp.png", size=(200, 200)) -> Op
 
 
 def load_tl_image(
-        turn: str = "s",
-        folder: str = "../assets/turns",
-        size: Tuple[int, int] = (40, 40),
+    turn: str = "s",
+    folder: str = "../assets/turns",
+    size: Tuple[int, int] = (40, 40),
 ) -> pygame.Surface:
     """
     Loads and scales a background image. Returns None if loading fails.
@@ -47,9 +51,9 @@ def load_tl_image(
 
 
 def load_car_images(
-        num_images: int = 7,
-        folder: str = "../assets/",
-        size: Tuple[int, int] = (40, 40),
+    num_images: int = 7,
+    folder: str = "../assets/",
+    size: Tuple[int, int] = (40, 40),
 ) -> Dict[int, pygame.Surface]:
     """
     Loads car images from the specified folder.

@@ -4,11 +4,7 @@ from server import server  # Our Flask instance
 import os
 
 # Create the Dash app on top of the Flask server
-app = dash.Dash(
-    __name__,
-    server=server,
-    suppress_callback_exceptions=True
-)
+app = dash.Dash(__name__, server=server, suppress_callback_exceptions=True)
 
 # Import your pages (AFTER creating app)
 from pages import page1_car_time
@@ -18,13 +14,15 @@ from pages import page4_collisions
 from pages import page5_correlation
 
 # Main layout with multi-page routing
-app.layout = html.Div([
-    dcc.Location(id="url", refresh=False),
-    html.Div(id="page-content"),
+app.layout = html.Div(
+    [
+        dcc.Location(id="url", refresh=False),
+        html.Div(id="page-content"),
+        # Refresh plots every 2 seconds
+        dcc.Interval(id="interval-component", interval=2000, n_intervals=0),
+    ]
+)
 
-    # Refresh plots every 2 seconds
-    dcc.Interval(id="interval-component", interval=2000, n_intervals=0),
-])
 
 # Simple router to swap pages
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
@@ -40,6 +38,7 @@ def display_page(pathname):
     else:
         # Default page-1 if blank or unknown
         return page1_car_time.layout
+
 
 if __name__ == "__main__":
     # Run on port 8050 by default; no need for root privileges

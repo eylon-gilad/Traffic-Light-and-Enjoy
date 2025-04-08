@@ -39,8 +39,12 @@ class DynamicWeightedTrafficController(BaseAlgorithm):
 
         # Tracks waiting times for each traffic-light combination.
         # Format: self.cars_time_tracker[(light_id_tuple)][car_id] = [waiting_time, start_time]
-        self.cars_time_tracker: Dict[Tuple[int, ...], Dict[int, List[float]]] = defaultdict(dict)
-        self.combinations: List[Tuple[int, ...]] = TrafficLightsCombinator(junction).get_combinations()
+        self.cars_time_tracker: Dict[Tuple[int, ...], Dict[int, List[float]]] = (
+            defaultdict(dict)
+        )
+        self.combinations: List[Tuple[int, ...]] = TrafficLightsCombinator(
+            junction
+        ).get_combinations()
         for comb in self.combinations:
             self.cars_time_tracker[comb] = {}
 
@@ -66,8 +70,10 @@ class DynamicWeightedTrafficController(BaseAlgorithm):
                     # Use hysteresis to avoid rapid switching:
                     if self.current_combination is not None:
                         current_score = self.costs.get(self.current_combination, 0)
-                        if (best_combination == self.current_combination or
-                            (best_score - current_score) < self.hysteresis_threshold):
+                        if (
+                            best_combination == self.current_combination
+                            or (best_score - current_score) < self.hysteresis_threshold
+                        ):
                             best_combination = self.current_combination
 
                     # Update traffic lights based on the selected combination.
@@ -139,4 +145,6 @@ class DynamicWeightedTrafficController(BaseAlgorithm):
                             self.cars_time_tracker[comb][car_id] = [0.0, current_time]
                         else:
                             start_time = self.cars_time_tracker[comb][car_id][1]
-                            self.cars_time_tracker[comb][car_id][0] = current_time - start_time
+                            self.cars_time_tracker[comb][car_id][0] = (
+                                current_time - start_time
+                            )

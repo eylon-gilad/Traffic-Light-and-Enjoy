@@ -27,8 +27,12 @@ class ExpCarsOnTimeController(BaseAlgorithm):
         self.epsilon: float = 0.01
         # Tracks how long each car has been on each combination of traffic lights:
         # self.cars_time_tracker[ (light_id_tuple) ][car_id ] = [time_waiting, start_time]
-        self.cars_time_tracker: Dict[Tuple[int, ...], Dict[int, List[float]]] = defaultdict(dict)
-        self.combinations: List[Tuple[int, ...]] = TrafficLightsCombinator(junction).get_combinations()
+        self.cars_time_tracker: Dict[Tuple[int, ...], Dict[int, List[float]]] = (
+            defaultdict(dict)
+        )
+        self.combinations: List[Tuple[int, ...]] = TrafficLightsCombinator(
+            junction
+        ).get_combinations()
         for comb in self.combinations:
             self.cars_time_tracker[comb] = defaultdict()
 
@@ -105,7 +109,7 @@ class ExpCarsOnTimeController(BaseAlgorithm):
             if count_cars != 0:
                 # Original formula: cost = (count_cars+1)^(avg_time)
                 avg_time = time_sum / count_cars
-                self.costs[combination] = [(count_cars + 1) ** (avg_time+1)]
+                self.costs[combination] = [(count_cars + 1) ** (avg_time + 1)]
 
     def set_cars_time(self) -> None:
         """
@@ -113,7 +117,9 @@ class ExpCarsOnTimeController(BaseAlgorithm):
         """
         for comb in self.combinations:
             for traffic_light_id in comb:
-                origins: List[int] = self.junction.get_traffic_light_by_id(traffic_light_id).get_origins()
+                origins: List[int] = self.junction.get_traffic_light_by_id(
+                    traffic_light_id
+                ).get_origins()
                 road_id: int = origins[0] // 10
                 road: Road = self.junction.get_road_by_id(road_id)
                 # For each lane that leads to this traffic light, track waiting times
@@ -121,7 +127,10 @@ class ExpCarsOnTimeController(BaseAlgorithm):
                     for car in lane.cars:
                         if car.get_id() not in self.cars_time_tracker[comb]:
                             # Store [delta_time, start_time]
-                            self.cars_time_tracker[comb][car.get_id()] = [0.0, time.time()]
+                            self.cars_time_tracker[comb][car.get_id()] = [
+                                0.0,
+                                time.time(),
+                            ]
                         else:
                             _, start_time = self.cars_time_tracker[comb][car.get_id()]
                             self.cars_time_tracker[comb][car.get_id()] = [

@@ -18,7 +18,7 @@ def random_remove_traffic_lights(amount_road: int = 4) -> list[tuple[int, int]]:
     :return: A list of pairs representing traffic lights to be removed.
     """
     remove_lights: list[tuple[int, int]] = []
-    remove_amount: int = random.randint(0, amount_road ** 2 - 1)
+    remove_amount: int = random.randint(0, amount_road**2 - 1)
 
     for _ in range(remove_amount):
         road_pair: tuple[int, int] = (
@@ -51,7 +51,7 @@ def random_merge_lights(amount_road: int = 4) -> list[tuple[list[int], list[int]
     :return: A list of traffic lights represented by the roads they control.
     """
     merged_lights: list[tuple[list[int], list[int]]] = []
-    merged_amount: int = random.randint(0, amount_road ** 2 - 1)
+    merged_amount: int = random.randint(0, amount_road**2 - 1)
     for _ in range(merged_amount):
         inputs: list[int] = get_random_array_numbers(amount_road)
         outputs: list[int] = get_random_array_numbers(amount_road)
@@ -60,11 +60,11 @@ def random_merge_lights(amount_road: int = 4) -> list[tuple[list[int], list[int]
 
 
 def create_light(
-        jun_index: int = 1,
-        traffic_light_index: int = None,
-        input_index: list[int] = None,
-        output_index: list[int] = None,
-        state: bool = RED_LIGHT,
+    jun_index: int = 1,
+    traffic_light_index: int = None,
+    input_index: list[int] = None,
+    output_index: list[int] = None,
+    state: bool = RED_LIGHT,
 ) -> TrafficLight:
     """
     Creates a traffic light object.
@@ -86,10 +86,10 @@ def create_light(
 
 
 def create_all_lights(
-        jun_index: int = 1,
-        amount_road: int = 4,
-        black_list: list[tuple[int, int]] = None,
-        merged_lights: list[tuple[list[int], list[int]]] = None,
+    jun_index: int = 1,
+    amount_road: int = 4,
+    black_list: list[tuple[int, int]] = None,
+    merged_lights: list[tuple[list[int], list[int]]] = None,
 ) -> list[TrafficLight]:
     """
     Creates an array of all the traffic lights.
@@ -156,12 +156,14 @@ def create_roads(junction_index: int = 1, amount_road: int = 4) -> list[Road]:
     roads: list[Road] = []
     for i in range(amount_road):
         index = junction_index * 10 + i
-        directions=index_to_directions(i)
-        road = Road(index,
-                    create_lanes(index, 3),
-                    congection_level=0,
-                    from_side=directions[0],
-                    to_side=directions[1])
+        directions = index_to_directions(i)
+        road = Road(
+            index,
+            create_lanes(index, 3),
+            congection_level=0,
+            from_side=directions[0],
+            to_side=directions[1],
+        )
 
         roads.append(road)
     return roads
@@ -179,7 +181,7 @@ def index_to_directions(road_index: int):
     if road_index % 2 == 0:
         to_directions = index_direction[road_index + 1]
     else:
-        to_directions = index_direction[road_index-1]
+        to_directions = index_direction[road_index - 1]
 
     return from_direction, to_directions
 
@@ -213,10 +215,10 @@ def create_all_json() -> str:
 
 def direction_to_index(direction: RoadEnum, junction: Junction):
     """
-       returning index from directions
-       :input: two direction where the road starts and end
-       :output: the road index
-       """
+    returning index from directions
+    :input: two direction where the road starts and end
+    :output: the road index
+    """
     for road in junction.get_roads():
         if road.from_side == direction:
             return road.get_id()

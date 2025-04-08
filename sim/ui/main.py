@@ -42,7 +42,9 @@ def main() -> None:
     sim.start()
 
     while running:
-        dt = clock.tick(FPS) / 1000.0  # Delta time in seconds (currently unused, but could pass to sim updates)
+        dt = (
+            clock.tick(FPS) / 1000.0
+        )  # Delta time in seconds (currently unused, but could pass to sim updates)
 
         # Handle events (quit, toggle debug)
         running, show_debug = handle_events(show_debug)
@@ -54,7 +56,7 @@ def main() -> None:
             car_images=car_images,
             bg_image=bg_image,
             show_debug=show_debug,
-            debug_font=debug_font
+            debug_font=debug_font,
         )
 
         pygame.display.flip()

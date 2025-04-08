@@ -10,6 +10,7 @@ class LanesGenerator:
     """
     Generates lanes for given roads (need only to pass road ids)
     """
+
     MIN_LANES_IN_ROAD = 2
     MAX_LANES_IN_ROAD = 3
 
@@ -31,7 +32,9 @@ class LanesGenerator:
         """
         lanes_of_roads: Dict[int, List[Lane]] = defaultdict(list)
 
-        num_of_lanes_in_road: List[int] = LanesGenerator.__generate_num_of_lanes_in_road(len(self.road_ids))
+        num_of_lanes_in_road: List[int] = (
+            LanesGenerator.__generate_num_of_lanes_in_road(len(self.road_ids))
+        )
 
         # Create for each road the amount of lanes that was generated
         for i, num_of_lanes in enumerate(num_of_lanes_in_road):
@@ -40,11 +43,13 @@ class LanesGenerator:
 
             # Create "num_of_lanes" lanes for the road
             for _ in range(num_of_lanes):
-                lanes.append(Lane(
-                    lane_id=int(str(self.road_ids[i]) + str(current_lane_index)),
-                    car_creation=random.uniform(0.003, 0.013),
-                    lane_max_vel=random.gauss(150, 1/3)
-                ))
+                lanes.append(
+                    Lane(
+                        lane_id=int(str(self.road_ids[i]) + str(current_lane_index)),
+                        car_creation=random.uniform(0.003, 0.013),
+                        lane_max_vel=random.gauss(150, 1 / 3),
+                    )
+                )
 
                 current_lane_index += 1
 
@@ -61,6 +66,10 @@ class LanesGenerator:
 
         result: List[int] = []
         for _ in range(num_of_roads):
-            result.append(random.randint(LanesGenerator.MIN_LANES_IN_ROAD, LanesGenerator.MAX_LANES_IN_ROAD))
+            result.append(
+                random.randint(
+                    LanesGenerator.MIN_LANES_IN_ROAD, LanesGenerator.MAX_LANES_IN_ROAD
+                )
+            )
 
         return result

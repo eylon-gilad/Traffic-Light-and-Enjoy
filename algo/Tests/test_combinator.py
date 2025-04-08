@@ -100,12 +100,18 @@ def build_traffic_lights1() -> List[TrafficLight]:
     Create a set of traffic lights with specified origins/destinations.
     """
     return [
-        TrafficLight(light_id=1, origins=[111, 112], destinations=[111, 112], state=False),
+        TrafficLight(
+            light_id=1, origins=[111, 112], destinations=[111, 112], state=False
+        ),
         TrafficLight(light_id=2, origins=[135], destinations=[135], state=False),
         TrafficLight(light_id=3, origins=[136], destinations=[111, 112], state=False),
-        TrafficLight(light_id=4, origins=[124], destinations=[124, 147, 148], state=False),
+        TrafficLight(
+            light_id=4, origins=[124], destinations=[124, 147, 148], state=False
+        ),
         TrafficLight(light_id=5, origins=[123], destinations=[123, 136], state=False),
-        TrafficLight(light_id=6, origins=[148], destinations=[148, 111, 112], state=False),
+        TrafficLight(
+            light_id=6, origins=[148], destinations=[148, 111, 112], state=False
+        ),
         TrafficLight(light_id=7, origins=[147], destinations=[147], state=False),
     ]
 
@@ -116,11 +122,15 @@ def build_traffic_lights2() -> List[TrafficLight]:
     """
     return [
         TrafficLight(light_id=1, origins=[111], destinations=[111, 135], state=False),
-        TrafficLight(light_id=2, origins=[112], destinations=[112, 147, 148], state=False),
+        TrafficLight(
+            light_id=2, origins=[112], destinations=[112, 147, 148], state=False
+        ),
         TrafficLight(light_id=3, origins=[135], destinations=[123, 124], state=False),
         TrafficLight(light_id=4, origins=[136], destinations=[136], state=False),
         TrafficLight(light_id=5, origins=[124], destinations=[124], state=False),
-        TrafficLight(light_id=6, origins=[123], destinations=[123, 135, 136], state=False),
+        TrafficLight(
+            light_id=6, origins=[123], destinations=[123, 135, 136], state=False
+        ),
         TrafficLight(light_id=7, origins=[148], destinations=[111, 112], state=False),
         TrafficLight(light_id=8, origins=[147], destinations=[123, 124], state=False),
     ]
@@ -140,7 +150,7 @@ def build_traffic_lights3() -> List[TrafficLight]:
         TrafficLight(light_id=7, origins=[136], destinations=[110, 136], state=False),
         TrafficLight(light_id=8, origins=[137], destinations=[137], state=False),
         TrafficLight(light_id=9, origins=[148], destinations=[112, 148], state=False),
-        TrafficLight(light_id=10, origins=[149], destinations=[149], state=False)
+        TrafficLight(light_id=10, origins=[149], destinations=[149], state=False),
     ]
 
 
@@ -158,7 +168,7 @@ def build_traffic_lights4() -> List[TrafficLight]:
         TrafficLight(light_id=7, origins=[136], destinations=[125], state=False),
         TrafficLight(light_id=8, origins=[137], destinations=[137], state=False),
         TrafficLight(light_id=9, origins=[148], destinations=[123], state=False),
-        TrafficLight(light_id=10, origins=[149], destinations=[110], state=False)
+        TrafficLight(light_id=10, origins=[149], destinations=[110], state=False),
     ]
 
 

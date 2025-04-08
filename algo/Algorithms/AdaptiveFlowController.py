@@ -21,17 +21,23 @@ class AdaptiveFlowController(BaseAlgorithm):
         super().__init__(junction)
         # For each combination, track car statuses:
         # self.car_status[combination][car_id] = (current_waiting_time, start_time)
-        self.car_status: Dict[Tuple[int, ...], Dict[int, Tuple[float, float]]] = defaultdict(dict)
-        self.combinations: List[Tuple[int, ...]] = TrafficLightsCombinator(junction).get_combinations()
+        self.car_status: Dict[Tuple[int, ...], Dict[int, Tuple[float, float]]] = (
+            defaultdict(dict)
+        )
+        self.combinations: List[Tuple[int, ...]] = TrafficLightsCombinator(
+            junction
+        ).get_combinations()
         for comb in self.combinations:
             self.car_status[comb] = {}
         # Will hold the computed score for each combination
         self.scores: Dict[Tuple[int, ...], float] = {}
 
         # Parameters for scoring
-        self.wait_weight: float = 1.2   # Weight for average waiting time
+        self.wait_weight: float = 1.2  # Weight for average waiting time
         self.density_weight: float = 1.0  # Weight for the number of cars
-        self.decay_factor: float = 0.8    # Exponential decay for smoothing waiting time updates
+        self.decay_factor: float = (
+            0.8  # Exponential decay for smoothing waiting time updates
+        )
 
     def start(self) -> None:
         """
@@ -58,7 +64,9 @@ class AdaptiveFlowController(BaseAlgorithm):
         try:
             roads = self.junction.get_roads()
             lanes = [lane for road in roads for lane in road.get_lanes()]
-            current_car_ids = {car.get_id() for lane in lanes for car in lane.get_cars()}
+            current_car_ids = {
+                car.get_id() for lane in lanes for car in lane.get_cars()
+            }
         except Exception as e:
             logging.error(f"Error fetching current cars: {e}")
             return
@@ -84,7 +92,10 @@ class AdaptiveFlowController(BaseAlgorithm):
                             prev_wait, start_time = self.car_status[comb][cid]
                             new_wait = current_time - start_time
                             # Smooth waiting time with an exponential decay
-                            updated_wait = self.decay_factor * prev_wait + (1 - self.decay_factor) * new_wait
+                            updated_wait = (
+                                self.decay_factor * prev_wait
+                                + (1 - self.decay_factor) * new_wait
+                            )
                             self.car_status[comb][cid] = (updated_wait, start_time)
                         else:
                             # New car: initialize waiting time

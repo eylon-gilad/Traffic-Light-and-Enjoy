@@ -11,10 +11,17 @@ from typing import Dict, Tuple, List
 import pygame
 
 from config import (
-    SCREEN_WIDTH, SCREEN_HEIGHT, CX, CY,
-    BACKGROUND_COLOR, ASPHALT_COLOR, INTERSECTION_COLOR,
-    LANE_MARKING_COLOR, CAR_DEBUG_COLOR,
-    LANE_WIDTH, LANE_GAP,
+    SCREEN_WIDTH,
+    SCREEN_HEIGHT,
+    CX,
+    CY,
+    BACKGROUND_COLOR,
+    ASPHALT_COLOR,
+    INTERSECTION_COLOR,
+    LANE_MARKING_COLOR,
+    CAR_DEBUG_COLOR,
+    LANE_WIDTH,
+    LANE_GAP,
     get_road_total_width,
 )
 from sim.Sim import Sim
@@ -33,7 +40,7 @@ def draw_game_screen(
     car_images: Dict[int, pygame.Surface],
     bg_image: pygame.Surface,
     show_debug: bool,
-    debug_font: pygame.font.Font
+    debug_font: pygame.font.Font,
 ) -> None:
     """
     The main rendering function.
@@ -78,7 +85,9 @@ def draw_game_screen(
                     car.img_index = random.randint(1, len(car_images))
                 car_img: pygame.Surface = car_images[car.img_index]
 
-                x, y, angle = _compute_car_position(road, lane_idx, lane, car, shifts, sim)
+                x, y, angle = _compute_car_position(
+                    road, lane_idx, lane, car, shifts, sim
+                )
                 rotated = pygame.transform.rotate(car_img, angle)
 
                 # Flip the sprite horizontally when facing EAST
@@ -112,10 +121,16 @@ def _compute_shifts(sim: Sim, junction: Junction) -> dict:
         return len(junction.get_road_by_id(road_id).get_lanes())
 
     return {
-        "NORTH": -10 - get_road_total_width(get_len_lanes(direction_to_index(RoadEnum.NORTH, junction))),
+        "NORTH": -10
+        - get_road_total_width(
+            get_len_lanes(direction_to_index(RoadEnum.NORTH, junction))
+        ),
         "SOUTH": 10,
         "WEST": 10,
-        "EAST": -10 - get_road_total_width(get_len_lanes(direction_to_index(RoadEnum.EAST, junction))),
+        "EAST": -10
+        - get_road_total_width(
+            get_len_lanes(direction_to_index(RoadEnum.EAST, junction))
+        ),
     }
 
 
@@ -149,11 +164,7 @@ def _draw_full_road(screen: pygame.Surface, road: Road, shifts: dict) -> None:
 
 
 def _draw_lane_boundaries_vertical(
-    screen: pygame.Surface,
-    left: int,
-    top: int,
-    width: int,
-    height: int
+    screen: pygame.Surface, left: int, top: int, width: int, height: int
 ) -> None:
     x_left: int = left
     x_right: int = left + width
@@ -161,16 +172,14 @@ def _draw_lane_boundaries_vertical(
     y_top: int = SCREEN_HEIGHT
 
     while x_left <= x_right:
-        pygame.draw.line(screen, LANE_MARKING_COLOR, (x_left, y_top), (x_left, y_bot), 2)
+        pygame.draw.line(
+            screen, LANE_MARKING_COLOR, (x_left, y_top), (x_left, y_bot), 2
+        )
         x_left += LANE_WIDTH
 
 
 def _draw_lane_boundaries_horizontal(
-    screen: pygame.Surface,
-    left: int,
-    top: int,
-    width: int,
-    height: int
+    screen: pygame.Surface, left: int, top: int, width: int, height: int
 ) -> None:
     y_top: int = top
     y_bot: int = top + height
@@ -178,29 +187,43 @@ def _draw_lane_boundaries_horizontal(
     x_right: int = SCREEN_WIDTH
 
     while y_top <= y_bot:
-        pygame.draw.line(screen, LANE_MARKING_COLOR, (x_left, y_top), (x_right, y_top), 2)
+        pygame.draw.line(
+            screen, LANE_MARKING_COLOR, (x_left, y_top), (x_right, y_top), 2
+        )
         y_top += LANE_WIDTH
 
 
-def _draw_intersection(screen: pygame.Surface, sim: Sim, junction: Junction, show_debug: bool) -> None:
+def _draw_intersection(
+    screen: pygame.Surface, sim: Sim, junction: Junction, show_debug: bool
+) -> None:
     """
     Draw the intersection rectangle on top of the roads.
     """
     from sim.creator.create_sim import direction_to_index
 
     # Start coords
-    start_y = CY - _get_road_width_from_id(sim, direction_to_index(RoadEnum.NORTH, junction)) - 10
-    start_x = CX - _get_road_width_from_id(sim, direction_to_index(RoadEnum.EAST, junction)) - 10
+    start_y = (
+        CY
+        - _get_road_width_from_id(sim, direction_to_index(RoadEnum.NORTH, junction))
+        - 10
+    )
+    start_x = (
+        CX
+        - _get_road_width_from_id(sim, direction_to_index(RoadEnum.EAST, junction))
+        - 10
+    )
 
     end_y = (
         _get_road_width_from_id(sim, direction_to_index(RoadEnum.NORTH, junction))
         + _get_road_width_from_id(sim, direction_to_index(RoadEnum.SOUTH, junction))
-        + 2*10 + LANE_GAP / 4
+        + 2 * 10
+        + LANE_GAP / 4
     )
     end_x = (
         _get_road_width_from_id(sim, direction_to_index(RoadEnum.WEST, junction))
         + _get_road_width_from_id(sim, direction_to_index(RoadEnum.EAST, junction))
-        + 2*10 + LANE_GAP / 4
+        + 2 * 10
+        + LANE_GAP / 4
     )
 
     intersection_rect = pygame.Rect(start_y, start_x, end_y, end_x)
@@ -221,12 +244,7 @@ def _get_road_width_from_id(sim: Sim, road_id: int) -> int:
 
 
 def _compute_car_position(
-    road: Road,
-    lane_idx: int,
-    lane: Lane,
-    car: Car,
-    shifts: dict,
-    sim: Sim
+    road: Road, lane_idx: int, lane: Lane, car: Car, shifts: dict, sim: Sim
 ) -> Tuple[float, float, float]:
     """
     Returns (x, y, angle) for a car, factoring in direction and shifts.
@@ -240,8 +258,7 @@ def _compute_car_position(
 
     # For each lane index, figure out the lane-center offset (reverse index so left lane is index 0 visually).
     lane_offsets = [
-        LANE_WIDTH * (num_lanes - 1 - i) + (LANE_WIDTH // 2)
-        for i in range(num_lanes)
+        LANE_WIDTH * (num_lanes - 1 - i) + (LANE_WIDTH // 2) for i in range(num_lanes)
     ]
     lane_center_offset = lane_offsets[lane_idx]
     shift = shifts.get(direction_str, 0)
@@ -253,7 +270,13 @@ def _compute_car_position(
         angle = -90
         left_boundary = CX + shift
         x = left_boundary + lane_center_offset
-        shift_y = CY - _get_road_width_from_id(sim, direction_to_index(RoadEnum.EAST, sim.get_junctions()[0])) - 10
+        shift_y = (
+            CY
+            - _get_road_width_from_id(
+                sim, direction_to_index(RoadEnum.EAST, sim.get_junctions()[0])
+            )
+            - 10
+        )
 
         if dist >= 0:
             top_of_road = shift_y - lane.LENGTH
@@ -266,7 +289,13 @@ def _compute_car_position(
         angle = 90
         left_boundary = CX + shift
         x = left_boundary + lane_center_offset
-        shift_y = CY + _get_road_width_from_id(sim, direction_to_index(RoadEnum.WEST, sim.get_junctions()[0])) + 10
+        shift_y = (
+            CY
+            + _get_road_width_from_id(
+                sim, direction_to_index(RoadEnum.WEST, sim.get_junctions()[0])
+            )
+            + 10
+        )
 
         if dist >= 0:
             bottom_of_road = shift_y + lane.LENGTH
@@ -279,7 +308,13 @@ def _compute_car_position(
         angle = 0
         top_boundary = CY + shift
         y = top_boundary + lane_center_offset
-        shift_x = CX + _get_road_width_from_id(sim, direction_to_index(RoadEnum.SOUTH, sim.get_junctions()[0])) + 10
+        shift_x = (
+            CX
+            + _get_road_width_from_id(
+                sim, direction_to_index(RoadEnum.SOUTH, sim.get_junctions()[0])
+            )
+            + 10
+        )
 
         if dist >= 0:
             right_of_road = shift_x + lane.LENGTH
@@ -292,7 +327,13 @@ def _compute_car_position(
         angle = 0
         top_boundary = CY + shift
         y = top_boundary + lane_center_offset
-        shift_x = CX - _get_road_width_from_id(sim, direction_to_index(RoadEnum.NORTH, sim.get_junctions()[0])) - 10
+        shift_x = (
+            CX
+            - _get_road_width_from_id(
+                sim, direction_to_index(RoadEnum.NORTH, sim.get_junctions()[0])
+            )
+            - 10
+        )
 
         if dist >= 0:
             left_of_road = shift_x - lane.LENGTH
@@ -311,7 +352,7 @@ def _draw_lane_debug_info(
     lane: Lane,
     shifts: dict,
     sim: Sim,
-    font: pygame.font.Font
+    font: pygame.font.Font,
 ) -> None:
     """
     Draws text (lane ID, car count) near the midpoint of each lane.
@@ -326,11 +367,7 @@ def _draw_lane_debug_info(
 
 
 def _compute_position_at_dist(
-    road: Road,
-    lane_idx: int,
-    dist: float,
-    shifts: dict,
-    sim: Sim
+    road: Road, lane_idx: int, dist: float, shifts: dict, sim: Sim
 ) -> Tuple[float, float, float]:
     """
     Helper for positioning debug text in the lane center.
@@ -340,8 +377,7 @@ def _compute_position_at_dist(
     direction_str = RoadEnum(road.get_from_side()).name
     num_lanes = len(road.get_lanes())
     lane_offsets = [
-        LANE_WIDTH * (num_lanes - 1 - i) + (LANE_WIDTH // 2)
-        for i in range(num_lanes)
+        LANE_WIDTH * (num_lanes - 1 - i) + (LANE_WIDTH // 2) for i in range(num_lanes)
     ]
     lane_center_offset = lane_offsets[lane_idx]
     shift = shifts.get(direction_str, 0)
@@ -353,38 +389,59 @@ def _compute_position_at_dist(
         angle = -90
         left_boundary = CX + shift
         x = left_boundary + lane_center_offset
-        shift_y = CY - _get_road_width_from_id(sim, direction_to_index(RoadEnum.EAST, sim.get_junctions()[0])) - 10
+        shift_y = (
+            CY
+            - _get_road_width_from_id(
+                sim, direction_to_index(RoadEnum.EAST, sim.get_junctions()[0])
+            )
+            - 10
+        )
         y = (shift_y - length) + dist
 
     elif direction_str == "SOUTH":
         angle = 90
         left_boundary = CX + shift
         x = left_boundary + lane_center_offset
-        shift_y = CY + _get_road_width_from_id(sim, direction_to_index(RoadEnum.WEST, sim.get_junctions()[0])) + 10
+        shift_y = (
+            CY
+            + _get_road_width_from_id(
+                sim, direction_to_index(RoadEnum.WEST, sim.get_junctions()[0])
+            )
+            + 10
+        )
         y = shift_y + (length - dist)
 
     elif direction_str == "EAST":
         angle = 180
         top_boundary = CY + shift
         y = top_boundary + lane_center_offset
-        shift_x = CX + _get_road_width_from_id(sim, direction_to_index(RoadEnum.SOUTH, sim.get_junctions()[0])) + 10
+        shift_x = (
+            CX
+            + _get_road_width_from_id(
+                sim, direction_to_index(RoadEnum.SOUTH, sim.get_junctions()[0])
+            )
+            + 10
+        )
         x = shift_x + (length - dist)
 
     elif direction_str == "WEST":
         angle = 0
         top_boundary = CY + shift
         y = top_boundary + lane_center_offset
-        shift_x = CX - _get_road_width_from_id(sim, direction_to_index(RoadEnum.NORTH, sim.get_junctions()[0])) - 10
+        shift_x = (
+            CX
+            - _get_road_width_from_id(
+                sim, direction_to_index(RoadEnum.NORTH, sim.get_junctions()[0])
+            )
+            - 10
+        )
         x = (shift_x - length) + dist
 
     return x, y, angle
 
 
 def _draw_traffic_light(
-    screen: pygame.Surface,
-    sim: Sim,
-    tl: TrafficLight,
-    shifts: dict
+    screen: pygame.Surface, sim: Sim, tl: TrafficLight, shifts: dict
 ) -> None:
     """
     Renders a traffic light near the intersection center.
@@ -392,7 +449,11 @@ def _draw_traffic_light(
     from sim.creator.create_sim import direction_to_index
 
     is_green: bool = tl.get_state()
-    color: Tuple[int, int, int] = (255, 255, 0) if tl.get_is_yellow() else (0, 255, 0) if is_green else (255, 0, 0)
+    color: Tuple[int, int, int] = (
+        (255, 255, 0)
+        if tl.get_is_yellow()
+        else (0, 255, 0) if is_green else (255, 0, 0)
+    )
 
     junction = sim.get_junctions()[0] if sim.get_junctions() else None
     if not junction or not tl.get_origins():
@@ -405,7 +466,9 @@ def _draw_traffic_light(
     min_lane_in_road = min(l.get_id() for l in road.get_lanes())
     num_lanes_in_road = len(road.get_lanes())
 
-    lane_offsets = [LANE_WIDTH * (num_lanes_in_road - 1 - i) for i in range(num_lanes_in_road)]
+    lane_offsets = [
+        LANE_WIDTH * (num_lanes_in_road - 1 - i) for i in range(num_lanes_in_road)
+    ]
     direction_str = RoadEnum(direction_val).name
 
     lw: int = 12
@@ -417,7 +480,9 @@ def _draw_traffic_light(
             cur_road: Road = junction.get_road_by_id(origin // 10)
             dest_road: Road = junction.get_road_by_id(dest // 10)
 
-            turn_type = (dest_road.get_from_side().value - cur_road.get_from_side().value) % 4
+            turn_type = (
+                dest_road.get_from_side().value - cur_road.get_from_side().value
+            ) % 4
 
             if origin in tl.get_destinations() and "straight" not in turns:
                 turns += "straight"
@@ -426,14 +491,22 @@ def _draw_traffic_light(
             if turn_type == 3 and "left" not in turns:  # Turn left
                 turns += "left"
 
-
     # Positioning logic similar to your original code
     if direction_val == RoadEnum.NORTH:
-        y = CY - _get_road_width_from_id(sim, direction_to_index(RoadEnum.EAST, junction)) - 4 * LANE_GAP
+        y = (
+            CY
+            - _get_road_width_from_id(sim, direction_to_index(RoadEnum.EAST, junction))
+            - 4 * LANE_GAP
+        )
         for origin in tl.get_origins():
             offset_idx = origin - min_lane_in_road
 
-            c_lane = CX + shifts.get(direction_str) + lane_offsets[offset_idx] + LANE_WIDTH / 2
+            c_lane = (
+                CX
+                + shifts.get(direction_str)
+                + lane_offsets[offset_idx]
+                + LANE_WIDTH / 2
+            )
 
             pygame.draw.circle(screen, color, (c_lane, y + 10), 15)
 
@@ -442,11 +515,20 @@ def _draw_traffic_light(
             screen.blit(image, (c_lane - 15, y - 5))
 
     elif direction_val == RoadEnum.EAST:
-        x = CX + _get_road_width_from_id(sim, direction_to_index(RoadEnum.SOUTH, junction)) + 1.25 * LANE_GAP
+        x = (
+            CX
+            + _get_road_width_from_id(sim, direction_to_index(RoadEnum.SOUTH, junction))
+            + 1.25 * LANE_GAP
+        )
         for origin in tl.get_origins():
             offset_idx = origin - min_lane_in_road
 
-            c_lane = CY + shifts.get(direction_str) + lane_offsets[offset_idx] + LANE_WIDTH / 2
+            c_lane = (
+                CY
+                + shifts.get(direction_str)
+                + lane_offsets[offset_idx]
+                + LANE_WIDTH / 2
+            )
 
             pygame.draw.circle(screen, color, (x + 15, c_lane), 15)
 
@@ -456,11 +538,20 @@ def _draw_traffic_light(
 
     elif direction_val == RoadEnum.SOUTH:
         start_x = CX + shifts.get(direction_str) + (LANE_WIDTH - lw) / 2
-        y = CY + _get_road_width_from_id(sim, direction_to_index(RoadEnum.WEST, junction)) + 1.25 * LANE_GAP
+        y = (
+            CY
+            + _get_road_width_from_id(sim, direction_to_index(RoadEnum.WEST, junction))
+            + 1.25 * LANE_GAP
+        )
         for origin in tl.get_origins():
             offset_idx = origin - min_lane_in_road
 
-            c_lane = CX + shifts.get(direction_str) + lane_offsets[offset_idx] + LANE_WIDTH / 2
+            c_lane = (
+                CX
+                + shifts.get(direction_str)
+                + lane_offsets[offset_idx]
+                + LANE_WIDTH / 2
+            )
 
             pygame.draw.circle(screen, color, (c_lane, y + 15), 15)
 
@@ -469,11 +560,20 @@ def _draw_traffic_light(
 
     elif direction_val == RoadEnum.WEST:
         start_y = CY + shifts.get(direction_str) + (LANE_WIDTH - lw) / 2
-        x = CX - _get_road_width_from_id(sim, direction_to_index(RoadEnum.NORTH, junction)) - 2.25 * LANE_GAP
+        x = (
+            CX
+            - _get_road_width_from_id(sim, direction_to_index(RoadEnum.NORTH, junction))
+            - 2.25 * LANE_GAP
+        )
         for origin in tl.get_origins():
             offset_idx = origin - min_lane_in_road
 
-            c_lane = CY + shifts.get(direction_str) + lane_offsets[offset_idx] + LANE_WIDTH / 2
+            c_lane = (
+                CY
+                + shifts.get(direction_str)
+                + lane_offsets[offset_idx]
+                + LANE_WIDTH / 2
+            )
 
             pygame.draw.circle(screen, color, (x - 2, c_lane), 15)
 
@@ -487,7 +587,7 @@ def _draw_traffic_light_id(
     tl: TrafficLight,
     sim: Sim,
     shifts: dict,
-    font: pygame.font.Font
+    font: pygame.font.Font,
 ) -> None:
     """
     Draws the traffic light ID near its position, for debugging.
@@ -514,25 +614,41 @@ def _draw_traffic_light_id(
     lw: int = 12
     if direction_val == RoadEnum.NORTH:
         start_x = CX + shifts.get(direction_str) + (LANE_WIDTH - lw) / 2
-        y = CY - _get_road_width_from_id(sim, direction_to_index(RoadEnum.EAST, junction)) - 4 * LANE_GAP
+        y = (
+            CY
+            - _get_road_width_from_id(sim, direction_to_index(RoadEnum.EAST, junction))
+            - 4 * LANE_GAP
+        )
         x = start_x + (LANE_WIDTH * (offset_idx))
         label_rect.center = (x, y - 10)
 
     elif direction_val == RoadEnum.EAST:
         start_y = CY + shifts.get(direction_str) + (LANE_WIDTH - lw) / 2
-        x = CX + _get_road_width_from_id(sim, direction_to_index(RoadEnum.SOUTH, junction)) + 1.25 * LANE_GAP
+        x = (
+            CX
+            + _get_road_width_from_id(sim, direction_to_index(RoadEnum.SOUTH, junction))
+            + 1.25 * LANE_GAP
+        )
         y = start_y + (LANE_WIDTH * (offset_idx))
         label_rect.center = (x + 25, y)
 
     elif direction_val == RoadEnum.SOUTH:
         start_x = CX + shifts.get(direction_str) + (LANE_WIDTH - lw) / 2
-        y = CY + _get_road_width_from_id(sim, direction_to_index(RoadEnum.WEST, junction)) + 1.25 * LANE_GAP
+        y = (
+            CY
+            + _get_road_width_from_id(sim, direction_to_index(RoadEnum.WEST, junction))
+            + 1.25 * LANE_GAP
+        )
         x = start_x + (LANE_WIDTH * (offset_idx))
         label_rect.center = (x, y + 20)
 
     elif direction_val == RoadEnum.WEST:
         start_y = CY + shifts.get(direction_str) + (LANE_WIDTH - lw) / 2
-        x = CX - _get_road_width_from_id(sim, direction_to_index(RoadEnum.NORTH, junction)) - 2.25 * LANE_GAP
+        x = (
+            CX
+            - _get_road_width_from_id(sim, direction_to_index(RoadEnum.NORTH, junction))
+            - 2.25 * LANE_GAP
+        )
         y = start_y + (LANE_WIDTH * (offset_idx))
         label_rect.center = (x - 25, y)
 

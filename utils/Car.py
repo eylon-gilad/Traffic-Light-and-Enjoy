@@ -11,6 +11,7 @@ Changes:
 - Preserved existing functionality.
 """
 
+
 class Car:
     """
     Represents a single car in the traffic simulation.
@@ -18,7 +19,15 @@ class Car:
     destination lane/road, and a type (e.g., "CAR", "AMBULANCE").
     """
 
-    def __init__(self, car_id: int, dist: float, velocity: float, dest: int, car_type: str, origin: int = 0) -> None:
+    def __init__(
+        self,
+        car_id: int,
+        dist: float,
+        velocity: float,
+        dest: int,
+        car_type: str,
+        origin: int = 0,
+    ) -> None:
         """
         Initialize a Car object.
 
@@ -35,6 +44,7 @@ class Car:
         self.dest: int = dest
         self.origin: int = origin
         self.car_type: str = car_type
+
     def get_id(self) -> int:
         """
         Get the car's unique identifier.
