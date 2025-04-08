@@ -9,6 +9,7 @@ from algo.Algorithms.AdaptiveFlowController import AdaptiveFlowController
 from algo.Algorithms.DynamicWeightedTrafficController import DynamicWeightedTrafficController
 from algo.Algorithms.RoundRobin import RoundRobinController
 from algo.Algorithms.VolumeBasedController import VolumeBasedController
+from algo.Algorithms.SmartTrafficController import SmartTrafficController
 from utils import Junction
 
 
@@ -31,13 +32,14 @@ class AlgoRunner:
 
         # Choose which controller to use.
         # A threading lock to ensure thread-safe operations on the controller. (random for now)
-        all_controllers = [ExpCarsOnTimeController, wightedAvg, AdaptiveFlowController, DynamicWeightedTrafficController, RoundRobinController, VolumeBasedController]
+        all_controllers = [ExpCarsOnTimeController, wightedAvg, AdaptiveFlowController, DynamicWeightedTrafficController, RoundRobinController, VolumeBasedController, SmartTrafficController]
         # Randomly select one of the controllers.
-        selected_controller = random.choice(all_controllers)
-        print(selected_controller)
+        #selected_controller = random.choice(all_controllers)
+        #print(selected_controller)
         # Initialize the selected controller with the junction.
-        self.controller = selected_controller(junction)
+        #self.controller = selected_controller(junction)
         #self.controller = DynamicWeightedTrafficController(junction)
+        self.controller = SmartTrafficController(junction)
         #self.controller = AdaptiveFlowController(junction)
         #self.controller = RoundRobinController(junction)
         #self.controller = VolumeBasedController(junction)
