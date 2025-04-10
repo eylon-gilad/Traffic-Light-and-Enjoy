@@ -42,4 +42,4 @@ def display_page(pathname):
 
 if __name__ == "__main__":
     # Run on port 8050 by default; no need for root privileges
-    app.run(debug=False, host="127.0.0.1", port=8050)
+    app.run(debug=False, host="127.0.0.1", port=3000)

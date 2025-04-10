@@ -19,9 +19,9 @@ class SmartTrafficController(BaseAlgorithm):
     def __init__(
         self,
         junction: Junction,
-        alpha: float = 1.0,
-        beta: float = 5.0,
-        gamma: float = 1.0,
+        alpha: float = 2.0,
+        beta: float = 4.3,
+        gamma: float = 1.6,
         hysteresis_threshold: float = 10.0,
     ) -> None:
         """

@@ -27,8 +27,8 @@ class Client:
     TRAFFIC_LIGHT_STATE_URL: str = "http://127.0.0.1:8080/traffic-light-state"
     START_ALGORITHM_URL: str = "http://127.0.0.1:8080/start-algorithm"
     BUILD_JUNCTION_URL: str = "http://127.0.0.1:8080/build-junction"
-    UPDATE_STATISTICS_URL: str = "http://127.0.0.1:8050/update-data"
-    SEND_COLLISIONS: str = "http://127.0.0.1:8050/send_collision"
+    UPDATE_STATISTICS_URL: str = "http://127.0.0.1:3000/update-data"
+    SEND_COLLISIONS: str = "http://127.0.0.1:3000/send_collision"
 
     @staticmethod
     def start_algorithm() -> None:
